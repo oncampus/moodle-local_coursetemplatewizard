@@ -17,7 +17,8 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     local_oc_course_creation
+ * @package     local
+ * @subpackage  local_occoursecreation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,36 +26,30 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
-    if ($ADMIN->fulltree) {
-        global $DB;
-        $sql = "SELECT id,name From mdl_config_plugin WHERE plugin like 'format%' ";
+if ($hassiteconfig && $ADMIN->fulltree) {
+    global $DB;
+    $sql = "SELECT id,name From mdl_config_plugin WHERE plugin like 'format%' ";
 
-        $courseFormats = $DB->get_records("config_plugins");
-
-
-        $settings = new admin_settingpage('local_coursecreation', get_string('pluginname', 'oc_course_creation'));
-        $ADMIN->add('localplugins', $settings);
-
-        $name = 'local_oc_course_creation/setting_check_formats';
-        $title = get_string('course_formats', 'oc_course_creation');
-        $description = get_string('course_formats_desc', 'oc_course_creation');
-        $setting = new admin_setting_configmulticheckbox(
-            $name = "setting_check_formats",
-            $visiblename = get_string('setting_check_formats', 'oc_course_creation'),
-            $description = "Select all formats you want to be able to create",
-            $defaultsetting = array(),
-            $choices = array(
-                "name"=>"1",
-                "2"=>"2",
-                "3"=>"3",
-                "4"=>"4",
-                "5"=>"5",
-                "6"=>"6",
-            )
-        );
-
-        $settings->add($setting);
+    $courseFormats = $DB->get_records("config_plugins");
+    $formatsAvailable = array();
+    foreach ($courseFormats as $courseFormat) {
+        if (substr($courseFormat->plugin, 0, strlen("format_")) === "format_")
+            $formatsAvailable[$courseFormat->plugin] = $courseFormat->plugin;
     }
+
+    $settings = new admin_settingpage('local_coursecreation',
+        get_string('pluginname', 'occoursecreation'));
+    $ADMIN->add('localplugins', $settings);
+
+    $name = 'local_oc_course_creation/setting_check_formats';
+    $title = get_string('course_formats', 'occoursecreation');
+    $description = get_string('course_formats_desc', 'occoursecreation');
+    $setting = new admin_setting_configmulticheckbox(
+        $name,
+        $visiblename = get_string('setting_check_formats', 'occoursecreation'),
+        $description,
+        $defaultsetting = array_slice($formatsAvailable,0,4),
+        $choices = $formatsAvailable
+    );
+    $settings->add($setting);
 }

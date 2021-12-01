@@ -17,15 +17,15 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     local_oc_course_creation
+ * @package     local_occoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_oc_course_creation';
+$plugin->component = 'local_occoursecreation';
 $plugin->release = '0.1.0';
-$plugin->version = 2021120100;
+$plugin->version = 2021120101;
 $plugin->requires = 2020061511;
 $plugin->maturity = MATURITY_ALPHA;

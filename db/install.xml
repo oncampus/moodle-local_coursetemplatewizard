@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/oc_course_creation/db" VERSION="20211201" COMMENT="XMLDB file for Moodle local/oc_course_creation/"
+<XMLDB PATH="local/occoursecreation/db" VERSION="20211201" COMMENT="XMLDB file for Moodle local/oc_course_creation/"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="local_oc_course_creation" COMMENT="Default comment for local_ocCourseCreation, please edit me">
+        <TABLE NAME="local_occoursecreation" COMMENT="Default comment for local_occoursecreation, please edit me">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="course_format" TYPE="text" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
