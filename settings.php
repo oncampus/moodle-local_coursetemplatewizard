@@ -28,6 +28,33 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
     if ($ADMIN->fulltree) {
-        // TODO: Define the plugin settings page - {@link https://docs.moodle.org/dev/Admin_settings}.
+        global $DB;
+        $sql = "SELECT id,name From mdl_config_plugin WHERE plugin like 'format%' ";
+
+        $courseFormats = $DB->get_records("config_plugins");
+
+
+        $settings = new admin_settingpage('local_coursecreation', get_string('pluginname', 'oc_course_creation'));
+        $ADMIN->add('localplugins', $settings);
+
+        $name = 'local_oc_course_creation/setting_check_formats';
+        $title = get_string('course_formats', 'oc_course_creation');
+        $description = get_string('course_formats_desc', 'oc_course_creation');
+        $setting = new admin_setting_configmulticheckbox(
+            $name = "setting_check_formats",
+            $visiblename = get_string('setting_check_formats', 'oc_course_creation'),
+            $description = "Select all formats you want to be able to create",
+            $defaultsetting = array(),
+            $choices = array(
+                "name"=>"1",
+                "2"=>"2",
+                "3"=>"3",
+                "4"=>"4",
+                "5"=>"5",
+                "6"=>"6",
+            )
+        );
+
+        $settings->add($setting);
     }
 }
