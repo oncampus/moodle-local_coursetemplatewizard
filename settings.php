@@ -25,31 +25,34 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+require_admin();
 if ($hassiteconfig && $ADMIN->fulltree) {
-    global $DB;
-    $sql = "SELECT id,name From mdl_config_plugin WHERE plugin like 'format%' ";
+    $pluginman = core_plugin_manager::instance();
 
-    $courseFormats = $DB->get_records("config_plugins");
-    $formatsAvailable = array();
-    foreach ($courseFormats as $courseFormat) {
-        if (substr($courseFormat->plugin, 0, strlen("format_")) === "format_")
-            $formatsAvailable[$courseFormat->plugin] = $courseFormat->plugin;
+    //load all enabled format plugins
+    $formatsEnabled = $pluginman->get_enabled_plugins('format');
+    //load all default format plugins
+    $stdFormats = core_plugin_manager::standard_plugins_list('format');
+    $default = array();
+    //create default array
+    foreach ($stdFormats as $key => $value) {
+        $default[$value] = $value;
     }
-
+echo json_encode($formatsEnabled);
+    //add format checkbox settings
     $settings = new admin_settingpage('local_coursecreation',
-        get_string('pluginname', 'occoursecreation'));
+        get_string('pluginname', 'local_occoursecreation'));
     $ADMIN->add('localplugins', $settings);
 
     $name = 'local_oc_course_creation/setting_check_formats';
-    $title = get_string('course_formats', 'occoursecreation');
-    $description = get_string('course_formats_desc', 'occoursecreation');
+    $title = get_string('course_formats', 'local_occoursecreation');
+    $description = get_string('course_formats_desc', 'local_occoursecreation');
     $setting = new admin_setting_configmulticheckbox(
         $name,
-        $visiblename = get_string('setting_check_formats', 'occoursecreation'),
+        $visiblename = get_string('setting_check_formats', 'local_occoursecreation'),
         $description,
-        $defaultsetting = array_slice($formatsAvailable,0,4),
-        $choices = $formatsAvailable
+        $defaultsetting = $default,
+        $choices = $formatsEnabled
     );
     $settings->add($setting);
 }

@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_occoursecreation';
 $plugin->release = '0.1.0';
-$plugin->version = 2021120101;
+$plugin->version = 2021120103;
 $plugin->requires = 2020061511;
 $plugin->maturity = MATURITY_ALPHA;
