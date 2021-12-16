@@ -25,34 +25,29 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/config.php');
 require_admin();
 if ($hassiteconfig && $ADMIN->fulltree) {
-    $pluginman = core_plugin_manager::instance();
 
-    //load all enabled format plugins
-    $formatsEnabled = $pluginman->get_enabled_plugins('format');
-    //load all default format plugins
-    $stdFormats = core_plugin_manager::standard_plugins_list('format');
-    $default = array();
-    //create default array
-    foreach ($stdFormats as $key => $value) {
-        $default[$value] = $value;
-    }
-echo json_encode($formatsEnabled);
+    $courses = get_courses();
     //add format checkbox settings
     $settings = new admin_settingpage('local_coursecreation',
-        get_string('pluginname', 'local_occoursecreation'));
+            get_string('pluginname', 'local_occoursecreation'));
     $ADMIN->add('localplugins', $settings);
 
-    $name = 'local_oc_course_creation/setting_check_formats';
-    $title = get_string('course_formats', 'local_occoursecreation');
-    $description = get_string('course_formats_desc', 'local_occoursecreation');
-    $setting = new admin_setting_configmulticheckbox(
-        $name,
-        $visiblename = get_string('setting_check_formats', 'local_occoursecreation'),
-        $description,
-        $defaultsetting = $default,
-        $choices = $formatsEnabled
+    $name = 'local_oc_course_creation/setting_chose_course';
+    $title = get_string('template_course', 'local_occoursecreation');
+    $description = get_string('template_course_desc', 'local_occoursecreation');
+    $selection = array_map(function($course) {
+        return $course->fullname;
+    }, $courses);
+    $setting = new admin_setting_configselect(
+            $name,
+            $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
+            $description,
+            array_key_first($selection),
+            $selection,
+
     );
     $settings->add($setting);
 }
