@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-
 /**
  * @package     local_occoursecreation
  * @category    admin
@@ -21,19 +20,4 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
-
-require_once("../../config.php");
-require_once($CFG->dirroot.'/course/lib.php');
-
-/*
- * Creates a default course category
- */
-
-$data = new stdClass();
-$data->name = 'OC course category';
-$data->description = 'This is the default course category for course templates oc course creation will use.';
-$data->idnumber = '';
-$data->visible = '0';
-core_course_category::create($data);
