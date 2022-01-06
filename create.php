@@ -15,9 +15,51 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 /**
  * @package     local_occoursecreation
- * @category    admin
+ * @category    manager
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(__DIR__ . '/../../config.php');
+global $CFG, $DB;
+require_once($CFG->dirroot . '/course/classes/category.php');
 
+$PAGE->set_url(new moodle_url('/local/occoursecreation/create.php'));
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_title(get_string('creation_page_title', 'local_occoursecreation'));
+
+$setCourseCategory = get_config('local_occoursecreation', 'category');
+
+$categories = core_course_category::get_all(array('returnhidden' => true));
+
+$category = null;
+
+foreach ($categories as $item) {
+    if ($item->name == $setCourseCategory) {
+        $category = $item;
+    }
+}
+
+$courseIds = $category->get_courses(array('idonly' => true));
+$courses = array();
+$i = 0;
+foreach ($courseIds as $courseId) {
+    $courses[$i] = $DB->get_record('course', array('id' => $courseId));
+}
+$url = new moodle_url('/course/management.php');
+$url->param('categoryid', $category->id);
+$boolCoursesInCat = $category->has_courses();
+$templatecontext = (object) [
+        'courses' => $courses,
+        'jcourses' => json_encode($courses),
+        'courseCategoryName' => $category->name,
+        'coursesInCat' => $boolCoursesInCat,
+        'url' => $url
+];
+$context = context_coursecat::instance($category->id);
+$PAGE->requires->js_call_amd('core_course/copy_modal', 'init', array($context->id));
+echo $OUTPUT->header();
+
+echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
+
+echo $OUTPUT->footer();

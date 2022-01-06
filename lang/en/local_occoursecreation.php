@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     local_oc_course_creation
+ * @package     local_occoursecreation
  * @category    string
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,5 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
 $string['template_course'] = 'Course creation';
-$string['template_course_dec'] = 'Course creation';
-$string['setting_chose_course'] = 'Course creation';
+$string['setting_chose_course'] = 'Select course area';
+$string['setting_create_course'] = 'Create course from template';
+$string['template_course_desc'] = 'Set the course area in which the course templates are stored.';
+$string['creation_page_title'] = 'Course Templates';
+$string['headline_table_view'] = 'Course Templates';
+$string['table_head_coursename'] = 'Course name';
+$string['table_head_shortname'] = 'Course shortname';
+$string['table_head_edit'] = 'edit';
+$string['course_format'] = 'Course format';
+$string['info_no_courses'] = 'No course was found in the chosen course category';

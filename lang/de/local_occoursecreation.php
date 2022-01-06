@@ -27,5 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
 $string['template_course'] = 'Course creation';
-$string['template_course_dec'] = 'Course creation';
-$string['setting_chose_course'] = 'Course creation';
+$string['setting_chose_course'] = 'Kursbereich auswählen';
+$string['setting_create_course'] = 'Kurs aus Vorlage erstellen';
+$string['template_course_desc'] = 'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
+$string['creation_page_title'] = 'Kurs Vorlagen';
+$string['headline_table_view'] = 'Kurs Vorlagen';
+$string['table_head_coursename'] = 'Kurs name';
+$string['table_head_shortname'] = 'Kürzel';
+$string['table_head_edit'] = 'bearbeiten';
+$string['course_format'] = 'Kursbereich';
+$string['info_no_courses'] = 'Es wurde kein Kurs im gewählten Kursbereich gefunden.';

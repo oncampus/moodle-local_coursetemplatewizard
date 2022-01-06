@@ -26,34 +26,37 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/config.php');
-require_once($CFG->dirroot . '/course/lib.php');
 require_admin();
-if ($hassiteconfig && $ADMIN->fulltree) {
-    //add format checkbox settings
+if ($hassiteconfig) {
+
     $settings = new admin_settingpage('local_coursecreation',
             get_string('pluginname', 'local_occoursecreation'));
+
     $ADMIN->add('localplugins', $settings);
 
-    $name = 'local_oc_course_creation/setting_chose_course';
+    $name = 'local_occoursecreation/category';
     $title = get_string('template_course', 'local_occoursecreation');
     $description = get_string('template_course_desc', 'local_occoursecreation');
-    $default = [];
+    $default ["OC course category"] = "OC course category";
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
-    echo json_encode($categories);
+
     foreach ($categories as $category) {
-        if ($category->name === 'OC course category') {
-            $default[$category->name] =  $category->name;
-        }
         $selection[$category->name] = $category->name;
     }
     $setting = new admin_setting_configselect(
             $name,
             $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
-            $description,
+            $title,
             $default,
             $selection,
 
     );
+
+    $ADMIN->add('courses',
+            new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_occoursecreation'),
+                    new moodle_url('/local/occoursecreation/create.php', array()), array('moodle/category:manage')));
+
+
     $settings->add($setting);
 }
