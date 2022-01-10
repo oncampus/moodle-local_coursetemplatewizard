@@ -37,7 +37,7 @@ if ($hassiteconfig) {
     $name = 'local_occoursecreation/category';
     $title = get_string('template_course', 'local_occoursecreation');
     $description = get_string('template_course_desc', 'local_occoursecreation');
-    $default ["OC course category"] = "OC course category";
+    $default = get_string('pluginname' , 'local_occoursecreation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
 
