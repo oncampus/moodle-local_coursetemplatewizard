@@ -37,9 +37,9 @@ if ($hassiteconfig) {
     $name = 'local_occoursecreation/category';
     $title = get_string('template_course', 'local_occoursecreation');
     $description = get_string('template_course_desc', 'local_occoursecreation');
-    $default = get_string('pluginname' , 'local_occoursecreation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
+    $default = $categories[get_string('pluginname', 'local_occoursecreation')];
 
     foreach ($categories as $category) {
         $selection[$category->name] = $category->name;
@@ -48,7 +48,7 @@ if ($hassiteconfig) {
             $name,
             $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
             $title,
-            $default,
+            $categories[get_string('pluginname', 'local_occoursecreation')],
             $selection,
 
     );
