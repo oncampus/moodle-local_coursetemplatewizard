@@ -24,14 +24,20 @@ require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB;
 require_once($CFG->dirroot . '/course/classes/category.php');
 
+use local_occoursecreation\form\stringForm;
+use local_occoursecreation\manager;
+
 $PAGE->set_url(new moodle_url('/local/occoursecreation/create.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_occoursecreation'));
 
+
+$mform = new stringForm();
+$manager = new manager();
+
+
 $setCourseCategory = get_config('local_occoursecreation', 'category');
-
 $categories = core_course_category::get_all(array('returnhidden' => true));
-
 $category = null;
 
 foreach ($categories as $item) {
@@ -41,24 +47,49 @@ foreach ($categories as $item) {
 }
 
 $courseIds = $category->get_courses(array('idonly' => true));
+
+$context = context_coursecat::instance($category->id);
+$PAGE->requires->js_call_amd('local_occoursecreation/create_course_copy_modal', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_occoursecreation/changeForm', 'init', array($context->id));
+
 $courses = array();
 $i = 0;
+$url = new moodle_url('/backup/copy.php');
+$url->param('categoryid', $category->id);
+
 foreach ($courseIds as $courseId) {
     $courses[$i] = $DB->get_record('course', array('id' => $courseId));
 }
-$url = new moodle_url('/course/management.php');
-$url->param('categoryid', $category->id);
+
 $boolCoursesInCat = $category->has_courses();
+
+
+
+if ($mform->is_cancelled()) {
+    //nothing happens
+} elseif ($fromform = $mform->get_data()) {
+    //insert the data in the db
+    if($fromform->id){
+        echo json_encode($fromform);
+        // $manager->update($fromform->id,$fromform->type, $fromform->string);
+    }
+    echo json_encode($fromform);
+    // $manager->create($fromform->type, $fromform->string);
+}
+
+
 $templatecontext = (object) [
         'courses' => $courses,
-        'jcourses' => json_encode($courses),
         'courseCategoryName' => $category->name,
         'coursesInCat' => $boolCoursesInCat,
         'url' => $url
 ];
-$context = context_coursecat::instance($category->id);
-$PAGE->requires->js_call_amd('core_course/copy_modal', 'init', array($context->id));
+
 echo $OUTPUT->header();
+
+$mform->display();
+
+echo "<br>";
 
 echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
 

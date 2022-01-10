@@ -38,3 +38,4 @@ $string['table_head_edit'] = 'bearbeiten';
 $string['course_format'] = 'Kursbereich';
 $string['info_no_courses'] = 'Es wurde kein Kurs im gewählten Kursbereich gefunden.';
 $string['table_head_courseimg'] = 'Vorschaubild';
+$string['form_select'] = 'Bearbeiten/Erstellen';

@@ -38,3 +38,4 @@ $string['table_head_edit'] = 'edit';
 $string['course_format'] = 'Course format';
 $string['info_no_courses'] = 'No course was found in the chosen course category';
 $string['table_head_courseimg'] = 'Preview image';
+$string['form_select'] = 'Edit/Create';
