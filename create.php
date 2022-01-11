@@ -31,10 +31,8 @@ $PAGE->set_url(new moodle_url('/local/occoursecreation/create.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_occoursecreation'));
 
-
 $mform = new stringForm();
 $manager = new manager();
-
 
 $setCourseCategory = get_config('local_occoursecreation', 'category');
 $categories = core_course_category::get_all(array('returnhidden' => true));
@@ -50,7 +48,7 @@ $courseIds = $category->get_courses(array('idonly' => true));
 
 $context = context_coursecat::instance($category->id);
 $PAGE->requires->js_call_amd('local_occoursecreation/create_course_copy_modal', 'init', array($context->id));
-$PAGE->requires->js_call_amd('local_occoursecreation/changeForm', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_occoursecreation/formControl');
 
 $courses = array();
 $i = 0;
@@ -63,20 +61,17 @@ foreach ($courseIds as $courseId) {
 
 $boolCoursesInCat = $category->has_courses();
 
-
-
 if ($mform->is_cancelled()) {
     //nothing happens
-} elseif ($fromform = $mform->get_data()) {
+} else if ($fromform = $mform->get_data()) {
     //insert the data in the db
-    if($fromform->id){
-        echo json_encode($fromform);
-        // $manager->update($fromform->id,$fromform->type, $fromform->string);
+    echo $fromform->id;
+    if ($fromform->id && $fromform->string && $fromform->string !== '') {
+      $manager->update($fromform->id, $fromform->type, $fromform->string);
+    } else if ($fromform->string && $fromform->string !== '' ) {
+        $manager->create($fromform->type, $fromform->string);
     }
-    echo json_encode($fromform);
-    // $manager->create($fromform->type, $fromform->string);
 }
-
 
 $templatecontext = (object) [
         'courses' => $courses,

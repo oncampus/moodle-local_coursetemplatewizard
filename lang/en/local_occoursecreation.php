@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
+$string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['template_course'] = 'Course creation';
 $string['setting_chose_course'] = 'Select course area';
 $string['setting_create_course'] = 'Create course from template';

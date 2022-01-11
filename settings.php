@@ -25,12 +25,16 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/config.php');
 require_admin();
 if ($hassiteconfig) {
 
+    $plugin_name = get_string('pluginname', 'local_occoursecreation');
+    $category_name = get_string('plugin_categoryname', 'local_occoursecreation');
+
     $settings = new admin_settingpage('local_coursecreation',
-            get_string('pluginname', 'local_occoursecreation'));
+            $plugin_name);
 
     $ADMIN->add('localplugins', $settings);
 
@@ -39,16 +43,18 @@ if ($hassiteconfig) {
     $description = get_string('template_course_desc', 'local_occoursecreation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
-    $default = $categories[get_string('pluginname', 'local_occoursecreation')];
-
+    $default = null;
     foreach ($categories as $category) {
         $selection[$category->name] = $category->name;
+        if ($category->name === $category_name) {
+            $default = $selection[$category->name];
+        }
     }
     $setting = new admin_setting_configselect(
             $name,
             $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
             $title,
-            $categories[get_string('pluginname', 'local_occoursecreation')],
+            $default,
             $selection,
 
     );
@@ -56,7 +62,6 @@ if ($hassiteconfig) {
     $ADMIN->add('courses',
             new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_occoursecreation'),
                     new moodle_url('/local/occoursecreation/create.php', array()), array('moodle/category:manage')));
-
 
     $settings->add($setting);
 }

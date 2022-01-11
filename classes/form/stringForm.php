@@ -38,23 +38,18 @@ class stringForm extends moodleform {
         $mform->setType('id', PARAM_INT);
 
         $manager = new manager();
-        $choices = array();
+        $choices[-1] = ""; // empty choice to add new
         foreach ($manager->getAll() as $record) {
-            $choices[$record->id] = $record->string;
+            $choices[$record->id . '_' .$record->type] = $record->string;
         }
-        $options = array(
-                'tags' => true,
-                'noselectionstring' => get_string('allareas', 'search'),
-                'showsuggestions' => true,
-                'showstandard' => true,
-                'class' => 'notation-form-edit',
-        );
-        $autocomplete = $mform->createElement('autocomplete', 'string', get_string('searcharea', 'search'), $choices, $options);
-        $mform->addElement($autocomplete);
+        $mform->addElement('select', 'dropSelect', get_string('forumtype', 'forum'),$choices, array('onchange' => 'javascript:selectChanged();'));
+        $mform->addElement('text', 'string', get_string('forumtype', 'forum'));
+        $mform->setType('string', PARAM_TEXT);
         $radioarray = array();
         $radioarray[] = $mform->createElement('radio', 'type', '', 'prefix', 0);
         $radioarray[] = $mform->createElement('radio', 'type', '', 'postfix', 1);
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
+
 
         $this->add_action_buttons();
     }

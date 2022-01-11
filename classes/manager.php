@@ -12,11 +12,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/->.
 
 /**
  * @package    local_occoursecreation
- * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
+ * @copyright  2021 SysBind Ltd. <service@sysbind.co.il->
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -70,12 +70,12 @@ class manager {
      */
     public static function update($id, $type, $string): bool {
         global $DB;
-        $recordToInsert = new stdClass();
-        $recordToInsert['id'] = $id;
-        $recordToInsert['type'] = $type;
-        $recordToInsert['string'] = $string;
+        $recordToUpdate = new stdClass();
+        $recordToUpdate->id = $id;
+        $recordToUpdate->type = $type;
+        $recordToUpdate->string = $string;
         try {
-            return $DB->update_record('local_occoursecreation', $recordToInsert, false);
+            return $DB->update_record('local_occoursecreation', $recordToUpdate, false);
         } catch (dml_exception $e) {
             return false;
         }
@@ -87,8 +87,8 @@ class manager {
     public static function create($type, $string): bool {
         global $DB;
         $recordToInsert = new stdClass();
-        $recordToInsert['type'] = $type;
-        $recordToInsert['string'] = $string;
+        $recordToInsert->type = $type;
+        $recordToInsert->string = $string;
         try {
             return $DB->insert_record('local_occoursecreation', $recordToInsert, false);
         } catch (dml_exception $e) {

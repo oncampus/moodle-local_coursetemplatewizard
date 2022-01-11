@@ -33,7 +33,7 @@ require_once($CFG->dirroot.'/course/lib.php');
  */
 
 $data = new stdClass();
-$data->name = 'OC course category';
+$data->name = get_string('plugin_categoryname' ,'local_occoursecreation');
 $data->description = 'This is the default course category for course templates oc course creation will use.';
 $data->idnumber = '';
 $data->visible = '0';
