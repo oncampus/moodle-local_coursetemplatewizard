@@ -42,12 +42,13 @@ class stringForm extends moodleform {
         foreach ($manager->getAll() as $record) {
             $choices[$record->id . '_' .$record->type] = $record->string;
         }
-        $mform->addElement('select', 'dropSelect', get_string('forumtype', 'forum'),$choices, array('onchange' => 'javascript:selectChanged();'));
-        $mform->addElement('text', 'string', get_string('forumtype', 'forum'));
+        $mform->addElement('select', 'dropSelect', get_string('form_choose', 'local_occoursecreation'),$choices, array('onchange' => 'javascript:selectChanged();'));
+        $mform->addElement('text', 'string', get_string('form_select', 'local_occoursecreation'));
         $mform->setType('string', PARAM_TEXT);
         $radioarray = array();
-        $radioarray[] = $mform->createElement('radio', 'type', '', 'prefix', 0);
-        $radioarray[] = $mform->createElement('radio', 'type', '', 'postfix', 1);
+        $radioarray[] = $mform->createElement('radio', 'type', '', get_string('form_type_course_name', 'local_occoursecreation'), 0);
+        $radioarray[] = $mform->createElement('radio', 'type', '', get_string('form_type_course_semester', 'local_occoursecreation'), 1);
+        $radioarray[] = $mform->createElement('radio', 'type', '', get_string('form_type_course_year', 'local_occoursecreation'), 2);
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
 
 

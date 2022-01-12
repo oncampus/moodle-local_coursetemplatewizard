@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
 $string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
-$string['template_course'] = 'Course creation';
 $string['setting_chose_course'] = 'Select course area';
 $string['setting_create_course'] = 'Create course from template';
 $string['template_course_desc'] = 'Set the course area in which the course templates are stored.';
@@ -40,3 +39,7 @@ $string['course_format'] = 'Course format';
 $string['info_no_courses'] = 'No course was found in the chosen course category';
 $string['table_head_courseimg'] = 'Preview image';
 $string['form_select'] = 'Edit/Create';
+$string['form_choose'] = 'Select';
+$string['form_type_course_name'] = 'Course name';
+$string['form_type_course_semester'] = 'Semester name';
+$string['form_type_course_year'] = 'Year';

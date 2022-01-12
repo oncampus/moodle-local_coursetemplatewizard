@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
 $string['plugin_categoryname'] = 'Oncampus course creation category';
-$string['template_course'] = 'Course creation';
 $string['setting_chose_course'] = 'Kursbereich auswählen';
 $string['setting_create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] = 'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
@@ -40,3 +39,6 @@ $string['course_format'] = 'Kursbereich';
 $string['info_no_courses'] = 'Es wurde kein Kurs im gewählten Kursbereich gefunden.';
 $string['table_head_courseimg'] = 'Vorschaubild';
 $string['form_select'] = 'Bearbeiten/Erstellen';
+$string['form_type_course_name'] = 'Kursname';
+$string['form_type_course_semester'] = 'Semesterbezeichnung';
+$string['form_type_course_year'] = 'Jahr';

@@ -50,13 +50,13 @@ $context = context_coursecat::instance($category->id);
 $PAGE->requires->js_call_amd('local_occoursecreation/create_course_copy_modal', 'init', array($context->id));
 $PAGE->requires->js_call_amd('local_occoursecreation/formControl');
 
-$courses = array();
-$i = 0;
 $url = new moodle_url('/backup/copy.php');
 $url->param('categoryid', $category->id);
 
+$courses = array();
+$i = 0;
 foreach ($courseIds as $courseId) {
-    $courses[$i] = $DB->get_record('course', array('id' => $courseId));
+    $courses[$i++] = $DB->get_record('course', array('id' => $courseId));
 }
 
 $boolCoursesInCat = $category->has_courses();
@@ -82,10 +82,10 @@ $templatecontext = (object) [
 
 echo $OUTPUT->header();
 
-$mform->display();
+echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
 
 echo "<br>";
 
-echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
+$mform->display();
 
 echo $OUTPUT->footer();

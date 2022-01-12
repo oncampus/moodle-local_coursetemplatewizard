@@ -39,7 +39,6 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
 
     $name = 'local_occoursecreation/category';
-    $title = get_string('template_course', 'local_occoursecreation');
     $description = get_string('template_course_desc', 'local_occoursecreation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
@@ -53,7 +52,7 @@ if ($hassiteconfig) {
     $setting = new admin_setting_configselect(
             $name,
             $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
-            $title,
+            $description,
             $default,
             $selection,
 
