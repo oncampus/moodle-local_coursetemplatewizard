@@ -16,8 +16,3 @@ function selectChanged() {
         }
     }
 }
-
-$(document).ready(function () {
-    $('#course-table').DataTable();
-    $('.dataTables_length').addClass('bs-select');
-});

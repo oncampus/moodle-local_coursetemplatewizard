@@ -83,9 +83,7 @@ $templatecontext = (object) [
 echo $OUTPUT->header();
 
 echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
-
-echo "<br>";
-
+echo "<div class='mr-5'>";
 $mform->display();
-
+echo "</div>";
 echo $OUTPUT->footer();

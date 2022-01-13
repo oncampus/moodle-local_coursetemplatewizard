@@ -35,10 +35,8 @@ class local_occoursecreation_external extends external_api
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public static function get_course_name_prefix()
+    public static function get_course_semester()
     {
-
-
         $prefix = manager::getPrefixes();
 
         return $prefix;
@@ -48,7 +46,7 @@ class local_occoursecreation_external extends external_api
      * Returns the description of method result value
      * @return external_description
      */
-    public static function get_course_name_prefix_returns()
+    public static function get_course_semester_returns()
     {
         return new external_value(PARAM_ARRAY, 'Array of Prefixes');
     }
@@ -58,10 +56,8 @@ class local_occoursecreation_external extends external_api
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public static function get_course_name_postfix()
+    public static function get_course_name()
     {
-
-
         $postfix = manager::getPostfixes();
 
         return $postfix;
@@ -71,7 +67,27 @@ class local_occoursecreation_external extends external_api
      * Returns the description of method result value
      * @return external_description
      */
-    public static function get_course_name_postfix_returns()
+    public static function get_course_name_returns()
+    {
+        return new external_value(PARAM_ARRAY, 'Array of Postfixes');
+    }
+    /**
+     * @return bool
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     */
+    public static function get_course_year()
+    {
+        $postfix = manager::getPostfixes();
+
+        return $postfix;
+    }
+
+    /**
+     * Returns the description of method result value
+     * @return external_description
+     */
+    public static function get_course_year_returns()
     {
         return new external_value(PARAM_ARRAY, 'Array of Postfixes');
     }
