@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * @package     local_occoursecreation
+ * @package     local_oc_course_creation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,6 +26,6 @@ global $DB;
 
 //Delete course category?
 
-$sql = "DROP TABLE {local_occoursecreation}";
+$sql = "DROP TABLE {local_oc_course_creation}";
 
 $DB->execute($sql);

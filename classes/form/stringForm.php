@@ -22,14 +22,14 @@
  */
 //moodleform is defined in formslib.php
 
-namespace local_occoursecreation\form;
+namespace local_oc_course_creation\form;
 
 use moodleform;
 use local_occoursecreation\manager;
 
 require_once("$CFG->libdir/formslib.php");
 
-class stringForm extends moodleform {
+class string_form extends moodleform {
     //Add elements to form
     public function definition() {
         $mform = $this->_form; // Don't forget the underscore!

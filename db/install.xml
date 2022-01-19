@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/occoursecreation/db" VERSION="20211201" COMMENT="XMLDB file for Moodle local/oc_course_creation/"
+<XMLDB PATH="local/oc_course_creation/db" VERSION="20211201" COMMENT="XMLDB file for Moodle local/oc_course_creation/"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="local_occoursecreation" COMMENT="Saves post and prefix for the local_occoursecreation plugin.">
+        <TABLE NAME="local_oc_course_creation" COMMENT="Saves post and prefix for the local_oc_course_creation plugin.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="type" TYPE="int"  LENGTH="1" NOTNULL="true" SEQUENCE="false"/>

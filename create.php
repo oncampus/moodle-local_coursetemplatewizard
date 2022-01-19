@@ -1,40 +1,27 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
- * @package     local_occoursecreation
+ * @package     local_oc_course_creation
  * @category    manager
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB;
+require('../../config.php');
 require_once($CFG->dirroot . '/course/classes/category.php');
 
-use local_occoursecreation\form\stringForm;
-use local_occoursecreation\manager;
+//use local_oc_course_creation\form\string_form;
+use local_oc_course_creation\form\string_form;
+use local_oc_course_creation\manager;
 
-$PAGE->set_url(new moodle_url('/local/occoursecreation/create.php'));
+$PAGE->set_url(new moodle_url('/local/oc_course_creation/create.php'));
 $PAGE->set_context(\context_system::instance());
-$PAGE->set_title(get_string('creation_page_title', 'local_occoursecreation'));
+$PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 
-$mform = new stringForm();
 $manager = new manager();
+$mform = new string_form();
 
-$setCourseCategory = get_config('local_occoursecreation', 'category');
+$setCourseCategory = get_config('local_oc_course_creation', 'category');
 $categories = core_course_category::get_all(array('returnhidden' => true));
 $category = null;
 
@@ -47,8 +34,8 @@ foreach ($categories as $item) {
 $courseIds = $category->get_courses(array('idonly' => true));
 
 $context = context_coursecat::instance($category->id);
-$PAGE->requires->js_call_amd('local_occoursecreation/create_course_copy_modal', 'init', array($context->id));
-$PAGE->requires->js_call_amd('local_occoursecreation/formControl');
+$PAGE->requires->js_call_amd('local_oc_course_creation/create_course_copy_modal', 'init', array($context->id));
+$PAGE->requires->js_call_amd('local_oc_course_creation/formControl');
 
 $url = new moodle_url('/backup/copy.php');
 $url->param('categoryid', $category->id);
@@ -82,7 +69,7 @@ $templatecontext = (object) [
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->render_from_template('local_occoursecreation/courselistview', $templatecontext);
+echo $OUTPUT->render_from_template('local_oc_course_creation/courselistview', $templatecontext);
 echo "<div class='mr-5'>";
 $mform->display();
 echo "</div>";

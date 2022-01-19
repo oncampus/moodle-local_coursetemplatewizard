@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_message
+ * local_oc_course_creation services
  *
- * @package    local_message
+ * @package    local_oc_course_creation
  * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = array(
         'local_occoursecreation_custom_prefix' => array(           //web service name (unique in all Moodle)
-                'classname'   => 'local_occoursecreation', //class containing the function implementation
+                'classname'   => 'local_oc_course_creation', //class containing the function implementation
                 'methodname'  => 'get_course_name_prefix',              //name of the function into the class
-                'classpath'   => 'local/occoursecreation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
+                'classpath'   => 'local/oc_course_creation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
                 'description' => 'Get defined prefixes for course names',
                 'type' => 'write',
                 'ajax' => 'true',
@@ -34,18 +34,17 @@ $functions = array(
         )
 );
 /**
- * local_message
  *
- * @package    local_message
+ * @package    local_oc_course_creation
  * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = array(
-        'local_occoursecreation_custom_postfix' => array(           //web service name (unique in all Moodle)
-                'classname'   => 'local_occoursecreation', //class containing the function implementation
+        'local_oc_course_creation_custom_postfix' => array(           //web service name (unique in all Moodle)
+                'classname'   => 'local_oc_course_creation', //class containing the function implementation
                 'methodname'  => 'get_course_name_postfix',              //name of the function into the class
-                'classpath'   => 'local/occoursecreation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
+                'classpath'   => 'local/oc_course_creation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
                 'description' => 'Get defined postfixes for course names',
                 'type' => 'write',
                 'ajax' => 'true',

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * @package     local_occoursecreation
+ * @package     local_oc_course_creation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,8 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-require_once("../../config.php");
 global $CFG;
+require_once($CFG->dirroot."/config.php");
 require_once($CFG->dirroot.'/course/lib.php');
 
 /*
@@ -33,7 +33,7 @@ require_once($CFG->dirroot.'/course/lib.php');
  */
 
 $data = new stdClass();
-$data->name = get_string('plugin_categoryname' ,'local_occoursecreation');
+$data->name = get_string('plugin_categoryname' ,'local_oc_course_creation');
 $data->description = 'This is the default course category for course templates oc course creation will use.';
 $data->idnumber = '';
 $data->visible = '0';

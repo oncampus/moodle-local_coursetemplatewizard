@@ -18,7 +18,7 @@
  * Plugin administration pages are defined here.
  *
  * @package     local
- * @subpackage  local_occoursecreation
+ * @subpackage  local_oc_course_creation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,16 +30,16 @@ require_once($CFG->dirroot . '/config.php');
 require_admin();
 if ($hassiteconfig) {
 
-    $plugin_name = get_string('pluginname', 'local_occoursecreation');
-    $category_name = get_string('plugin_categoryname', 'local_occoursecreation');
+    $plugin_name = get_string('pluginname', 'local_oc_course_creation');
+    $category_name = get_string('plugin_categoryname', 'local_oc_course_creation');
 
-    $settings = new admin_settingpage('local_coursecreation',
+    $settings = new admin_settingpage('local_oc_course_creation',
             $plugin_name);
 
     $ADMIN->add('localplugins', $settings);
 
-    $name = 'local_occoursecreation/category';
-    $description = get_string('template_course_desc', 'local_occoursecreation');
+    $name = 'local_oc_course_creation/category';
+    $description = get_string('template_course_desc', 'local_oc_course_creation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
     $default = null;
@@ -51,7 +51,7 @@ if ($hassiteconfig) {
     }
     $setting = new admin_setting_configselect(
             $name,
-            $visiblename = get_string('setting_chose_course', 'local_occoursecreation'),
+            $visiblename = get_string('setting_chose_course', 'local_oc_course_creation'),
             $description,
             $default,
             $selection,
@@ -59,8 +59,8 @@ if ($hassiteconfig) {
     );
 
     $ADMIN->add('courses',
-            new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_occoursecreation'),
-                    new moodle_url('/local/occoursecreation/create.php', array()), array('moodle/category:manage')));
+            new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_oc_course_creation'),
+                    new moodle_url('/local/oc_course_creation/create.php', array()), array('moodle/category:manage')));
 
     $settings->add($setting);
 }

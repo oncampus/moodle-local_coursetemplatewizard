@@ -17,7 +17,7 @@
 /**
  * local_message externallib will specify additional functions
  *
- * @package    local_occoursecreation
+ * @package    local_oc_course_creation
  * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_occoursecreation\manager;
+use local_oc_course_creation\manager;
 
-class local_occoursecreation_external extends external_api
+class local_oc_course_creation_external extends external_api
 {
 
     /**

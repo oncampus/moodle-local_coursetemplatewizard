@@ -1,14 +1,18 @@
 <div class="container-fluid">
-    <h2>{{#str}} headline_table_view, local_occoursecreation {{/str}}</h2>
+    <h2>{{#str}} headline_table_view, local_oc_course_creation {{/str}}</h2>
     <div>
         <table class="table table-striped table-bordered table-sm" cellspacing="0" width="90%" id="course-table">
             <thead class="table-head-courslist">
             <tr>
                 <th class="th-sm col-1">ID</th>
-                <th class="th-sm col-1">{{#str}} table_head_shortname, local_occoursecreation {{/str}}</th>
-                <th class="th-sm col-4">{{#str}} table_head_coursename, local_occoursecreation {{/str}}</th>
-                <th class="th-sm col-4">{{#str}} table_head_courseimg, local_occoursecreation {{/str}}</th>
-                <th class="th-sm col-1"><i class="icon custom_entry"> {{#str}} table_head_edit, local_occoursecreation {{/str}} </i></th>
+                <th class="th-sm col-1">{{#str}} table_head_shortname, local_oc_course_creation {{/str}}</th>
+                <th class="th-sm col-4">{{#str}} table_head_coursename, local_oc_course_creation {{/str}}</th>
+                <th class="th-sm col-4">{{#str}} table_head_courseimg, local_oc_course_creation {{/str}}</th>
+                <th class="th-sm col-1">
+                    <i class="icon custom_entry">
+                        {{#str}} table_head_edit, local_oc_course_creation {{/str}}
+                    </i>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -30,7 +34,7 @@
     </div>
     <br>
     {{#coursesInCat}}
-        {{#str}} info_no_courses, local_occoursecreation {{/str}} <br>
+        {{#str}} info_no_courses, local_oc_course_creation {{/str}} <br>
     {{/coursesInCat}}
-    <p><small>{{#str}} course_format, local_occoursecreation {{/str}}: {{courseCategoryName}}</small></p>
+    <p><small>{{#str}} course_format, local_oc_course_creation {{/str}}: {{courseCategoryName}}</small></p>
 </div>

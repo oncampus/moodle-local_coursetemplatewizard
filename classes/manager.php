@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/->.
 
 /**
- * @package    local_occoursecreation
+ * @package    local_oc_course_creation
  * @copyright  2021 SysBind Ltd. <service@sysbind.co.il->
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_occoursecreation;
+namespace local_oc_course_creation;
 
 use dml_transaction_exception;
 use stdClass;
@@ -35,7 +35,7 @@ class manager {
     public static function getPrefixes(): array {
         global $DB;
         try {
-            return $DB->get_records('local_occoursecreation', ["type" => false]);
+            return $DB->get_records('local_oc_course_creation', ["type" => false]);
         } catch (dml_exception $e) {
             return array();
         }
@@ -47,7 +47,7 @@ class manager {
     public static function getPostfixes(): array {
         global $DB;
         try {
-            return $DB->get_records('local_occoursecreation', ["type" => true]);
+            return $DB->get_records('local_oc_course_creation', ["type" => true]);
         } catch (dml_exception $e) {
             return array();
         }
@@ -59,7 +59,7 @@ class manager {
     public static function getAll(): array {
         global $DB;
         try {
-            return $DB->get_records('local_occoursecreation', []);
+            return $DB->get_records('local_oc_course_creation', []);
         } catch (dml_exception $e) {
             return array();
         }
@@ -75,7 +75,7 @@ class manager {
         $recordToUpdate->type = $type;
         $recordToUpdate->string = $string;
         try {
-            return $DB->update_record('local_occoursecreation', $recordToUpdate, false);
+            return $DB->update_record('local_oc_course_creation', $recordToUpdate, false);
         } catch (dml_exception $e) {
             return false;
         }
@@ -90,7 +90,7 @@ class manager {
         $recordToInsert->type = $type;
         $recordToInsert->string = $string;
         try {
-            return $DB->insert_record('local_occoursecreation', $recordToInsert, false);
+            return $DB->insert_record('local_oc_course_creation', $recordToInsert, false);
         } catch (dml_exception $e) {
             return false;
         }
