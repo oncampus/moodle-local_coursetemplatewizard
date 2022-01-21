@@ -30,21 +30,9 @@ use dml_exception;
 class manager {
 
     /**
-     * @return mixed Array of prefix strings
-     */
-    public static function getPrefixes(): array {
-        global $DB;
-        try {
-            return $DB->get_records('local_oc_course_creation', ["type" => false]);
-        } catch (dml_exception $e) {
-            return array();
-        }
-    }
-
-    /**
      * @return mixed Array of postfix strings
-     */
-    public static function getPostfixes(): array {
+
+    public static function get_by_id(): array {
         global $DB;
         try {
             return $DB->get_records('local_oc_course_creation', ["type" => true]);
@@ -52,11 +40,11 @@ class manager {
             return array();
         }
     }
-
+*/
     /**
-     * @return mixed Array of postfix strings
+     * @return mixed Array of all strings
      */
-    public static function getAll(): array {
+    public static function get_all(): array {
         global $DB;
         try {
             return $DB->get_records('local_oc_course_creation', []);

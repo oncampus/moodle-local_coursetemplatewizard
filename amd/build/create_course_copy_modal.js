@@ -89,11 +89,15 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events',
                 'jsonformdata': JSON.stringify(formdata),
                 'courseid': course.id,
             };
-
             modalObj.setBody(spinner);
             Str.get_string('copycoursetitle', 'backup', course.shortname).then(function(title) {
+
                 modalObj.setTitle(title);
-                modalObj.setBody(Fragment.loadFragment('course', 'new_base_form', contextid, params));
+                var modalbody = Fragment.loadFragment('local_oc_course_creation', 'modified_course_copy', 0, params);
+                console.log(contextid);
+                console.log(params);
+                $('div').forEach(div => div.appendChild(modalbody));
+                modalObj.setBody(modalbody);
                 return;
             }).catch(function() {
                 Notification.exception(new Error('Failed to load string: copycoursetitle'));
@@ -175,7 +179,6 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events',
                     // We have the course info get the modal content.
                     course = response[0];
                     course['fullname'] = [1,2,3,4,5,6,7,8]
-                        console.log(course);
                     updateModalBody();
 
                 }).fail(function() {

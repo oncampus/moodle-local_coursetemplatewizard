@@ -60,7 +60,7 @@ if ($hassiteconfig) {
 
     $ADMIN->add('courses',
             new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_oc_course_creation'),
-                    new moodle_url('/local/oc_course_creation/create.php', array()), array('moodle/category:manage')));
+                    new moodle_url('/local/oc_course_creation/list_courses_to_copy.php', array()), array('moodle/category:manage')));
 
     $settings->add($setting);
 }
