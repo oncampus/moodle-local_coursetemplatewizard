@@ -23,11 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = array(
-        'local_occoursecreation_custom_prefix' => array(           //web service name (unique in all Moodle)
-                'classname'   => 'local_oc_course_creation', //class containing the function implementation
-                'methodname'  => 'get_course_name_prefix',              //name of the function into the class
-                'classpath'   => 'local/oc_course_creation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
-                'description' => 'Get defined prefixes for course names',
+        'local_occoursecreation_custom_preset_update' => array(                     //web service name (unique in all Moodle)
+                'classname'   => 'local_oc_course_creation',                        //class containing the function implementation
+                'methodname'  => 'edit_entry',                                      //name of the function into the class
+                'classpath'   => 'local/oc_course_creation/externallib.php',        //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
+                'description' => 'Update selected preset string of an course by its id',
                 'type' => 'write',
                 'ajax' => 'true',
                 'capabilities' => 'true',
@@ -41,11 +41,28 @@ $functions = array(
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = array(
-        'local_oc_course_creation_custom_postfix' => array(           //web service name (unique in all Moodle)
-                'classname'   => 'local_oc_course_creation', //class containing the function implementation
-                'methodname'  => 'get_course_name_postfix',              //name of the function into the class
+        'local_oc_course_creation_custom_preset_delete' => array(                   //web service name (unique in all Moodle)
+                'classname'   => 'local_oc_course_creation',                        //class containing the function implementation
+                'methodname'  => 'delete_entry',                                    //name of the function into the class
+                'classpath'   => 'local/oc_course_creation/externallib.php',        //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
+                'description' => 'Delete selected preset string of an course by its id',
+                'type' => 'write',
+                'ajax' => 'true',
+                'capabilities' => 'true',
+        )
+);/**
+ *
+ * @package    local_oc_course_creation
+ * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
+ * @auther     schindlerl
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+$functions = array(
+        'local_oc_course_creation_custom_preset_insert' => array(               //web service name (unique in all Moodle)
+                'classname'   => 'local_oc_course_creation',                    //class containing the function implementation
+                'methodname'  => 'create_entry',                                //name of the function into the class
                 'classpath'   => 'local/oc_course_creation/externallib.php',     //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
-                'description' => 'Get defined postfixes for course names',
+                'description' => 'Create preset string of an course',
                 'type' => 'write',
                 'ajax' => 'true',
                 'capabilities' => 'true',

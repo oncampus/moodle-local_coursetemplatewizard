@@ -30,17 +30,40 @@ use dml_exception;
 class manager {
 
     /**
-     * @return mixed Array of postfix strings
-
-    public static function get_by_id(): array {
+     * @return mixed single string
+     */
+    public static function get_by_id($id): array {
         global $DB;
         try {
-            return $DB->get_records('local_oc_course_creation', ["type" => true]);
+            return $DB->get_record('local_oc_course_creation', $id);
         } catch (dml_exception $e) {
             return array();
         }
     }
-*/
+    /**
+     * @return mixed Array of string
+     */
+    public static function get_by_type($type): array {
+        global $DB;
+        try {
+            return $DB->get_records('local_oc_course_creation', $type);
+        } catch (dml_exception $e) {
+            return array();
+        }
+    }
+    /**
+     * @return mixed Array of string
+     */
+    public static function get_diff_types(): array {
+        global $DB;
+        $sql = "Select DISTINCT type from {local_oc_course_creation}";
+        try {
+            return $DB->get_records_sql($sql);
+        } catch (dml_exception $e) {
+            return array();
+        }
+    }
+
     /**
      * @return mixed Array of all strings
      */
@@ -54,7 +77,9 @@ class manager {
     }
 
     /**
-     * @return mixed Array of postfix strings
+     * Updates an entry by it's id
+     *
+     * @return bool DB transaction successful
      */
     public static function update($id, $type, $string): bool {
         global $DB;
@@ -70,7 +95,9 @@ class manager {
     }
 
     /**
-     * @return mixed Array of postfix strings
+     * Creats an entry
+     *
+     * @return bool DB transaction successful
      */
     public static function create($type, $string): bool {
         global $DB;
@@ -82,5 +109,18 @@ class manager {
         } catch (dml_exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Deletes a string and records for an id
+     *
+     * @param $id int
+     * @return bool DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    public function delete_message($id): bool {
+        global $DB;
+        return $DB->delete_records('local_oc_course_creation', ['id' => $id]);
     }
 }

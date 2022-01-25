@@ -26,6 +26,6 @@ global $DB;
 
 //Delete course category?
 
-$sql = "DROP TABLE {local_oc_course_creation}";
+$sql = "DROP TABLE IF EXISTS {local_oc_course_creation}";
 
 $DB->execute($sql);
