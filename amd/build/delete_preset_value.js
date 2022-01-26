@@ -18,6 +18,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                 let id = classString.substr(3);
                 modal.params = {'id': id};
                 modal.setSaveButtonText(String.get_string('modal_delete_button', 'local_oc_course_creation'));
+                console.log(modal.params);
             },
         }, trigger)
             .done(function(modal) {

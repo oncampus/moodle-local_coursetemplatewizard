@@ -16,28 +16,32 @@
                 </thead>
                 <tbody>
                 {{#entries}}
-                    <tr class="table-body-courlist">
+                    <tr class="id:{{id}} table-body-courlist">
                         <td class="col-1">{{id}}</td>
-                        <td class="col-8">{{string}}</td>
+                        <td class="col-8 string_{{id}}">{{string}}</td>
                         <td class="col-1">
-                            <a class="id:{{id}} action-edit mr-1">
-                                <i class="icon fa fa-cog fa-fw"><!-- --></i>
+                            <div class="row">
+                            <div class="ml-3 mr-2">
+                            <a href="{{editURL}}?id={{id}}" class=" action-edit">
+                                <i class="icon fa fa-cog fa-fw"></i>
                             </a>
+                            </div>
                             <a class="id:{{id}} action-delete">
-                                <i class="icon fa fa-trash"><!-- --></i>
+                                <i class="icon fa fa-trash"></i>
                             </a>
+                            </div>
                         </td>
                     </tr>
                 {{/entries}}
-                <tr class="table-body-courlist">
+                <tr class="table-body-courlist new-entry-form">
                     <form action="list_preset_values.php" method="post" id="{{type}}">
-                        <td class="col-1"></td>
-                        <td class="align-items-center h-100">
-                            <input type="hidden" value="{{type}}" name="type">
+                        <td class="col-1 h-100 w-100">
+                            <input type="text" value="{{type}}" name="type" class="w-100 h-100"></td>
+                        <td class="h-100">
                             <input type="text" name="text" class="w-100 h-100"/>
                         </td>
                         <td class="col-1">
-                            <input  value=" {{#str}} table_btn_submit, local_oc_course_creation {{/str}}" type="submit" class="btn btn-secondary"/>
+                            <input  value="{{#str}} table_btn_submit, local_oc_course_creation {{/str}}" type="submit" class="btn btn-secondary"/>
                             </a>
                         </td>
                     </form>

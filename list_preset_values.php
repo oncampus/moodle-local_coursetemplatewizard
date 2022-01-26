@@ -14,38 +14,44 @@ require_once($CFG->dirroot . '/course/classes/category.php');
 use local_oc_course_creation\form\string_form;
 use local_oc_course_creation\manager;
 
-$PAGE->set_url(new moodle_url('/local/oc_course_creation/list_preset_values.php'));
+$url = new moodle_url('/local/oc_course_creation/list_preset_values.php');
+
+$PAGE->set_url($url);
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_call_amd('local_oc_course_creation/delete_preset_value');
 
 $manager = new manager();
-$mform = new string_form();
 
-$url = new moodle_url('/local/oc_course_creation/list_preset_values.php');
-
-if ($_POST && $_POST['text']) {
+//get's posted form data and creates new entry in DB
+if ($_POST && $_POST['text'] && !array_key_exists('id',$_POST)) {
     $type = $_POST['type'];
     $string = $_POST['text'];
     $manager->create($type, $string);
     redirect($url, null, 1);
-} else {
-    //nothing happens
+} else if ($_POST && $_POST['text'] && $_POST['id']) {
+    $type = $_POST['type'];
+    $string = $_POST['text'];
+    $id = $_POST['id'];
+    $manager->update($id, $type, $string);
+    redirect($url, null, 1);
 }
 $types = array();
 $entries = $manager->get_all();
+//filles each type in one array -> display as one table
 foreach ($entries as $entry) {
-    if(!in_array($entry->type,array_column($types,'type'))){
-        $types[] = ['type'=>$entry->type, 'entries'=>array($entry)];
-    } else{
-        $key = array_search($entry->type,array_column($types,'type'));
+    if (!in_array($entry->type, array_column($types, 'type'))) {
+        $types[] = ['type' => $entry->type, 'entries' => array($entry)];
+    } else {
+        $key = array_search($entry->type, array_column($types, 'type'));
         $types[$key]['entries'][] = $entry;
     }
 }
 
 $templatecontext = (object) [
-        'types' => $types
+        'types' => $types,
+        'editURL' => new moodle_url('/local/oc_course_creation/edit_preset_value.php'),
 ];
 
 echo $OUTPUT->header();

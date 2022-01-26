@@ -30,6 +30,9 @@ foreach ($categories as $item) {
         $category = $item;
     }
 }
+if(is_null($category)){
+    redirect(new moodle_url('/admin/search.php'), 'Selected category missing.', 1);
+}
 
 $courseIds = $category->get_courses(array('idonly' => true));
 

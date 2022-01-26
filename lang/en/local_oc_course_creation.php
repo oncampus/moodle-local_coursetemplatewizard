@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course creation';
-$string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
+$string['plugin_categoryname'] = 'Oncampus course creation category';
 $string['setting_chose_course'] = 'Select course area';
 $string['setting_create_course'] = 'Create course from template';
 $string['template_course_desc'] = 'Set the course area in which the course templates are stored.';
@@ -53,3 +53,6 @@ $string['modal_create_message_failed'] = 'Creation of entry failed';
 $string['modal_create_message'] = 'Do you want to create this entry?';
 $string['modal_create_button'] = 'Create';
 $string['table_btn_submit'] = 'Create';
+$string['edit_presets'] = 'Edit presets';
+$string['edit_preset_value_title'] = 'Edit preset value';
+$string['teacher_name_placeholder'] = 'Lecturer';

@@ -55,12 +55,23 @@ if ($hassiteconfig) {
             $description,
             $default,
             $selection,
-
     );
 
+
     $ADMIN->add('courses',
-            new admin_externalpage('create_course_by_template', get_string('setting_create_course', 'local_oc_course_creation'),
-                    new moodle_url('/local/oc_course_creation/list_courses_to_copy.php', array()), array('moodle/category:manage')));
+            new admin_category( 'courses_local_oc_course_creation',
+                    get_string('pluginname','local_oc_course_creation')
+            ));
+
+    $ADMIN->add('courses_local_oc_course_creation',
+            new admin_externalpage('list_courses_to_copy', get_string('setting_create_course', 'local_oc_course_creation'),
+                    new moodle_url('/local/oc_course_creation/list_courses_to_copy.php', array()), array('moodle/category:manage')
+            ));
+
+    $ADMIN->add('courses_local_oc_course_creation',
+            new admin_externalpage('list_preset_values', get_string('edit_presets', 'local_oc_course_creation'),
+                    new moodle_url('/local/oc_course_creation/list_preset_values.php', array()), array('moodle/category:manage')
+            ));
 
     $settings->add($setting);
 }

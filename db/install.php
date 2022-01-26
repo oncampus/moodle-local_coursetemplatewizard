@@ -38,6 +38,9 @@ $data->idnumber = '';
 $data->visible = '0';
 core_course_category::create($data);
 
+use local_oc_course_creation\manager;
+$manager= new manager();
+
 $record_course_name = new stdClass();
 $record_year = new stdClass();
 $record_semester_So = new stdClass();

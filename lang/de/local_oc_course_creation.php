@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Course creation';
-$string['plugin_categoryname'] = 'Oncampus course creation category';
+$string['pluginname'] = 'Kurs erstellung';
+$string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['setting_chose_course'] = 'Kursbereich auswählen';
 $string['setting_create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] = 'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
@@ -52,3 +52,6 @@ $string['modal_create_message_failed'] = 'Erstellen fehlgeschlagen';
 $string['modal_create_message'] = 'Willst du den eintrag löschen?';
 $string['modal_create_button'] = 'Erstellen';
 $string['table_btn_submit'] = 'Erstellen';
+$string['edit_presets'] = 'Vorgaben bearbeiten';
+$string['edit_preset_value_title'] = 'Bearbeite vorgegebenen Wert';
+$string['teacher_name_placeholder'] = 'Dozent*in';

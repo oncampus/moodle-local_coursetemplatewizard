@@ -26,8 +26,10 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
  * @author     Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class modified_copy_form extends \moodleform {
 
+use local_oc_course_creation\manager;
+
+class modified_copy_form extends \moodleform {
     /**
      * Build form for the course copy settings.
      *
@@ -35,15 +37,19 @@ class modified_copy_form extends \moodleform {
      * @see \moodleform::definition()
      */
     public function definition() {
-        global $CFG, $OUTPUT, $USER;
+        $manager = new manager();
+        global $PAGE;
+        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', null,[]);
 
+
+        global $CFG, $OUTPUT, $USER;
         $mform = $this->_form;
         $course = $this->_customdata['course'];
         $coursecontext = \context_course::instance($course->id);
-        $courseconfig  = get_config('moodlecourse');
-        $returnto      = $this->_customdata['returnto'];
-        $returnurl     = $this->_customdata['returnurl'];
-        $course        = $this->_customdata['course']; // this contains the data of this form
+        $courseconfig = get_config('moodlecourse');
+        $returnto = $this->_customdata['returnto'];
+        $returnurl = $this->_customdata['returnurl'];
+        $course = $this->_customdata['course']; // this contains the data of this form
 
         if (empty($course->category)) {
             $course->category = $course->categoryid;
@@ -52,8 +58,10 @@ class modified_copy_form extends \moodleform {
         // Course ID.
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
+
         $mform->addElement('hidden', 'id', $course->id);
         $mform->setType('id', PARAM_INT);
+
         // Keep source course user data.
         $mform->addElement('hidden', 'userdata', 0);
         $mform->setType('userdata', PARAM_INT);
@@ -79,9 +87,24 @@ class modified_copy_form extends \moodleform {
 
         // Form heading.
         $mform->addElement('html', \html_writer::div(get_string('copycoursedesc', 'backup'), 'form-description mb-3'));
+        $types_key_value = array();
+        $type_group = array();
+        $teacher = $mform->createElement('text', 'type', '',
+                array('class'=>'mr-2 h-100', 'placeholder'=>
+                        get_string('teacher_name_placeholder', 'local_oc_course_creation')));
+        $teacher->setType('fullname', PARAM_TEXT);
+        foreach ($manager->get_all() as $preset) {
+            $types_key_value[$preset->type][] = $preset->string;
+        }
+        $type_group[] = $teacher;
+        $types=$manager->get_diff_types_string();
+        for ($i = count($types)-1; $i>=0;$i--){
+            $type_group[] = $mform->createElement('select', 'type', $types[$i],$types_key_value[$types[$i]],'',array('class'=>'mr-2'));
+         }
 
+        $mform->addGroup($type_group, '', '', ' ', false);
         // Course fullname.
-        $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50"');
+        $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50" readonly');
         $mform->addHelpButton('fullname', 'fullnamecourse');
         $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_TEXT);
@@ -114,7 +137,6 @@ class modified_copy_form extends \moodleform {
             $mform->setConstant('visible', $course->visible);
         }
 
-
         if (!empty($CFG->enablecourserelativedates)) {
             $attributes = [
                     'aria-describedby' => 'relativedatesmode_warning'
@@ -135,8 +157,6 @@ class modified_copy_form extends \moodleform {
             $mform->addHelpButton('relativedatesmodegroup', 'relativedatesmode');
         }
 
-
-
         $requiredcapabilities = array(
                 'moodle/restore:createuser', 'moodle/backup:userinfo', 'moodle/restore:userinfo'
         );
@@ -149,13 +169,14 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
         $mform->setExpanded('descriptionhdr');
 
-        $mform->addElement('editor','summary_editor', get_string('coursesummary'), null);
+        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
         $summaryfields = 'summary_editor';
 
         if ($overviewfilesoptions = course_overviewfiles_options($course)) {
-            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null, $overviewfilesoptions);
+            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null,
+                    $overviewfilesoptions);
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }

@@ -32,10 +32,10 @@ class manager {
     /**
      * @return mixed single string
      */
-    public static function get_by_id($id): array {
+    public static function get_by_id($id): stdClass {
         global $DB;
         try {
-            return $DB->get_record('local_oc_course_creation', $id);
+            return $DB->get_record('local_oc_course_creation', ['id'=>$id]);
         } catch (dml_exception $e) {
             return array();
         }
@@ -52,13 +52,29 @@ class manager {
         }
     }
     /**
-     * @return mixed Array of string
+     * @return mixed Array of stdclass
      */
     public static function get_diff_types(): array {
         global $DB;
         $sql = "Select DISTINCT type from {local_oc_course_creation}";
         try {
             return $DB->get_records_sql($sql);
+        } catch (dml_exception $e) {
+            return array();
+        }
+    }
+    /**
+     * @return mixed Array of string
+     */
+    public static function get_diff_types_string(): array {
+        global $DB;
+        $sql = "Select DISTINCT type from {local_oc_course_creation}";
+        try {
+            $arr=array();
+            foreach ($DB->get_records_sql($sql) as $value){
+                $arr[] = $value->type;
+            }
+            return $arr;
         } catch (dml_exception $e) {
             return array();
         }
@@ -119,7 +135,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function delete_message($id): bool {
+    public function delete($id): bool {
         global $DB;
         return $DB->delete_records('local_oc_course_creation', ['id' => $id]);
     }
