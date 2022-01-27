@@ -31,15 +31,12 @@ use local_oc_course_creation\manager;
 require('../../config.php');
 
 global $CFG;
-echo "a";
 
 $id = required_param('id', PARAM_INT);
 $PAGE->set_url(new moodle_url('/local/oc_course_creation/edit_preset_value.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
-echo "a";
-echo "a";
 $mform = new string_form();
 $manager = new manager();
 

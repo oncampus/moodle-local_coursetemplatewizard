@@ -39,8 +39,7 @@ class modified_copy_form extends \moodleform {
     public function definition() {
         $manager = new manager();
         global $PAGE;
-        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', null,[]);
-
+        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', null, []);
 
         global $CFG, $OUTPUT, $USER;
         $mform = $this->_form;
@@ -71,6 +70,10 @@ class modified_copy_form extends \moodleform {
         $mform->setType('returnto', PARAM_ALPHANUM);
         $mform->setConstant('returnto', $returnto);
 
+        // Course ID number (default to the current course ID number; blank for users who can't change ID numbers).
+        $mform->addElement('hidden', 'idnumber', $course->idnumber);
+        $mform->setType('idnumber', PARAM_RAW);
+
         // Notifications of current copies.
         $copies = \core_backup\copy\copy::get_copies($USER->id, $course->id);
         if (!empty($copies)) {
@@ -87,24 +90,41 @@ class modified_copy_form extends \moodleform {
 
         // Form heading.
         $mform->addElement('html', \html_writer::div(get_string('copycoursedesc', 'backup'), 'form-description mb-3'));
+
+        // Form select image
+        $summaryfields = 'summary_editor';
+        if ($overviewfilesoptions = course_overviewfiles_options($course)) {
+            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null,
+                    $overviewfilesoptions);
+            $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
+            $summaryfields .= ',overviewfiles_filemanager';
+        }
+
+        // Form preset values
         $types_key_value = array();
         $type_group = array();
-        $teacher = $mform->createElement('text', 'type', '',
-                array('class'=>'mr-2 h-100', 'placeholder'=>
+        $teacher = $mform->createElement('text', 'teacher_name', '',
+                array('class' => 'mr-2 h-100 modifying_type', 'placeholder' =>
                         get_string('teacher_name_placeholder', 'local_oc_course_creation')));
-        $teacher->setType('fullname', PARAM_TEXT);
+        $course_type = $mform->createElement('text', 'course_type', '',
+                array('class' => 'mr-2 h-100 modifying_type', 'placeholder' =>
+                        get_string('teacher_course_type_placeholder', 'local_oc_course_creation')));
+        $teacher->setType('teacher_name', PARAM_TEXT);
+        $course_type->setType('course_type', PARAM_TEXT);
         foreach ($manager->get_all() as $preset) {
             $types_key_value[$preset->type][] = $preset->string;
         }
         $type_group[] = $teacher;
-        $types=$manager->get_diff_types_string();
-        for ($i = count($types)-1; $i>=0;$i--){
-            $type_group[] = $mform->createElement('select', 'type', $types[$i],$types_key_value[$types[$i]],'',array('class'=>'mr-2'));
-         }
+        $type_group[] = $course_type;
+        $types = $manager->get_diff_types_string();
+        for ($i = count($types) - 1; $i >= 0; $i--) {
+            $type_group[] = $mform->createElement('select', 'type_' . $types[$i], "", $types_key_value[$types[$i]]
+                    , ['class' => 'modifying_type select_type']);
+        }
 
         $mform->addGroup($type_group, '', '', ' ', false);
         // Course fullname.
-        $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50" readonly');
+        $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50"');
         $mform->addHelpButton('fullname', 'fullnamecourse');
         $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_TEXT);
@@ -172,20 +192,37 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
-        $summaryfields = 'summary_editor';
-
-        if ($overviewfilesoptions = course_overviewfiles_options($course)) {
-            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('courseoverviewfiles'), null,
-                    $overviewfilesoptions);
-            $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
-            $summaryfields .= ',overviewfiles_filemanager';
-        }
 
         if (!empty($course->id) and !has_capability('moodle/course:changesummary', $coursecontext)) {
             // Remove the description header it does not contain anything any more.
             $mform->removeElement('descriptionhdr');
             $mform->hardFreeze($summaryfields);
         }
+
+        $role = new \stdClass();
+        $role->id  = 2;
+        $role->roleid = 2;
+        $role->contextid = $coursecontext;
+        $role->localname  = 'None';
+        $role->userid = $USER->id;
+        $role->component = '';
+        $role->itemid = 0;
+        $role->timemodified = time();
+        $roles[] = $role;
+        // Only add the option if there are roles in this course.
+        if (!empty($roles) && has_capability('moodle/restore:createuser', $coursecontext)) {
+            $rolearray = array();
+            foreach ($roles as $role) {
+                $roleid = 'role_' . $role->id;
+                $rolearray[] = $mform->createElement('advcheckbox', $roleid,
+                        $role->localname, '', array('group' => 2), array(0, $role->id));
+            }
+
+            $mform->addGroup($rolearray, 'rolearray', get_string('keptroles', 'backup'), ' ', false);
+            $mform->addHelpButton('rolearray', 'keptroles', 'backup');
+            $this->add_checkbox_controller(2);
+        }
+
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitreturn', get_string('copyreturn', 'backup'));

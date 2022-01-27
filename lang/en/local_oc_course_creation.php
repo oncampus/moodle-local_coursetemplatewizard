@@ -56,3 +56,4 @@ $string['table_btn_submit'] = 'Create';
 $string['edit_presets'] = 'Edit presets';
 $string['edit_preset_value_title'] = 'Edit preset value';
 $string['teacher_name_placeholder'] = 'Lecturer';
+$string['teacher_course_type_placeholder'] = 'Course category';

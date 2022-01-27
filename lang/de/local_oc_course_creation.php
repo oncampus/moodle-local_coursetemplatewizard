@@ -55,3 +55,4 @@ $string['table_btn_submit'] = 'Erstellen';
 $string['edit_presets'] = 'Vorgaben bearbeiten';
 $string['edit_preset_value_title'] = 'Bearbeite vorgegebenen Wert';
 $string['teacher_name_placeholder'] = 'Dozent*in';
+$string['teacher_course_type_placeholder'] = 'Kurs Kategorie';

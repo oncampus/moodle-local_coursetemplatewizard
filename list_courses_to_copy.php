@@ -14,7 +14,7 @@ require_once($CFG->dirroot . '/course/classes/category.php');
 use local_oc_course_creation\form\string_form;
 use local_oc_course_creation\manager;
 
-$PAGE->set_url(new moodle_url('/local/oc_course_creation/create.php'));
+$PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 $PAGE->set_pagelayout('admin');
@@ -38,7 +38,6 @@ $courseIds = $category->get_courses(array('idonly' => true));
 
 $context = context_coursecat::instance($category->id);
 //$PAGE->requires->js_call_amd('local_oc_course_creation/create_course_copy_modal', 'init', array($context->id));
-$PAGE->requires->js_call_amd('local_oc_course_creation/form_control', null,[]);
 
 $url = new moodle_url('/local/oc_course_creation/handle_copy_form.php');
 
