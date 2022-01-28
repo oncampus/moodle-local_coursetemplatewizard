@@ -25,14 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Kurs erstellung';
+$string['pluginname'] = 'Kurserstellung';
 $string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['setting_chose_course'] = 'Kursbereich auswählen';
 $string['setting_create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] = 'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
 $string['creation_page_title'] = 'Kurs Vorlagen';
 $string['headline_table_view'] = 'Kurs Vorlagen';
-$string['table_head_coursename'] = 'Kurs name';
+$string['table_head_coursename'] = 'Kursname';
 $string['table_head_shortname'] = 'Kürzel';
 $string['table_head_edit'] = 'bearbeiten';
 $string['course_format'] = 'Kursbereich';
@@ -45,11 +45,11 @@ $string['form_type_course_year'] = 'Jahr';
 $string['table_head_preset_value'] = 'voreingestellter Wert';
 $string['modal_delete_title'] = 'Eintrag löschen';
 $string['modal_delete_message_failed'] = 'Eintrag löschen fehlgeschlagen';
-$string['modal_delete_message'] = 'Willst du den eintrag löschen?';
+$string['modal_delete_message'] = 'Willst du den Eintrag löschen?';
 $string['modal_delete_button'] = 'Löschen';
 $string['modal_create_title'] = 'Eintrag erstellen';
 $string['modal_create_message_failed'] = 'Erstellen fehlgeschlagen';
-$string['modal_create_message'] = 'Willst du den eintrag löschen?';
+$string['modal_create_message'] = 'Willst du den Eintrag löschen?';
 $string['modal_create_button'] = 'Erstellen';
 $string['table_btn_submit'] = 'Erstellen';
 $string['edit_presets'] = 'Vorgaben bearbeiten';

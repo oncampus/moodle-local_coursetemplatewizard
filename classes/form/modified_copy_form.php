@@ -58,8 +58,6 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('hidden', 'id', $course->id);
-        $mform->setType('id', PARAM_INT);
 
         // Keep source course user data.
         $mform->addElement('hidden', 'userdata', 0);
@@ -180,10 +178,6 @@ class modified_copy_form extends \moodleform {
         $requiredcapabilities = array(
                 'moodle/restore:createuser', 'moodle/backup:userinfo', 'moodle/restore:userinfo'
         );
-        if (!has_all_capabilities($requiredcapabilities, $coursecontext)) {
-            $mform->hardFreeze('userdata');
-            $mform->setConstant('userdata', 0);
-        }
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
@@ -199,29 +193,7 @@ class modified_copy_form extends \moodleform {
             $mform->hardFreeze($summaryfields);
         }
 
-        $role = new \stdClass();
-        $role->id  = 2;
-        $role->roleid = 2;
-        $role->contextid = $coursecontext;
-        $role->localname  = 'None';
-        $role->userid = $USER->id;
-        $role->component = '';
-        $role->itemid = 0;
-        $role->timemodified = time();
-        $roles[] = $role;
-        // Only add the option if there are roles in this course.
-        if (!empty($roles) && has_capability('moodle/restore:createuser', $coursecontext)) {
-            $rolearray = array();
-            foreach ($roles as $role) {
-                $roleid = 'role_' . $role->id;
-                $rolearray[] = $mform->createElement('advcheckbox', $roleid,
-                        $role->localname, '', array('group' => 2), array(0, $role->id));
-            }
-
-            $mform->addGroup($rolearray, 'rolearray', get_string('keptroles', 'backup'), ' ', false);
-            $mform->addHelpButton('rolearray', 'keptroles', 'backup');
-            $this->add_checkbox_controller(2);
-        }
+       
 
 
         $buttonarray = array();
