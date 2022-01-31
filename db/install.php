@@ -22,7 +22,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 global $CFG, $DB;
 require_once($CFG->dirroot . "/config.php");
 require_once($CFG->dirroot . '/course/lib.php');
