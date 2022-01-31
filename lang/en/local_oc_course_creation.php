@@ -57,3 +57,6 @@ $string['edit_presets'] = 'Edit presets';
 $string['edit_preset_value_title'] = 'Edit preset value';
 $string['teacher_name_placeholder'] = 'Lecturer';
 $string['teacher_course_type_placeholder'] = 'Course category';
+$string['record_type1_value1'] = 'SuSe';
+$string['record_type1_value2'] = 'WiSe';
+$string['table_head_new_type'] = 'Descriptive name';
