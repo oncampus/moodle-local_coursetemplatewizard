@@ -58,4 +58,4 @@ $record_semester_So->string = 'SoSe';
 $record_semester_Wi->type = "Semester";
 $record_semester_Wi->string = 'WiSe';
 
-$DB->insert_records('local_oc_course_creation',[$record_course_name,$record_year,$record_semester_So,$record_semester_Wi]);
+$DB->insert_records('oc_course_creation',[$record_course_name,$record_year,$record_semester_So,$record_semester_Wi]);

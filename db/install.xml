@@ -4,7 +4,7 @@
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="local_oc_course_creation" COMMENT="Saves preset values for the local_oc_course_creation plugin.">
+        <TABLE NAME="oc_course_creation" COMMENT="Saves preset values for the local_oc_course_creation plugin.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="type" TYPE="text"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -14,7 +14,7 @@
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="local_oc_course_creation_type" COMMENT="Saves preset types for the local_oc_course_creation plugin.">
+        <TABLE NAME="oc_course_creation_type" COMMENT="Saves preset types for the local_oc_course_creation plugin.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="type" TYPE="text"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -24,7 +24,7 @@
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="local_oc_course_creation_values" COMMENT="Saves preset values for the local_oc_course_creation plugin.">
+        <TABLE NAME="oc_course_creation_values" COMMENT="Saves preset values for the local_oc_course_creation plugin.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="string" TYPE="text"  LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

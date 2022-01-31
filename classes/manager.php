@@ -32,10 +32,10 @@ class manager {
     /**
      * @return mixed single string
      */
-    public static function get_by_id($id): stdClass {
+    public static function get_by_id($id) {
         global $DB;
         try {
-            return $DB->get_record('local_oc_course_creation', ['id'=>$id]);
+            return $DB->get_record('oc_course_creation', ['id'=>$id]);
         } catch (dml_exception $e) {
             return array();
         }
@@ -43,10 +43,10 @@ class manager {
     /**
      * @return mixed Array of string
      */
-    public static function get_by_type($type): array {
+    public static function get_by_type($type) {
         global $DB;
         try {
-            return $DB->get_records('local_oc_course_creation', $type);
+            return $DB->get_records('oc_course_creation', $type);
         } catch (dml_exception $e) {
             return array();
         }
@@ -54,9 +54,9 @@ class manager {
     /**
      * @return mixed Array of stdclass
      */
-    public static function get_diff_types(): array {
+    public static function get_diff_types() {
         global $DB;
-        $sql = "Select DISTINCT type from {local_oc_course_creation}";
+        $sql = "Select DISTINCT type from {oc_course_creation}";
         try {
             return $DB->get_records_sql($sql);
         } catch (dml_exception $e) {
@@ -66,9 +66,9 @@ class manager {
     /**
      * @return mixed Array of string
      */
-    public static function get_diff_types_string(): array {
+    public static function get_diff_types_string() {
         global $DB;
-        $sql = "Select DISTINCT type from {local_oc_course_creation}";
+        $sql = "Select DISTINCT type from {oc_course_creation}";
         try {
             $arr=array();
             foreach ($DB->get_records_sql($sql) as $value){
@@ -83,10 +83,10 @@ class manager {
     /**
      * @return mixed Array of all strings
      */
-    public static function get_all(): array {
+    public static function get_all() {
         global $DB;
         try {
-            return $DB->get_records('local_oc_course_creation', []);
+            return $DB->get_records('oc_course_creation', []);
         } catch (dml_exception $e) {
             return array();
         }
@@ -97,14 +97,14 @@ class manager {
      *
      * @return bool DB transaction successful
      */
-    public static function update($id, $type, $string): bool {
+    public static function update($id, $type, $string) {
         global $DB;
         $recordToUpdate = new stdClass();
         $recordToUpdate->id = $id;
         $recordToUpdate->type = $type;
         $recordToUpdate->string = $string;
         try {
-            return $DB->update_record('local_oc_course_creation', $recordToUpdate, false);
+            return $DB->update_record('oc_course_creation', $recordToUpdate, false);
         } catch (dml_exception $e) {
             return false;
         }
@@ -115,13 +115,13 @@ class manager {
      *
      * @return bool DB transaction successful
      */
-    public static function create($type, $string): bool {
+    public static function create($type, $string) {
         global $DB;
         $recordToInsert = new stdClass();
         $recordToInsert->type = $type;
         $recordToInsert->string = $string;
         try {
-            return $DB->insert_record('local_oc_course_creation', $recordToInsert, false);
+            return $DB->insert_record('oc_course_creation', $recordToInsert, false);
         } catch (dml_exception $e) {
             return false;
         }
@@ -135,8 +135,8 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function delete($id): bool {
+    public function delete($id) {
         global $DB;
-        return $DB->delete_records('local_oc_course_creation', ['id' => $id]);
+        return $DB->delete_records('oc_course_creation', ['id' => $id]);
     }
 }
