@@ -22,39 +22,42 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG, $DB;
-require_once($CFG->dirroot . "/config.php");
-require_once($CFG->dirroot . '/course/lib.php');
-
-/*
- * Creates a default course category
- */
-
-$data = new stdClass();
-$data->name = get_string('plugin_categoryname', 'local_oc_course_creation');
-$data->description = 'This is the default course category for course templates oc course creation will use.';
-$data->idnumber = '';
-$data->visible = '0';
-core_course_category::create($data);
 
 use local_oc_course_creation\manager;
-$manager= new manager();
+function install()  {
+    global $CFG, $DB;
 
-$record_course_name = new stdClass();
-$record_year = new stdClass();
-$record_semester_So = new stdClass();
-$record_semester_Wi = new stdClass();
+    require_once($CFG->dirroot . "/config.php");
+    require_once($CFG->dirroot . '/course/lib.php');
 
-$record_course_name->type = "Kursbezeichnung";
-$record_course_name->string = "Informatik";
+    /*
+     * Creates a default course category
+     */
+    $data = new stdClass();
+    $data->name = get_string('plugin_categoryname', 'local_oc_course_creation');
+    $data->description = 'This is the default course category for course templates oc course creation will use.';
+    $data->idnumber = '';
+    $data->visible = '0';
+    core_course_category::create($data);
+    $manager = new manager();
 
-$record_year->type = "Jahr";
-$record_year->string = date("y");
+    $record_course_name = new stdClass();
+    $record_year = new stdClass();
+    $record_semester_So = new stdClass();
+    $record_semester_Wi = new stdClass();
 
-$record_semester_So->type = 'Semester';
-$record_semester_So->string = 'SoSe';
+    $record_course_name->type = "Kursbezeichnung";
+    $record_course_name->string = "Informatik";
 
-$record_semester_Wi->type = "Semester";
-$record_semester_Wi->string = 'WiSe';
+    $record_year->type = "Jahr";
+    $record_year->string = date("y");
 
-$DB->insert_records('oc_course_creation',[$record_course_name,$record_year,$record_semester_So,$record_semester_Wi]);
+    $record_semester_So->type = 'Semester';
+    $record_semester_So->string = 'SoSe';
+
+    $record_semester_Wi->type = "Semester";
+    $record_semester_Wi->string = 'WiSe';
+
+    $DB->insert_records('oc_course_creation', [$record_course_name, $record_year, $record_semester_So, $record_semester_Wi]);
+}
+
