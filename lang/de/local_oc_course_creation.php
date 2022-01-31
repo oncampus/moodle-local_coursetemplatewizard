@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Kurserstellung';
+$string['pluginname'] = 'Kurse Duplizieren';
 $string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['setting_chose_course'] = 'Kursbereich auswählen';
 $string['setting_create_course'] = 'Kurs aus Vorlage erstellen';

@@ -24,10 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 use local_oc_course_creation\manager;
-function install()  {
+function xmldb_local_oc_course_creation_install() {
     global $CFG, $DB;
-
-    require_once($CFG->dirroot . "/config.php");
     require_once($CFG->dirroot . '/course/lib.php');
 
     /*
@@ -39,7 +37,6 @@ function install()  {
     $data->idnumber = '';
     $data->visible = '0';
     core_course_category::create($data);
-    $manager = new manager();
 
     $record_course_name = new stdClass();
     $record_year = new stdClass();
@@ -49,14 +46,11 @@ function install()  {
     $record_course_name->type = "Kursbezeichnung";
     $record_course_name->string = "Informatik";
 
-    $record_year->type = "Jahr";
-    $record_year->string = date("y");
-
     $record_semester_So->type = 'Semester';
-    $record_semester_So->string = 'SoSe';
+    $record_semester_So->string = 'SoSe ' . date("y");
 
     $record_semester_Wi->type = "Semester";
-    $record_semester_Wi->string = 'WiSe';
+    $record_semester_Wi->string = 'WiSe ' . date("y");
 
     $DB->insert_records('oc_course_creation', [$record_course_name, $record_year, $record_semester_So, $record_semester_Wi]);
 }
