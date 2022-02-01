@@ -38,21 +38,6 @@ function xmldb_local_oc_course_creation_install() {
     $data->visible = '0';
     core_course_category::create($data);
 
-    $record_course_name = new stdClass();
-    $record_year = new stdClass();
-    $record_semester_So = new stdClass();
-    $record_semester_Wi = new stdClass();
-
-    $record_course_name->type = "Kursbezeichnung";
-    $record_course_name->string = "Informatik";
-
-    $record_semester_So->type = 'Semester';
-    $record_semester_So->string = 'SoSe ' . date("y");
-
-    $record_semester_Wi->type = "Semester";
-    $record_semester_Wi->string = 'WiSe ' . date("y");
-
-
     $record_type1 = new stdClass();
     $record_type2 = new stdClass();
 

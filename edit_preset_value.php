@@ -27,7 +27,6 @@ use local_oc_course_creation\form\string_form;
 use local_oc_course_creation\form;
 use local_oc_course_creation\manager;
 
-
 require('../../config.php');
 
 global $CFG;
@@ -43,17 +42,17 @@ $manager = new manager();
 if ($mform->is_cancelled()) {
     //go back to manage page
     redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
-} elseif ($fromform = $mform->get_data()) {
+} else if ($fromform = $mform->get_data()) {
     //insert the data in the db
 
-    if($fromform->id){
-        $manager->update($fromform->id,$fromform->type, $fromform->string);
+    if ($fromform->id) {
+        $manager->update_value($fromform->id, $fromform->string, $fromform->type_id);
         redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
     }
 }
 
 if ($id) {
-    $preset = $manager->get_by_id($id);
+    $preset = $manager->get_value_by_id($id);
     if (!$preset) {
         throw new invalid_parameter_exception('Preset not found.');
     }

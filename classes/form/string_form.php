@@ -32,10 +32,10 @@ class string_form extends  \moodleform {
     public function definition() {
 
         $manager = new manager();
-        $types = $manager->get_diff_types_string();
+        $types = $manager->get_all_types();
         $types_key_value = array();
         foreach ($types as $type){
-            $types_key_value[$type] = $type;
+            $types_key_value[$type->id] = $type->type;
         }
 
 
@@ -45,7 +45,7 @@ class string_form extends  \moodleform {
         $mform->setType('id', PARAM_INT);
 
 
-        $mform->addElement('select', 'type', get_string('forumtype', 'forum'), $types_key_value, []);
+        $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $types_key_value, []);
 
 
         $mform->addElement('text', 'string', get_string('form_select', 'local_oc_course_creation'));

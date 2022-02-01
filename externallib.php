@@ -52,7 +52,7 @@ class local_oc_course_creation_external extends external_api {
         self::validate_parameters(self::custom_preset_delete_parameters(), array('id' => $id));
 
         $manager = new manager();
-        return $manager->delete($id);
+        return $manager->delete_value($id);
 
     }
 

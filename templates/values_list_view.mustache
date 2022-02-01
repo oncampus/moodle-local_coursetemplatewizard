@@ -1,6 +1,6 @@
 <div class="container-fluid">
     <div>
-        {{#types}}
+        {{#entries}}
             <h2>{{type}}</h2>
             <table class="table table-striped table-bordered table-sm" id="course-table">
                 <thead class="table-head-courslist">
@@ -15,7 +15,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {{#entries}}
+                {{#values}}
                     <tr class="id:{{id}} table-body-courlist">
                         <td class="col-1">{{id}}</td>
                         <td class="col-8 string_{{id}}">{{string}}</td>
@@ -32,11 +32,11 @@
                             </div>
                         </td>
                     </tr>
-                {{/entries}}
+                {{/values}}
                 <tr class="table-body-courslist new-entry-form flex-column justify-content-center">
                     <form action="list_preset_values.php" method="post" id="{{type}}">
                         <td class="col-1 h-100 w-100">
-                            <input type="hidden" value="{{type}}" name="type" class="w-100 h-100 "></td>
+                            <input type="hidden" value="{{type_id}}" name="type_id" class="w-100 h-100 "></td>
                         <td class="h-100">
                             <input type="text" name="text" class="w-100 h-100 p-1"/>
                         </td>
@@ -48,7 +48,7 @@
                 </tr>
                 </tbody>
             </table>
-        {{/types}}
+        {{/entries}}
         <h2>{{#str}} modal_create_title, local_oc_course_creation {{/str}}</h2>
         <table class="table table-striped table-bordered table-sm" id="course-table">
             <thead class="table-head-courslist">
@@ -63,7 +63,7 @@
             <tr class="table-body-courlist new-entry-form  align-items-center">
                 <form action="list_preset_values.php" method="post">
                     <td class="col-1 h-100 w-100 th-sm col-1>">
-                        <input type="text" value="{{type}}" name="type" class="w-100 h-100  p-1"></td>
+                        <input type="text" value="" name="type" class="w-100 h-100  p-1"></td>
                     <td class="h-100 th-sm col-8">
                         <input type="text" name="text" class="w-100 h-100  p-1"/>
                     </td>
