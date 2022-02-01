@@ -94,27 +94,31 @@ class manager {
     }
 
     /**
-     * Inserts a type at new rank and changes other ranks down
+     * Moves a type a rank up
      *
      * @param $id int
-     * @param $new_rank int
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function update_insert_sort($id, $new_rank) {
+    public function type_sort_up($id) {
         global $DB;
-        $highest_record = $this->get_type_by_id($id);
-        $highest_record->rank = $new_rank;
+        $record_to_move = $this->get_type_by_id($id);
+        $old_rank = $record_to_move->rank;
+        $record_to_move->rank -=1;
         $transactions = array();
 
-        $records = $this->get_types_lower_and_equal_ranked($new_rank);
+        $types = $this->get_types_higher_and_equal_rank($old_rank - 1);
 
         $transaction = $DB->start_delegated_transaction();
-        $transactions[] = $DB->update_record('oc_course_creation_type', $highest_record, true);
-        foreach ($records as $record) {
-            $record->rank += 1;
-            $transactions[] = $DB->update_record('oc_course_creation_type', $record, true);
+        foreach ($types as $type) {
+            if($old_rank === $type->rank){
+                --$type->rank;
+                $transactions[] = $DB->update_record('oc_course_creation_type',$type);
+            } else{
+                ++$type->rank;
+                $transactions[] = $DB->update_record('oc_course_creation_type',$type);
+            }
         }
         if (!in_array(false, $transactions, true)) {
             $DB->commit_delegated_transaction($transaction);
@@ -124,10 +128,9 @@ class manager {
     }
 
     /**
-     * Inserts a type at new rank and changes other ranks down
+     * Deletes a type at new rank and changes other ranks down
      *
      * @param $id int
-     * @param $new_rank int
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
@@ -138,7 +141,7 @@ class manager {
         $new_rank = $record_to_delete->rank;
         $transactions = array();
 
-        $records = $this->get_types_lower_and_equal_ranked($new_rank);
+        $records = $this->get_types_higher_and_equal_rank($new_rank);
 
         $transaction = $DB->start_delegated_transaction();
         $transactions[] = $DB->delete_records('oc_course_creation_type', ['id' => $id]);
@@ -244,9 +247,9 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_types_lower_and_equal_ranked($rank) {
+    private function get_types_higher_and_equal_rank($rank) {
         global $DB;
-        $sql = "SELECT * FROM {oc_course_creation_type} WHERE 'rank' <= ?";
+        $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
         try {
             return $DB->get_records_sql($sql, [$rank]);
         } catch (dml_exception $e) {
