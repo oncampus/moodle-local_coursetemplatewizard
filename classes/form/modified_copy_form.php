@@ -98,6 +98,14 @@ class modified_copy_form extends \moodleform {
             $summaryfields .= ',overviewfiles_filemanager';
         }
 
+        $mform->addElement('checkbox', 'add_prefix', get_string('course_prefix', 'local_oc_course_creation'));
+
+
+        $prefix = $mform->createElement('text', 'prefix', '',
+                array('class' => 'mr-2 h-100 modifying_type prefix', 'placeholder' =>
+                        get_config('local_oc_course_creation', 'prefix_text')));
+
+        $mform->hideIf("prefix", "add_prefix", 'checked',1);
         // Form preset values
         $types_key_value = array();
         $type_group = array();
@@ -107,16 +115,26 @@ class modified_copy_form extends \moodleform {
         $course_type = $mform->createElement('text', 'course_type', '',
                 array('class' => 'mr-2 h-100 modifying_type', 'placeholder' =>
                         get_string('teacher_course_type_placeholder', 'local_oc_course_creation')));
+
         $teacher->setType('teacher_name', PARAM_TEXT);
+
+        $prefix->setType('prefix', PARAM_TEXT);
         $course_type->setType('course_type', PARAM_TEXT);
-        foreach ($manager->get_all() as $preset) {
-            $types_key_value[$preset->type][] = $preset->string;
+        foreach ($manager->get_all_types() as $type) {
+            foreach ($manager->get_all_values() as $value) {
+                if($value->type_id === $type->id) {
+                    $types_key_value[$type->type][] = $value->string;
+                }
+            }
         }
+        $type_group[] = $prefix;
         $type_group[] = $teacher;
         $type_group[] = $course_type;
-        $types = $manager->get_diff_types_string();
-        for ($i = count($types) - 1; $i >= 0; $i--) {
-            $type_group[] = $mform->createElement('select', 'type_' . $types[$i], "", $types_key_value[$types[$i]]
+        $types = $manager->get_all_types();
+
+        foreach ($types as $type) {
+            $type_group[] = $mform->createElement('select', 'type_' . $type->type,
+                    "", $types_key_value[$type->type]
                     , ['class' => 'modifying_type select_type']);
         }
 
@@ -193,7 +211,7 @@ class modified_copy_form extends \moodleform {
             $mform->hardFreeze($summaryfields);
         }
 
-       
+
 
 
         $buttonarray = array();

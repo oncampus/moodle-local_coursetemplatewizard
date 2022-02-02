@@ -56,7 +56,19 @@ if ($hassiteconfig) {
             $default,
             $selection,
     );
+    $settings->add($setting);
 
+    $name = 'local_oc_course_creation/prefix_text';
+    $description = get_string('template_prefix_desc', 'local_oc_course_creation');
+    $selection = [];
+    $default = get_string('template_prefix_default', 'local_oc_course_creation');;
+    $setting = new admin_setting_configtext(
+            $name,
+            $visiblename = get_string('setting_edit_template_prefix', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settings->add($setting);
 
     $ADMIN->add('courses',
             new admin_category( 'courses_local_oc_course_creation',
@@ -73,5 +85,4 @@ if ($hassiteconfig) {
                     new moodle_url('/local/oc_course_creation/list_preset_values.php', array()), array('moodle/category:manage')
             ));
 
-    $settings->add($setting);
 }

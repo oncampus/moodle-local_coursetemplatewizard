@@ -16,7 +16,7 @@ use local_oc_course_creation\manager;
 
 $url = new moodle_url('/local/oc_course_creation/list_preset_values.php');
 $action = optional_param('action', '', PARAM_ALPHA);
-$type_id = optional_param('type_id', '', PARAM_ALPHA);
+$rank = optional_param('rank', '', PARAM_INT);
 $PAGE->set_url($url);
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
@@ -25,13 +25,13 @@ $PAGE->requires->js_call_amd('local_oc_course_creation/delete_preset_value');
 
 $manager = new manager();
 
-if($action && $type_id){
+if($action && $rank){
     switch ($action){
         case "moveup" :
-        $manager->
+        $manager->swap($rank, $rank - 1);
             redirect($url, null, 1);
         case "movedown" :
-
+            $manager->swap($rank, $rank + 1);
             redirect($url, null, 1);
     }
 }
@@ -64,12 +64,12 @@ foreach ($types as $type) {
     $entries[$i]['rank'] = $type->rank;
     $entries[$i]['btns'] =  get_spacer();
     if ($type != $first_type) {
-        $entries[$i]['btns'] .= get_action_icon($url . '?action=moveup&amp;type_id=' . $type->rank, 'up', $strmoveup, $strmoveup);
+        $entries[$i]['btns'] .= get_action_icon($url . '?action=moveup&amp;rank=' . $type->rank, 'up', $strmoveup, $strmoveup);
     } else {
         $entries[$i]['btns'] .= get_spacer();
     }
     if ($type != $last_type) {
-        $entries[$i]['btns'] .= get_action_icon($url . '?action=movedown&amp;type_id=' . $type->rank, 'down', $strmovedown,
+        $entries[$i]['btns'] .= get_action_icon($url . '?action=movedown&amp;rank=' . $type->rank, 'down', $strmovedown,
                 $strmovedown);
     } else {
         $entries[$i]['btns'] .= get_spacer();

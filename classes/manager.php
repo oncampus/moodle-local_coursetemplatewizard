@@ -50,7 +50,7 @@ class manager {
         $value->string = $string;
         $transaction = $DB->start_delegated_transaction();
         $insert_type = $this->create_type($type);
-        $value->type_id = $this->get_last_rank()->id;
+        $value->type_id = $this->get_last_type_by_rank()->id;
         $insert_value = $DB->insert_record("oc_course_creation_value", $value);
         if ($insert_value && $insert_type) {
             $DB->commit_delegated_transaction($transaction);
@@ -84,7 +84,6 @@ class manager {
         $delete_type = true;
         if (count($types) === 0) {
             $delete_type = $this->update_delete_sort($value->type_id);
-            var_dump($types);
         }
         if ($delete_value && $delete_type) {
             $DB->commit_delegated_transaction($transaction);
@@ -93,39 +92,7 @@ class manager {
         return false;
     }
 
-    /**
-     * Moves a type a rank up
-     *
-     * @param $id int
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function type_sort_up($id) {
-        global $DB;
-        $record_to_move = $this->get_type_by_id($id);
-        $old_rank = $record_to_move->rank;
-        $record_to_move->rank -=1;
-        $transactions = array();
 
-        $types = $this->get_types_higher_and_equal_rank($old_rank - 1);
-
-        $transaction = $DB->start_delegated_transaction();
-        foreach ($types as $type) {
-            if($old_rank === $type->rank){
-                --$type->rank;
-                $transactions[] = $DB->update_record('oc_course_creation_type',$type);
-            } else{
-                ++$type->rank;
-                $transactions[] = $DB->update_record('oc_course_creation_type',$type);
-            }
-        }
-        if (!in_array(false, $transactions, true)) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Deletes a type at new rank and changes other ranks down
@@ -170,35 +137,54 @@ class manager {
         global $DB;
         $new_type = new stdClass();
         $new_type->type = $string;
-        $new_type->rank = $this->get_last_rank()->rank + 1;
+        $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
         return $DB->insert_record('oc_course_creation_type', $new_type);
     }
 
     /**
-     * Inserts a type at highest rank
+     * Returns the
      *
-     * @param $string String
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_last_rank() {
+    private function get_last_type_by_rank() {
         global $DB;
         $sql = "SELECT * from {oc_course_creation_type} ORDER BY rank DESC LIMIT 1";
-        return $DB->get_record_sql($sql);
+        if($rank = $DB->get_record_sql($sql))
+            return $rank;
+        else {
+            $rank = new stdClass();
+            $rank->rank =0;
+            $rank->id =0;
+            $rank->type = "";
+            return $rank;
+        }
     }
 
     /**
      * Get A type by its id
      *
      * @param $id int
-     * @return bool DB transaction successful
+     * @return mixed DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
     private function get_type_by_id($id) {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['id' => $id]);
+    }
+    /**
+     * Get A type by its rank
+     *
+     * @param $rank int
+     * @return mixed DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    private function get_type_by_rank($rank) {
+        global $DB;
+        return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
     }
 
     /**
@@ -240,20 +226,35 @@ class manager {
     }
 
     /**
-     * gets all types where rank is same or greater than given
+     * Swaps two ranks of type
      *
-     * @param $rank int
+     * @param $type_rank1 int
+     * @param $type_rank2 int
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_types_higher_and_equal_rank($rank) {
+    public function swap($type_rank1,$type_rank2) {
         global $DB;
-        $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
-        try {
-            return $DB->get_records_sql($sql, [$rank]);
-        } catch (dml_exception $e) {
-            return false;
+        $record_to_swap1 = $this->get_type_by_rank($type_rank1);
+        $record_to_swap2 = $this->get_type_by_rank($type_rank2);
+
+        $tmp_rank = $record_to_swap1->rank;
+
+        $record_to_swap1->rank = $record_to_swap2->rank;
+        $record_to_swap2->rank = $tmp_rank;
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $tr1 = $DB->update_record('oc_course_creation_type',$record_to_swap1 );
+        $tr2 = $DB->update_record('oc_course_creation_type',$record_to_swap2 );
+
+        if ($tr1 && $tr2) {
+            $DB->commit_delegated_transaction($transaction);
+            return true;
         }
+        return false;
     }
+
+
 }

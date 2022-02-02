@@ -14,11 +14,9 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
             // Get id before modal is displayed
             preShowCallback: function (triggerElement, modal) {
                 triggerElement = $(triggerElement);
-                let classString = triggerElement[0].classList[0];
-                let id = classString.substr(3);
+                let id = triggerElement[0].classList[0].substr(3);
                 modal.params = {'id': id};
                 modal.setSaveButtonText(String.get_string('modal_delete_button', 'local_oc_course_creation'));
-                console.log(modal.params);
             },
         }, trigger)
             .done(function(modal) {
@@ -40,7 +38,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                             Y.log('deleted message ' + modal.params);
                         } else {
                             Notification.addNotification({
-                                message: String.get_string('modal_delete_message_failed', 'local_oc_course_creation'),
+                                message: String.get_string('modal_delete_preset_failed', 'local_oc_course_creation'),
                                 type: 'error'
                             });
                         }
