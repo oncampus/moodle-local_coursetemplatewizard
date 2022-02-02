@@ -29,6 +29,14 @@ use dml_exception;
 
 class manager {
 
+    /**
+     * Creates an value
+     * @param $string
+     * @param $type_id
+     * @return bool
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     */
     public function create_value($string, $type_id) {
         global $DB;
         $value = new stdClass();
@@ -44,6 +52,14 @@ class manager {
         return false;
     }
 
+    /**
+     * Creates an type and the value with new type_id
+     * @param $string
+     * @param $type
+     * @return bool
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     */
     public function create_value_and_type($string, $type) {
         global $DB;
         $value = new stdClass();
@@ -59,9 +75,19 @@ class manager {
         return false;
     }
 
+    /**
+     * Updates an value with
+     * @param $id
+     * @param $string
+     * @param $type_id
+     * @return bool
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     */
     public function update_value($id, $string, $type_id) {
         global $DB;
-        $value = $this->get_value_by_id($id);
+        $value = new stdClass();
+        $value->id = $id;
         $value->string = $string;
         $value->type_id = $type_id;
         return $DB->update_record('oc_course_creation_value', $value);
@@ -141,51 +167,6 @@ class manager {
         return $DB->insert_record('oc_course_creation_type', $new_type);
     }
 
-    /**
-     * Returns the
-     *
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    private function get_last_type_by_rank() {
-        global $DB;
-        $sql = "SELECT * from {oc_course_creation_type} ORDER BY rank DESC LIMIT 1";
-        if($rank = $DB->get_record_sql($sql))
-            return $rank;
-        else {
-            $rank = new stdClass();
-            $rank->rank =0;
-            $rank->id =0;
-            $rank->type = "";
-            return $rank;
-        }
-    }
-
-    /**
-     * Get A type by its id
-     *
-     * @param $id int
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    private function get_type_by_id($id) {
-        global $DB;
-        return $DB->get_record('oc_course_creation_type', ['id' => $id]);
-    }
-    /**
-     * Get A type by its rank
-     *
-     * @param $rank int
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    private function get_type_by_rank($rank) {
-        global $DB;
-        return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
-    }
 
     /**
      * Get a value by id
@@ -256,5 +237,69 @@ class manager {
         return false;
     }
 
+
+    /**
+     * gets all types where rank is same or greater than given
+     *
+     * @param $rank int
+     * @return bool DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    private function get_types_higher_and_equal_rank($rank) {
+        global $DB;
+        $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
+        try {
+            return $DB->get_records_sql($sql, [$rank]);
+        } catch (dml_exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get A type by its id
+     *
+     * @param $id int
+     * @return mixed DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    private function get_type_by_id($id) {
+        global $DB;
+        return $DB->get_record('oc_course_creation_type', ['id' => $id]);
+    }
+    /**
+     * Get A type by its rank
+     *
+     * @param $rank int
+     * @return mixed DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    private function get_type_by_rank($rank) {
+        global $DB;
+        return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
+    }
+
+    /**
+     * Returns the
+     *
+     * @return bool DB transaction successful
+     * @throws dml_transaction_exception
+     * @throws dml_exception
+     */
+    private function get_last_type_by_rank() {
+        global $DB;
+        $sql = "SELECT * from {oc_course_creation_type} ORDER BY rank DESC LIMIT 1";
+        if($rank = $DB->get_record_sql($sql))
+            return $rank;
+        else {
+            $rank = new stdClass();
+            $rank->rank =0;
+            $rank->id =0;
+            $rank->type = "";
+            return $rank;
+        }
+    }
 
 }
