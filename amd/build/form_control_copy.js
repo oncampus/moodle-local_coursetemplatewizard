@@ -3,43 +3,46 @@
  *  @module local_message
  */
 
-define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/ajax', 'core/notification'],
-    function ($, ModalFactory, String, ModalEvents, Ajax, Notification) {
-
+define([],
+    function () {
         var trigger = document.getElementsByClassName("modifying_type");
 
         for (let i = 0; i < trigger.length; i++) {
-            if (trigger[i].tagName == 'INPUT') {
-                trigger[i].addEventListener('keyup', e => change_course_name());
+            console.log(i);
+            console.log(trigger[i]);
+            if (trigger[i].classList.contains('input_type')) {
+                trigger[i].addEventListener('keyup', e => change_course_name(trigger));
             } else if (trigger[i].classList.contains('select_type')) {
-                trigger[i].getElementsByTagName('select')[0].addEventListener('change', e => change_course_name());
+                trigger[i].getElementsByTagName('select')[0].addEventListener('change', e => change_course_name(trigger));
             } else {
-                console.log(input_fields[i].classList);
+                console.log(trigger[i].classList);
             }
         }
     }
 )
 
-var change_course_name = function () {
-    var input_fullname = '';
-    var input_shortname = '';
-    var input_fields = document.getElementsByClassName("modifying_type");
-    var first = true;
+var change_course_name = function (input_fields) {
+    let input_fullname = '';
+    let input_shortname = '';
+    let first = true;
     var prefix_set = document.getElementById("id_add_prefix").checked;
-    for (let i = 0; input_fields.length > i; i++) {
-        let spacing = input_fields.length - 1 > i ? " " : "";
-        if (input_fields[i].tagName === 'INPUT') {
+    var field_len = input_fields.length;
+    for (let i = 0; field_len > i; i++) {
+        let spacing = field_len - 1 > i ? " " : "";
+        if (input_fields[i].classList.contains('input_type')) {
             var is_prefix = input_fields[i].classList.contains('prefix');
+            var select = input_fields[i].getElementsByTagName('input')[0];
             if (!is_prefix) {
-                input_fullname += input_fields[i].value + spacing;
-                input_shortname +=  input_fields[i].value.substr(0, 3) + spacing;
+                input_fullname += select.value;
+                input_shortname +=  select.value.substr(0, 3) + spacing;
                 if (first) {
-                    input_fullname += ": ";
+                    input_fullname += ":";
                     first = false
                 }
+                input_fullname += spacing;
             }  else if (is_prefix && prefix_set) {
-                input_fullname += input_fields[i].value;
-                input_fullname += "- ";
+                input_fullname += select.value;
+                input_fullname += " - ";
             }
 
         } else if (input_fields[i].classList.contains('select_type')) {

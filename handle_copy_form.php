@@ -8,6 +8,7 @@ use local_oc_course_creation\manager;
 
 global $CFG, $DB;
 
+
 $courseid = required_param('id', PARAM_INT);
 $course = get_course($courseid);
 $coursecontext = context_course::instance($course->id);
@@ -31,6 +32,7 @@ if ($returnto == 'copylist') {
 }
 
 $title = get_string('copycoursetitle', 'backup', $course->shortname);
+
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_context(\context_system::instance());

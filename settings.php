@@ -58,6 +58,20 @@ if ($hassiteconfig) {
     );
     $settings->add($setting);
 
+
+    $name = 'local_oc_course_creation/prefix_desc';
+    $description = get_string('template_prefix_checkbox_text_desc', 'local_oc_course_creation');
+    $selection = [];
+    $default = get_string('course_prefix', 'local_oc_course_creation');
+    $setting = new admin_setting_configtext(
+            $name,
+            $visiblename = get_string('setting_edit_template_checkbox_desc', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settings->add($setting);
+
+
     $name = 'local_oc_course_creation/prefix_text';
     $description = get_string('template_prefix_desc', 'local_oc_course_creation');
     $selection = [];

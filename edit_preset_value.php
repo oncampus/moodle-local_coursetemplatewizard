@@ -36,6 +36,8 @@ $PAGE->set_url(new moodle_url('/local/oc_course_creation/edit_preset_value.php')
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
+$PAGE->set_heading( get_site()->fullname);
+
 $mform = new string_form();
 $manager = new manager();
 

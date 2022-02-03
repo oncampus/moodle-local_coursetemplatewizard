@@ -97,29 +97,29 @@ class modified_copy_form extends \moodleform {
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }
-
-        $mform->addElement('checkbox', 'add_prefix', get_string('course_prefix', 'local_oc_course_creation'));
-
-
+        // Form add prefix checkbox
+        $mform->addElement('checkbox', 'add_prefix', get_config('local_oc_course_creation', 'prefix_desc'));
+        // Form add prefix
         $prefix = $mform->createElement('text', 'prefix', '',
-                array('class' => 'mr-2 h-100 modifying_type prefix', 'placeholder' =>
+                array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
                         get_config('local_oc_course_creation', 'prefix_text')));
+        $mform->setType('prefix', PARAM_TEXT);
 
-        $mform->hideIf("prefix", "add_prefix", 'checked',1);
+        $mform->hideIf("prefix", "add_prefix");
+
         // Form preset values
+        $teacher = $mform->createElement('text', 'teacher_name', '',
+                array('class' => 'mr-2 h-100 modifying_type input_type', 'placeholder' =>
+                        get_string('teacher_name_placeholder', 'local_oc_course_creation')));
+        $mform->setType('teacher_name', PARAM_TEXT);
+
+        $course_type = $mform->createElement('text', 'course_type', '',
+                array('class' => 'mr-2 h-100 modifying_type input_type', 'placeholder' =>
+                        get_string('teacher_course_type_placeholder', 'local_oc_course_creation')));
+        $mform->setType('course_type', PARAM_TEXT);
+
         $types_key_value = array();
         $type_group = array();
-        $teacher = $mform->createElement('text', 'teacher_name', '',
-                array('class' => 'mr-2 h-100 modifying_type', 'placeholder' =>
-                        get_string('teacher_name_placeholder', 'local_oc_course_creation')));
-        $course_type = $mform->createElement('text', 'course_type', '',
-                array('class' => 'mr-2 h-100 modifying_type', 'placeholder' =>
-                        get_string('teacher_course_type_placeholder', 'local_oc_course_creation')));
-
-        $teacher->setType('teacher_name', PARAM_TEXT);
-
-        $prefix->setType('prefix', PARAM_TEXT);
-        $course_type->setType('course_type', PARAM_TEXT);
         foreach ($manager->get_all_types() as $type) {
             foreach ($manager->get_all_values() as $value) {
                 if($value->type_id === $type->id) {
@@ -131,14 +131,21 @@ class modified_copy_form extends \moodleform {
         $type_group[] = $teacher;
         $type_group[] = $course_type;
         $types = $manager->get_all_types();
-
+        $type_names ="";
         foreach ($types as $type) {
             $type_group[] = $mform->createElement('select', 'type_' . $type->type,
                     "", $types_key_value[$type->type]
                     , ['class' => 'modifying_type select_type']);
+            $type_names .=$type->type. "<br>";
         }
 
-        $mform->addGroup($type_group, '', '', ' ', false);
+        $mform->addGroup($type_group, "",
+                get_config('local_oc_course_creation', 'prefix_text'). " | " .
+                get_string('teacher_name_placeholder', 'local_oc_course_creation'). " | " .
+                get_string('teacher_course_type_placeholder', 'local_oc_course_creation') . "<br>".
+                $type_names
+                , ' ', false);
+
         // Course fullname.
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50"');
         $mform->addHelpButton('fullname', 'fullnamecourse');

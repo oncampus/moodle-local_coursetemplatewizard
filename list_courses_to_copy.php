@@ -10,14 +10,14 @@ global $CFG, $DB;
 require('../../config.php');
 require_once($CFG->dirroot . '/course/classes/category.php');
 
-//use local_oc_course_creation\form\string_form;
-use local_oc_course_creation\form\string_form;
 use local_oc_course_creation\manager;
 
 $PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 $PAGE->set_pagelayout('admin');
+$PAGE->set_heading( get_site()->fullname);
+
 
 $manager = new manager();
 

@@ -22,6 +22,7 @@ $PAGE->set_context(\context_system::instance());
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_call_amd('local_oc_course_creation/delete_preset_value');
+$PAGE->set_heading( get_site()->fullname);
 
 $manager = new manager();
 
