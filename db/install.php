@@ -67,8 +67,7 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2_value2->string =date("y") +1;
     $record_type2_value2->type_id = $record_type2->id;
 
-    $DB->insert_records('oc_course_creation', [$record_course_name, $record_year, $record_semester_So, $record_semester_Wi]);
     $DB->insert_records('oc_course_creation_type', [$record_type1,$record_type2]);
-    $DB->insert_records('oc_course_creation_values', [$record_type2_value1,$record_type2_value2]);
+    $DB->insert_records('oc_course_creation_value', [$record_type2_value1,$record_type2_value2]);
 }
 

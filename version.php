@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_oc_course_creation';
-$plugin->release = '0.6.0';
-$plugin->version = 2022020200;
+$plugin->release = '0.7.5';
+$plugin->version = 2022020300;
 $plugin->requires = 2020061511;
 $plugin->maturity = MATURITY_ALPHA;
