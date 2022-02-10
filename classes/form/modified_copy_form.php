@@ -46,8 +46,6 @@ class modified_copy_form extends \moodleform {
         $course = $this->_customdata['course'];
         $coursecontext = \context_course::instance($course->id);
         $courseconfig = get_config('moodlecourse');
-        $returnto = $this->_customdata['returnto'];
-        $returnurl = $this->_customdata['returnurl'];
         $course = $this->_customdata['course']; // this contains the data of this form
 
         if (empty($course->category)) {
@@ -58,15 +56,10 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('hidden', 'courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-
         // Keep source course user data.
         $mform->addElement('hidden', 'userdata', 0);
         $mform->setType('userdata', PARAM_INT);
 
-        // Return to type.
-        $mform->addElement('hidden', 'returnto', null);
-        $mform->setType('returnto', PARAM_ALPHANUM);
-        $mform->setConstant('returnto', $returnto);
 
         // Course ID number (default to the current course ID number; blank for users who can't change ID numbers).
         $mform->addElement('hidden', 'idnumber', $course->idnumber);
@@ -81,10 +74,6 @@ class modified_copy_form extends \moodleform {
             $mform->addElement('html', $notification);
         }
 
-        // Return to URL.
-        $mform->addElement('hidden', 'returnurl', null);
-        $mform->setType('returnurl', PARAM_LOCALURL);
-        $mform->setConstant('returnurl', $returnurl);
 
         // Form heading.
         $mform->addElement('html', \html_writer::div(get_string('copycoursedesc', 'backup'), 'form-description mb-3'));
@@ -97,6 +86,8 @@ class modified_copy_form extends \moodleform {
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }
+        //group prefix
+        $type_group = array();
         // Form add prefix checkbox
         $mform->addElement('checkbox', 'add_prefix', get_config('local_oc_course_creation', 'prefix_desc'));
         // Form add prefix
@@ -118,31 +109,32 @@ class modified_copy_form extends \moodleform {
                         get_string('teacher_course_type_placeholder', 'local_oc_course_creation')));
         $mform->setType('course_type', PARAM_TEXT);
 
-        $types_key_value = array();
-        $type_group = array();
-        foreach ($manager->get_all_types() as $type) {
-            foreach ($manager->get_all_values() as $value) {
-                if($value->type_id === $type->id) {
-                    $types_key_value[$type->type][] = $value->string;
-                }
-            }
-        }
         $type_group[] = $prefix;
         $type_group[] = $teacher;
         $type_group[] = $course_type;
+
+        $types_key_value = array();
+        $type_names = "";
         $types = $manager->get_all_types();
-        $type_names ="";
+        $values = $manager->get_all_values();
         foreach ($types as $type) {
+            foreach ($values as $value) {
+                if ($value->type_id === $type->id) {
+                    $types_key_value[$type->id][] = $value->string;
+                }
+            }
             $type_group[] = $mform->createElement('select', 'type_' . $type->type,
-                    "", $types_key_value[$type->type]
+                    "", $types_key_value[$type->id]
                     , ['class' => 'modifying_type select_type']);
-            $type_names .=$type->type. "<br>";
+            $type_names .= $type->type . "<br>";
         }
 
+
+
         $mform->addGroup($type_group, "",
-                get_config('local_oc_course_creation', 'prefix_text'). " | " .
-                get_string('teacher_name_placeholder', 'local_oc_course_creation'). " | " .
-                get_string('teacher_course_type_placeholder', 'local_oc_course_creation') . "<br>".
+                get_config('local_oc_course_creation', 'prefix_text') . " | " .
+                get_string('teacher_name_placeholder', 'local_oc_course_creation') . " | " .
+                get_string('teacher_course_type_placeholder', 'local_oc_course_creation') . "<br>" .
                 $type_names
                 , ' ', false);
 
@@ -217,9 +209,6 @@ class modified_copy_form extends \moodleform {
             $mform->removeElement('descriptionhdr');
             $mform->hardFreeze($summaryfields);
         }
-
-
-
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitreturn', get_string('copyreturn', 'backup'));
