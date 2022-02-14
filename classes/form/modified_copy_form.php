@@ -46,7 +46,6 @@ class modified_copy_form extends \moodleform {
         $course = $this->_customdata['course'];
         $coursecontext = \context_course::instance($course->id);
         $courseconfig = get_config('moodlecourse');
-        $course = $this->_customdata['course']; // this contains the data of this form
 
         if (empty($course->category)) {
             $course->category = $course->categoryid;
@@ -241,11 +240,6 @@ class modified_copy_form extends \moodleform {
             if ($courseidnumber) {
                 $errors['idnumber'] = get_string('courseidnumbertaken', 'error', $courseidnumber->fullname);
             }
-        }
-
-        // Validate the dates (make sure end isn't greater than start).
-        if ($errorcode = course_validate_dates($data)) {
-            $errors['enddate'] = get_string($errorcode, 'error');
         }
 
         return $errors;

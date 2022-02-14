@@ -15,28 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * message file description here.
+ * Changes presets vlues via form
  *
- * @package    local_message
- * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
+ * @package    local_oc_course_creation
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @var $PAGE
+ * @var $OUTPUT
  */
 
 use local_oc_course_creation\form\string_form;
-use local_oc_course_creation\form;
 use local_oc_course_creation\manager;
 
-require('../../config.php');
-
+require_once('../../config.php');
 global $CFG;
 
 $id = required_param('id', PARAM_INT);
 $PAGE->set_url(new moodle_url('/local/oc_course_creation/edit_preset_value.php'));
-$PAGE->set_context(\context_system::instance());
+$PAGE->set_context(\context_course::instance($id));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
-$PAGE->set_heading( get_site()->fullname);
+$PAGE->set_heading(get_site()->fullname);
 
 $mform = new string_form();
 $manager = new manager();
@@ -47,10 +46,9 @@ if ($mform->is_cancelled()) {
 } else if ($fromform = $mform->get_data()) {
     //insert the data in the db
 
-    if ($fromform->id) {
-        $manager->update_value($fromform->id, $fromform->string, $fromform->type_id);
-        redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
-    }
+    $manager->update_value($fromform->id, $fromform->string, $fromform->type_id);
+    redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
+
 }
 
 if ($id) {

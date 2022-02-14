@@ -23,13 +23,27 @@
 
 namespace local_oc_course_creation;
 
+use context_course;
 use dml_transaction_exception;
+use moodle_exception;
 use stdClass;
 use dml_exception;
 
 
 
 class manager {
+
+    /**
+     * Creates an value
+     *
+     * @param $course_id
+     * @return bool|\stored_file[]
+     */
+    public function get_course_summary(int $course_id) {
+        global $DB;
+        return $DB->get_field("course", "summary", array("id" => $course_id));
+    }
+
 
     /**
      * Creates an value
@@ -302,109 +316,4 @@ class manager {
             return $rank;
         }
     }
-
-    /**
-     * Run the adhoc task and preform the backup.
-     */
-    public function execute($backupid, $restoreid, $user) {
-
-        global $CFG, $DB;
-
-        $backuprecord = $DB->get_record('backup_controllers', array('backupid' => $backupid), 'id, itemid', MUST_EXIST);
-        $restorerecord = $DB->get_record('backup_controllers', array('backupid' => $restoreid), 'id, itemid', MUST_EXIST);
-
-        // First backup the course.
-        try {
-            $bc = \backup_controller::load_controller($backupid); // Get the backup controller by backup id.
-        } catch (\backup_dbops_exception $e) {
-            delete_course($restorerecord->itemid, false); // Clean up partially created destination course.
-            return; // Return early as we can't continue.
-        }
-        $bc->set_progress(new \core\progress\db_updater($backuprecord->id, 'backup_controllers', 'progress'));
-        $copyinfo = $bc->get_copy();
-        $backupplan = $bc->get_plan();
-
-
-            $bc->execute_plan();
-
-        $results = $bc->get_results();
-        $backupbasepath = $backupplan->get_basepath();
-        $file = $results['backup_destination'];
-        $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $backupbasepath);
-        // Start the restore process.
-        $rc = \restore_controller::load_controller($restoreid);  // Get the restore controller by restore id.
-        $rc->set_progress(new \core\progress\db_updater($restorerecord->id, 'backup_controllers', 'progress'));
-        $rc->prepare_copy();
-
-        // Set the course settings we can do now (the remaining settings will be done after restore completes).
-        $plan = $rc->get_plan();
-
-        $startdate = $plan->get_setting('course_startdate');
-        $startdate->set_value($copyinfo->startdate);
-        $fullname = $plan->get_setting('course_fullname');
-        $fullname->set_value($copyinfo->fullname);
-        $shortname = $plan->get_setting('course_shortname');
-        $shortname->set_value($copyinfo->shortname);
-
-        // Do some preflight checks on the restore.
-        $rc->execute_precheck();
-        $status = $rc->get_status();
-        // Check that the restore is in the correct status and
-        // that is set for asynchronous execution.
-        if ($status == \backup::STATUS_AWAITING) {
-            // Execute the restore.
-            $rc->execute_plan();
-
-        } else {
-            // If status isn't 700, it means the process has failed.
-            // Retrying isn't going to fix it, so marked operation as failed.
-            $rc->set_status(\backup::STATUS_FINISHED_ERR);
-            delete_course($restorerecord->itemid, false); // Clean up partially created destination course.
-            $file->delete();
-            if (empty($CFG->keeptempdirectoriesonbackup)) {
-                fulldelete($backupbasepath);
-            }
-            $rc->destroy();
-            return; // Return early as we can't continue.
-
-        }
-
-        // Set up remaining course settings.
-        $course = $DB->get_record('course', array('id' => $restorerecord->itemid), '*', MUST_EXIST);
-        $course->visible = $copyinfo->visible;
-        $course->idnumber = $copyinfo->idnumber;
-        $course->enddate = $copyinfo->enddate;
-        $course->category = $copyinfo->category;
-        $DB->update_record('course', $course);
-
-        $copyinfo->id = $restorerecord->itemid;
-
-        $editoroptions =
-                array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
-        $context = \context_course::instance($restorerecord->itemid);
-        $editoroptions['context'] = $context;
-        $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
-        if ($editoroptions) {
-            $data = file_postupdate_standard_editor($copyinfo, 'summary', $editoroptions, $context, 'course', 'summary', 0);
-        }
-        if ($overviewfilesoptions = course_overviewfiles_options($restorerecord->itemid)) {
-            $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course',
-                    'overviewfiles', 0);
-        }
-
-        update_course($data, $editoroptions);
-
-        // Cleanup.
-        $bc->destroy();
-        $rc->destroy();
-        $file->delete();
-        if (empty($CFG->keeptempdirectoriesonbackup)) {
-            fulldelete($backupbasepath);
-        }
-
-        enrol_try_internal_enrol($course->id, $user->id, $CFG->creatornewroleid);
-
-        return $course->id;
-    }
-
 }

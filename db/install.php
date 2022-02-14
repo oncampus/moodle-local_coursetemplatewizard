@@ -47,11 +47,9 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2_value1 = new stdClass();
     $record_type2_value2 = new stdClass();
 
-    $record_type1->id = 0;
     $record_type1->type = "Semester";
     $record_type1->rank = 1;
 
-    $record_type2->id = 1;
     $record_type2->type = "Year";
     $record_type2->rank = 2;
 

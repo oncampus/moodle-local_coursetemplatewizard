@@ -76,7 +76,6 @@ if ($mform->is_cancelled()) {
     $copyids['restoreid'] = $rc->get_restoreid();
 
     // Configure the controllers based on the submitted data.
-    $mdata;
     $mdata->copyids = $copyids;
     $mdata->id = $newcourseid;
 
