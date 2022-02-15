@@ -41,17 +41,22 @@ function xmldb_local_oc_course_creation_install() {
     $record_type1 = new stdClass();
     $record_type2 = new stdClass();
 
+
+    $record_type1->type = "Semester";
+    $record_type1->rank = 1;
+    $record_type1->id = 1;
+
+    $record_type2->type = "Year";
+    $record_type2->rank = 2;
+    $record_type2->id = 2;
+
+    $DB->insert_records('oc_course_creation_type', [$record_type1,$record_type2]);
+
     $record_type1_value1 = new stdClass();
     $record_type1_value2 = new stdClass();
 
     $record_type2_value1 = new stdClass();
     $record_type2_value2 = new stdClass();
-
-    $record_type1->type = "Semester";
-    $record_type1->rank = 1;
-
-    $record_type2->type = "Year";
-    $record_type2->rank = 2;
 
     $record_type1_value1->string = get_string('record_type1_value1', 'local_oc_course_creation');
     $record_type1_value1->type_id = $record_type1->id;
@@ -65,7 +70,6 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2_value2->string =date("y") +1;
     $record_type2_value2->type_id = $record_type2->id;
 
-    $DB->insert_records('oc_course_creation_type', [$record_type1,$record_type2]);
-    $DB->insert_records('oc_course_creation_value', [$record_type2_value1,$record_type2_value2]);
+    $DB->insert_records('oc_course_creation_value', [$record_type1_value1,$record_type1_value2,$record_type2_value1,$record_type2_value2]);
 }
 
