@@ -30,9 +30,20 @@ use local_oc_course_creation\manager;
 require_once('../../config.php');
 global $CFG;
 
+
 $id = required_param('id', PARAM_INT);
+$context = \context_course::instance($id);
+//secure
+redirect_if_major_upgrade_required();
+require_login();
+$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+if ($hassiteconfig && moodle_needs_upgrading()) {
+    redirect(new moodle_url('/admin/index.php'));
+}
+require_capability('local/oc_course_creation:handle_presets', $context);
+
 $PAGE->set_url(new moodle_url('/local/oc_course_creation/edit_preset_value.php'));
-$PAGE->set_context(\context_course::instance($id));
+$PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
 $PAGE->set_heading(get_site()->fullname);

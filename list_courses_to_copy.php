@@ -15,13 +15,7 @@ require_once($CFG->dirroot . '/course/classes/category.php');
 use local_oc_course_creation\manager;
 use core_course\external\course_summary_exporter;
 
-$PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
-$PAGE->set_context(\context_system::instance());
-$PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
-$PAGE->set_pagelayout('admin');
-$PAGE->set_heading(get_site()->fullname);
-
-$manager = new manager();
+require_login();
 
 $setCourseCategory = get_config('local_oc_course_creation', 'category');
 $categories = core_course_category::get_all(array('returnhidden' => true));
@@ -35,6 +29,16 @@ foreach ($categories as $item) {
 if (is_null($category)) {
     redirect(new moodle_url('/admin/search.php'), 'Selected category missing.', 1);
 }
+
+require_capability('moodle/category:manage', context_coursecat::instance($category->id));
+
+$PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
+$PAGE->set_pagelayout('admin');
+$PAGE->set_heading(get_site()->fullname);
+
+$manager = new manager();
 
 $courseIds = $category->get_courses(array('idonly' => true));
 
@@ -54,8 +58,8 @@ foreach ($courseIds as $courseId) {
     $courses[$i]->img = $out;
     //summary
     $summary = $manager->get_course_summary((int) $courseId);
-    $offset = 500;
-    $end = '</p>';
+    $offset = 500; //chars until end is searched
+    $end = '</p>'; //closing tag
     if (strlen($summary) > $offset && strpos($summary, $end, $offset)) {
         $result = substr($summary, 0, strlen($end) + (strpos($summary, $end, $offset)));
     } else {

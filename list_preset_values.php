@@ -14,7 +14,14 @@ require_once($CFG->dirroot . '/course/classes/category.php');
 
 use local_oc_course_creation\manager;
 
-
+//secure
+redirect_if_major_upgrade_required();
+require_login();
+$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+if ($hassiteconfig && moodle_needs_upgrading()) {
+    redirect(new moodle_url('/admin/index.php'));
+}
+require_capability('local/oc_course_creation:handle_presets', $context);
 
 $url = new moodle_url('/local/oc_course_creation/list_preset_values.php');
 $action = optional_param('action', '', PARAM_ALPHA);

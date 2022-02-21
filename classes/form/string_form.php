@@ -36,6 +36,7 @@ class string_form extends  \moodleform {
         $types_key_value = array();
         foreach ($types as $type){
             $types_key_value[$type->id] = $type->type;
+            $types_key_value[$type->id] = $type->type;
         }
 
 
@@ -48,7 +49,7 @@ class string_form extends  \moodleform {
         $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $types_key_value, []);
 
 
-        $mform->addElement('text', 'string', get_string('form_select', 'local_oc_course_creation'));
+        $mform->addElement('text', 'string', get_string('form:string:form_select', 'local_oc_course_creation'));
         $mform->setType('string', PARAM_TEXT);
 
 

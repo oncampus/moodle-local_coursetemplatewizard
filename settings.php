@@ -39,7 +39,7 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
 
     $name = 'local_oc_course_creation/category';
-    $description = get_string('template_course_desc', 'local_oc_course_creation');
+    $description = get_string('settings:template_course_desc', 'local_oc_course_creation');
     $selection = [];
     $categories = core_course_category::get_all(['returnhidden']);
     $default = null;
@@ -51,7 +51,7 @@ if ($hassiteconfig) {
     }
     $setting = new admin_setting_configselect(
             $name,
-            $visiblename = get_string('setting_chose_course', 'local_oc_course_creation'),
+            $visiblename = get_string('settings:choose_course', 'local_oc_course_creation'),
             $description,
             $default,
             $selection,
@@ -60,12 +60,12 @@ if ($hassiteconfig) {
 
 
     $name = 'local_oc_course_creation/prefix_desc';
-    $description = get_string('template_prefix_checkbox_text_desc', 'local_oc_course_creation');
+    $description = get_string('settings:template_prefix_checkbox_text_desc', 'local_oc_course_creation');
     $selection = [];
-    $default = get_string('course_prefix', 'local_oc_course_creation');
+    $default = get_string('settings:course_prefix', 'local_oc_course_creation');
     $setting = new admin_setting_configtext(
             $name,
-            $visiblename = get_string('setting_edit_template_checkbox_desc', 'local_oc_course_creation'),
+            $visiblename = get_string('settings:edit_template_checkbox_desc', 'local_oc_course_creation'),
             $description,
             $default,
     );
@@ -73,12 +73,12 @@ if ($hassiteconfig) {
 
 
     $name = 'local_oc_course_creation/prefix_text';
-    $description = get_string('template_prefix_desc', 'local_oc_course_creation');
+    $description = get_string('settings:template_prefix_desc', 'local_oc_course_creation');
     $selection = [];
-    $default = get_string('template_prefix_default', 'local_oc_course_creation');;
+    $default = get_string('settings:template_prefix_default', 'local_oc_course_creation');
     $setting = new admin_setting_configtext(
             $name,
-            $visiblename = get_string('setting_edit_template_prefix', 'local_oc_course_creation'),
+            $visiblename = get_string('settings:edit_template_prefix', 'local_oc_course_creation'),
             $description,
             $default,
     );
@@ -90,12 +90,12 @@ if ($hassiteconfig) {
             ));
 
     $ADMIN->add('courses_local_oc_course_creation',
-            new admin_externalpage('list_courses_to_copy', get_string('setting_create_course', 'local_oc_course_creation'),
+            new admin_externalpage('list_courses_to_copy', get_string('settings:create_course', 'local_oc_course_creation'),
                     new moodle_url('/local/oc_course_creation/list_courses_to_copy.php', array()), array('moodle/category:manage')
             ));
 
     $ADMIN->add('courses_local_oc_course_creation',
-            new admin_externalpage('list_preset_values', get_string('edit_presets', 'local_oc_course_creation'),
+            new admin_externalpage('list_preset_values', get_string('settings:edit_presets', 'local_oc_course_creation'),
                     new moodle_url('/local/oc_course_creation/list_preset_values.php', array()), array('moodle/category:manage')
             ));
 

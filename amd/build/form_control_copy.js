@@ -24,7 +24,6 @@ define([],
 var change_course_name = function (input_fields) {
     let input_fullname = '';
     let input_shortname = '';
-    let first = true;
     var prefix_set = document.getElementById("id_add_prefix").checked;
     var field_len = input_fields.length;
     for (let i = 0; field_len > i; i++) {
@@ -34,13 +33,10 @@ var change_course_name = function (input_fields) {
             var select = input_fields[i].getElementsByTagName('input')[0];
             if (!is_prefix) {
                 input_fullname += select.value;
-                input_shortname +=  select.value.substr(0, 3) + spacing;
-                if (first) {
-                    input_fullname += ":";
-                    first = false
-                }
+                input_shortname += select.value.substr(0, 3) + spacing;
+                input_fullname += i < 2 ? ":" : " -" ;
                 input_fullname += spacing;
-            }  else if (is_prefix && prefix_set) {
+            } else if (is_prefix && prefix_set) {
                 input_fullname += select.value;
                 input_fullname += " - ";
             }

@@ -14,6 +14,8 @@ use local_oc_course_creation\manager;
 
 global $CFG, $DB;
 
+require_login();
+
 require('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -32,7 +34,7 @@ require_login($course, false);
 $copycaps = \core_course\management\helper::get_course_copy_capabilities();
 require_all_capabilities($copycaps, $coursecontext);
 
-$title = get_string('copycoursetitle', 'backup', $course->shortname);
+$title = get_string("addnewcourse");
 
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');

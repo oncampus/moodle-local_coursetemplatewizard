@@ -24,20 +24,10 @@
  */
 
 $capabilities = [
-        'local/oc_course_creation:edit_presets' => [
+        'local/oc_course_creation:handle_presets' => [
                 'riskbitmask' => RISK_DATALOSS,
                 'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
-                'archetypes' => [
-                        'manager' => CAP_ALLOW,
-                        'coursecreator' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                ],
-        ],
-        'local/oc_course_creation:delete_presets' => [
-                'riskbitmask' => RISK_DATALOSS,
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
+                'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [
                         'manager' => CAP_ALLOW,
                         'coursecreator' => CAP_ALLOW,
