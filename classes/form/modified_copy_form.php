@@ -152,7 +152,7 @@ class modified_copy_form extends \moodleform {
         $mform->setType('shortname', PARAM_TEXT);
 
         // Course category.
-        $displaylist = \core_course_category::make_categories_list(\core_course\management\helper::get_course_copy_capabilities());
+        $displaylist = \core_course_category::make_categories_list( 'moodle/course:create');
         if (!isset($displaylist[$course->category])) {
             // Always keep current category.
             $displaylist[$course->category] = \core_course_category::get($course->category, MUST_EXIST, true)->get_formatted_name();

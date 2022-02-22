@@ -14,8 +14,6 @@ use local_oc_course_creation\manager;
 
 global $CFG, $DB;
 
-require_login();
-
 require('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -31,8 +29,12 @@ $manager = new manager();
 
 // Security and access checks.
 require_login($course, false);
-$copycaps = \core_course\management\helper::get_course_copy_capabilities();
-require_all_capabilities($copycaps, $coursecontext);
+
+$copycaps = [
+        'moodle/course:create',
+];
+$categorycontext = context_coursecat::instance($course->category);
+require_all_capabilities($copycaps, $categorycontext);
 
 $title = get_string("addnewcourse");
 

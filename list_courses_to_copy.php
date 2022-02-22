@@ -22,7 +22,7 @@ $categories = core_course_category::get_all(array('returnhidden' => true));
 $category = null;
 
 foreach ($categories as $item) {
-    if ($item->name == $setCourseCategory) {
+    if ($item->name === $setCourseCategory) {
         $category = $item;
     }
 }
@@ -30,7 +30,11 @@ if (is_null($category)) {
     redirect(new moodle_url('/admin/search.php'), 'Selected category missing.', 1);
 }
 
-require_capability('moodle/category:manage', context_coursecat::instance($category->id));
+$capabilities=[
+        'moodle/course:create'
+];
+
+require_all_capabilities($capabilities,context_coursecat::instance($category->id));
 
 $PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
 $PAGE->set_context(\context_system::instance());

@@ -18,6 +18,7 @@ use local_oc_course_creation\manager;
 redirect_if_major_upgrade_required();
 require_login();
 $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+$context = \context_system::instance();
 if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect(new moodle_url('/admin/index.php'));
 }
@@ -27,7 +28,7 @@ $url = new moodle_url('/local/oc_course_creation/list_preset_values.php');
 $action = optional_param('action', '', PARAM_ALPHA);
 $rank = optional_param('rank', '', PARAM_INT);
 $PAGE->set_url($url);
-$PAGE->set_context(\context_system::instance());
+$PAGE->set_context($context);
 $PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_call_amd('local_oc_course_creation/delete_preset_value');
