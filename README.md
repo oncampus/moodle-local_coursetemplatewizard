@@ -1,8 +1,8 @@
 # Course creation #
 
-TODO Describe the plugin shortly here.
+This plugin will create a new course category in which tempalte courses can be created.
+These templates can be easely copied to other categories to create courses after certaint shemes. 
 
-TODO Provide more detailed description here.
 
 ## Installing via uploaded ZIP file ##
 

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Changes presets vlues via form
+ * Changes presets values via form
  *
  * @package    local_oc_course_creation
  * @auther     schindlerl

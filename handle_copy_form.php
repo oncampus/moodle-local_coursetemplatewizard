@@ -1,7 +1,8 @@
 <?php
 /**
+ * handle copy form
+ *
  * @package    local/oc_course_creation
- * @copyright  2020 onward The Moodle Users Association <https://moodleassociation.org/>
  * @author     Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
@@ -62,62 +63,7 @@ if ($mform->is_cancelled()) {
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
 
-    global $USER;
-    $copyids = array();
-
-    // Create the initial backupcontoller.
-    $bc = new \backup_controller(\backup::TYPE_1COURSE, $courseid, \backup::FORMAT_MOODLE,
-            \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id, \backup::RELEASESESSION_NO);
-    $copyids['backupid'] = $bc->get_backupid();
-
-    // Create the initial restore contoller.
-    list($fullname, $shortname) = \restore_dbops::calculate_course_names(
-            0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
-    $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
-    $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-            \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id,
-            \backup::TARGET_NEW_COURSE);
-    $copyids['restoreid'] = $rc->get_restoreid();
-
-    // Configure the controllers based on the submitted data.
-    $mdata->copyids = $copyids;
-    $mdata->id = $newcourseid;
-
-    $bc->set_copy($mdata);
-    $bc->set_status(\backup::STATUS_AWAITING);
-
-    $rc->set_copy($mdata);
-    $rc->save_controller();
-
-    $asynctask = new \core\task\asynchronous_copy_task();
-    $asynctask->set_blocking(false);
-    $asynctask->set_custom_data($copyids);
-    $asynctask->execute();
-
-    $course = $DB->get_record('course', array('id' => $newcourseid), '*', MUST_EXIST);
-    $course->visible = $mdata->visible;
-    $course->idnumber = $mdata->idnumber;
-    $course->enddate = $mdata->enddate;
-    $course->category = $mdata->category;
-    $DB->update_record('course', $course);
-
-    $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
-    $context = \context_course::instance($newcourseid);
-    $editoroptions['context'] = $context;
-    $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
-    if ($editoroptions) {
-        $data = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $context, 'course', 'summary', 0);
-    }
-    if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
-        $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course',
-                'overviewfiles', 0);
-    }
-    update_course($data, $editoroptions);
-
-    enrol_try_internal_enrol($course->id, $USER->id, $CFG->creatornewroleid);
-
-    // Clean up the controller.
-    $bc->destroy();
+    $manager->create_copy($mdata, $course);
 
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.

@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Defines the api for deleting an preset value
  *
  * @package    local_oc_course_creation
- * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
  * @auther     schindlerl
+ * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = array(
@@ -28,7 +29,7 @@ $functions = array(
                 'classpath'   => 'local/oc_course_creation/externallib.php',        //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
                 'description' => 'Delete selected preset string by its id',
                 'component'   => 'local_oc_course_creation',
-                'capabilities'=> 'local/oc_course_creation:delete_presets',
+                'capabilities'=> 'local/oc_course_creation:handle_presets',
                 'type' => 'write',
                 'ajax' => 'true',
                 'capabilities' => 'true',

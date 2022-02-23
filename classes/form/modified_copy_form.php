@@ -1,11 +1,13 @@
 <?php
 
+
 /**
  * Course copy form class.
  *
  * @package     local_oc_course_creation
- * @copyright   2020 onward The Moodle Users Association <https://moodleassociation.org/>
- * @author      Matt Porritt <mattp@catalyst-au.net>
+ * @copyright  2020 onward The Moodle Users Association <https://moodleassociation.org/>
+ * @author     Matt Porritt <mattp@catalyst-au.net>
+ * @modified_by Laurenz Schindler <laurenz.schindler@oncampus.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -17,15 +19,6 @@ require_once("$CFG->libdir/formslib.php");
 
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
-
-/**
- * Course copy form class.
- *
- * @package     core_backup
- * @copyright  2020 onward The Moodle Users Association <https://moodleassociation.org/>
- * @author     Matt Porritt <mattp@catalyst-au.net>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 use local_oc_course_creation\manager;
 

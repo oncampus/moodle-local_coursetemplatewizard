@@ -16,6 +16,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Deinstall the plugin and the plugin settings
+ * Won't deinstall course category to ensure course templates are sustained
+ *
  * @package     local_oc_course_creation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>

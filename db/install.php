@@ -15,6 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * install.php will create a new course category
+ * adds preset values to db
+ *
  * @package     local_oc_course_creation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
@@ -23,7 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_oc_course_creation\manager;
 function xmldb_local_oc_course_creation_install() {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/course/lib.php');

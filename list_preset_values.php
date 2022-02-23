@@ -1,8 +1,9 @@
 <?php
 
 /**
+ * list preset values and also create new or delete them
+ *
  * @package     local_oc_course_creation
- * @category    manager
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE

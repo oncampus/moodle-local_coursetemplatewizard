@@ -17,8 +17,8 @@
 /**
  * creates special access for users
  *
- * @package    local_message
- * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
+ * @package    local_oc_course_creation
+ * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

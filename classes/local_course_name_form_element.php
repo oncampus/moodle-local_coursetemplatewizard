@@ -16,8 +16,9 @@
 
 
 /**
- * Local course name form eleent
+ * Local course name form element
  *
+ * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @package   oc_course_creation
  * @copyright 2022 Laurenz Schindler
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,13 +31,6 @@ global $CFG;
 
 require_once($CFG->libdir . '/form/select.php');
 
-/**
- * Local course name form eleent
- *
- * @package   oc_course_creation
- * @copyright 2022 Laurenz Schindler
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class local_course_name_form_element extends \MoodleQuickForm_select {
 
     /**
