@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/->.
 
 /**
- * @package    local_oc_course_creation
- * @copyright  2021 SysBind Ltd. <service@sysbind.co.il->
- * @auther     schindlerl
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_oc_course_creation
+ * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
+ * @auther      schindlerl
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_oc_course_creation;
@@ -27,21 +27,19 @@ use dml_transaction_exception;
 use stdClass;
 use dml_exception;
 
-
-
 class manager {
 
     /**
      * Creates an value
      *
-     * @param $course_id
+     * @param int $course_id
      * @return bool|\stored_file[]
+     * @throws dml_exception
      */
     public function get_course_summary(int $course_id) {
         global $DB;
         return $DB->get_field("course", "summary", array("id" => $course_id));
     }
-
 
     /**
      * Creates an value
@@ -52,19 +50,12 @@ class manager {
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public function create_value($string, $type_id) {
+    public function create_value($string, $type_id): bool {
         global $DB;
         $value = new stdClass();
         $value->string = $string;
-        $transaction = $DB->start_delegated_transaction();
-        $insert_type = true;
         $value->type_id = $type_id;
-        $insert_value = $DB->insert_record("oc_course_creation_value", $value);
-        if ($insert_value && $insert_type) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
-        }
-        return false;
+        return $DB->insert_record("oc_course_creation_value", $value ,false);
     }
 
     /**
@@ -233,19 +224,21 @@ class manager {
         $record_to_swap1 = $this->get_type_by_rank($type_rank1);
         $record_to_swap2 = $this->get_type_by_rank($type_rank2);
 
-        $tmp_rank = $record_to_swap1->rank;
+        if($record_to_swap1 && $record_to_swap2) {
+            $tmp_rank = $record_to_swap1->rank;
 
-        $record_to_swap1->rank = $record_to_swap2->rank;
-        $record_to_swap2->rank = $tmp_rank;
+            $record_to_swap1->rank = $record_to_swap2->rank;
+            $record_to_swap2->rank = $tmp_rank;
 
-        $transaction = $DB->start_delegated_transaction();
+            $transaction = $DB->start_delegated_transaction();
 
-        $tr1 = $DB->update_record('oc_course_creation_type', $record_to_swap1);
-        $tr2 = $DB->update_record('oc_course_creation_type', $record_to_swap2);
+            $tr1 = $DB->update_record('oc_course_creation_type', $record_to_swap1);
+            $tr2 = $DB->update_record('oc_course_creation_type', $record_to_swap2);
 
-        if ($tr1 && $tr2) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
+            if ($tr1 && $tr2) {
+                $DB->commit_delegated_transaction($transaction);
+                return true;
+            }
         }
         return false;
     }
@@ -258,7 +251,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_types_higher_and_equal_rank($rank) {
+    public function get_types_higher_and_equal_rank($rank) {
         global $DB;
         $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
         try {
@@ -276,7 +269,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_type_by_id($id) {
+    public function get_type_by_id($id) {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['id' => $id]);
     }
@@ -289,7 +282,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_type_by_rank($rank) {
+    public function get_type_by_rank($rank) {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
     }
@@ -301,7 +294,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    private function get_last_type_by_rank() {
+    public function get_last_type_by_rank() {
         global $DB;
         $sql = "SELECT * from {oc_course_creation_type} ORDER BY rank DESC LIMIT 1";
         if ($rank = $DB->get_record_sql($sql)) {
@@ -320,13 +313,13 @@ class manager {
      *
      * @param object $mdata
      * @param $course
-     * @throws \backup_controller_exception
+     * @return int courseid
      * @throws \coding_exception
      * @throws \moodle_exception
      * @throws dml_exception
-     * @return courseid int
+     * @throws \backup_controller_exception
      */
-    public function create_copy(object $mdata ,$course ) {
+    public function create_copy(object $mdata, $course) {
         global $USER, $DB, $CFG;
         $copyids = array();
 
@@ -357,6 +350,7 @@ class manager {
         $asynctask = new \core\task\asynchronous_copy_task();
         $asynctask->set_blocking(false);
         $asynctask->set_custom_data($copyids);
+
         $asynctask->execute();
 
         $course = $DB->get_record('course', array('id' => $newcourseid), '*', MUST_EXIST);
@@ -366,7 +360,8 @@ class manager {
         $course->category = $mdata->category;
         $DB->update_record('course', $course);
 
-        $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
+        $editoroptions =
+                array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
         $context = \context_course::instance($newcourseid);
         $editoroptions['context'] = $context;
         $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
