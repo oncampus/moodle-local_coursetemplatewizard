@@ -26,11 +26,12 @@ namespace local_oc_course_creation;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
+use function PHPUnit\Framework\isNull;
 
 class manager {
 
     /**
-     * Creates an value
+     * Get's the course summary
      *
      * @param int $course_id
      * @return bool|\stored_file[]
@@ -51,11 +52,14 @@ class manager {
      * @throws dml_transaction_exception
      */
     public function create_value($string, $type_id): bool {
+        if (is_Null($string) || $string === "" || !$this->get_type_by_id($type_id)) {
+            return false;
+        }
         global $DB;
         $value = new stdClass();
         $value->string = $string;
         $value->type_id = $type_id;
-        return $DB->insert_record("oc_course_creation_value", $value ,false);
+        return $DB->insert_record("oc_course_creation_value", $value, false);
     }
 
     /**
@@ -69,12 +73,23 @@ class manager {
      */
     public function create_value_and_type($string, $type) {
         global $DB;
+        if (is_Null($string) || $string === "" ||
+                is_Null($type) || $type === "" ) {
+            return false;
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $new_type = new stdClass();
+        $new_type->type = $type;
+        $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
+        $insert_type = $DB->insert_record('oc_course_creation_type', $new_type);
+
         $value = new stdClass();
         $value->string = $string;
-        $transaction = $DB->start_delegated_transaction();
-        $insert_type = $this->create_type($type);
         $value->type_id = $this->get_last_type_by_rank()->id;
         $insert_value = $DB->insert_record("oc_course_creation_value", $value);
+
         if ($insert_value && $insert_type) {
             $DB->commit_delegated_transaction($transaction);
             return true;
@@ -113,12 +128,15 @@ class manager {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
         $value = $DB->get_record('oc_course_creation_value', ['id' => $id]);
-        $delete_value = $DB->delete_records('oc_course_creation_value', ['id' => $id]);
+        if (!$value) {
+            return false;
+        }
         $types = $DB->get_records('oc_course_creation_value', ['type_id' => $value->type_id]);
         $delete_type = true;
-        if (count($types) === 0) {
+        if (count($types) === 1) {
             $delete_type = $this->update_delete_sort($value->type_id);
         }
+        $delete_value = $DB->delete_records('oc_course_creation_value', ['id' => $id]);
         if ($delete_value && $delete_type) {
             $DB->commit_delegated_transaction($transaction);
             return true;
@@ -127,7 +145,7 @@ class manager {
     }
 
     /**
-     * Deletes a type at new rank and changes other ranks down
+     * Deletes a type and changes other ranks down
      *
      * @param $id int
      * @return bool DB transaction successful
@@ -137,6 +155,9 @@ class manager {
     public function update_delete_sort($id) {
         global $DB;
         $record_to_delete = $this->get_type_by_id($id);
+        if (!$record_to_delete) {
+            return $record_to_delete;
+        }
         $new_rank = $record_to_delete->rank;
         $transactions = array();
 
@@ -169,8 +190,11 @@ class manager {
         global $DB;
         $new_type = new stdClass();
         $new_type->type = $string;
-        $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-        return $DB->insert_record('oc_course_creation_type', $new_type);
+        if ($string && $string !== "") {
+            $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
+            return $DB->insert_record('oc_course_creation_type', $new_type);
+        }
+        return false;
     }
 
     /**
@@ -224,7 +248,7 @@ class manager {
         $record_to_swap1 = $this->get_type_by_rank($type_rank1);
         $record_to_swap2 = $this->get_type_by_rank($type_rank2);
 
-        if($record_to_swap1 && $record_to_swap2) {
+        if ($record_to_swap1 && $record_to_swap2) {
             $tmp_rank = $record_to_swap1->rank;
 
             $record_to_swap1->rank = $record_to_swap2->rank;

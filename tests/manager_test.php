@@ -30,6 +30,28 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
 
     /**
      * Initial setup.
+     * By Installation default
+     *
+     * $record_type1->type = "Semester";
+     * $record_type1->rank = 1;
+     * $record_type1->id = 1;
+     *
+     * $record_type2->type = "Year";
+     * $record_type2->rank = 2;
+     * $record_type2->id = 2;
+     *
+     * $record_type1_value1->string = WiSe;
+     * $record_type1_value1->type_id = $record_type1->id;
+     *
+     * $record_type1_value2->string = SoSe;
+     * $record_type1_value2->type_id = $record_type1->id;
+     *
+     * $record_type2_value1->string = date("y");
+     * $record_type2_value1->type_id = $record_type2->id;
+     *
+     * $record_type2_value2->string = date("y") +1;
+     * $record_type2_value2->type_id = $record_type2->id;
+     *
      */
     protected function setUp(): void {
         parent::setUp();
@@ -73,22 +95,86 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
         $switched_type_rank1 = $manager->get_type_by_id($type_rank1->id);
         $switched_type_rank2 = $manager->get_type_by_id($type_rank2->id);
 
-        $this->assertEquals($type_rank1->rank, $switched_type_rank2->rank,"1");
-        $this->assertEquals($type_rank2->rank, $switched_type_rank1->rank,"2");
-        $this->assertEquals($type_rank1->type,$switched_type_rank1->type,"3");
-        $this->assertEquals($type_rank2->type,$switched_type_rank2->type,"4");
+        $this->assertEquals($type_rank1->rank, $switched_type_rank2->rank, "1");
+        $this->assertEquals($type_rank2->rank, $switched_type_rank1->rank, "2");
+        $this->assertEquals($type_rank1->type, $switched_type_rank1->type, "3");
+        $this->assertEquals($type_rank2->type, $switched_type_rank2->type, "4");
     }
 
     public function test_update_delete_sort() {
         $manager = new manager();
+        $this->assertEquals($manager->get_type_by_rank(1)->id, 1); // inital assertion claims type rank 1 has id 1
+        $manager->update_delete_sort(1);
+        $this->assertFalse($manager->get_type_by_id(1)); // type with id 1 does not exist
+        $this->assertNotNull($manager->get_type_by_rank(1)->id); // type with rank one exists
+
+        $manager->create_type("testtype");
+        $this->assertEquals($manager->get_type_by_rank(2)->rank, 2);
+
+        $manager->create_type("testtype2");
+        $this->assertEquals($manager->get_type_by_rank(3)->rank, 3);
+
+        $manager->create_type("testtype3");
+        $this->assertEquals($manager->get_type_by_rank(4)->rank, 4);
+
+        $manager->create_type("testtype4");
+        $this->assertEquals($manager->get_type_by_rank(5)->rank, 5);
+
+        $manager->create_type("testtype5");
+        $this->assertEquals($manager->get_type_by_rank(6)->rank, 6);
+
+        $types_pre_del = $manager->get_all_types();
+        $i = 0;
+        while (!$manager->update_delete_sort($i)) {
+            $i++;
+        }
+        $types = $manager->get_all_types();
+        $this->assertGreaterThan(count($types), count($types_pre_del));
+
+        $types = $manager->get_all_types();
+        $types = array_values($types);
+        for ($i = 1, $iMax = count($types); $i < $iMax && 1 < $iMax; $i++) {
+            $this->assertGreaterThan($types[$i - 1]->rank, $types[$i]->rank);
+        }
+
     }
 
     public function test_delete_value() {
         $manager = new manager();
+        $values = $manager->get_all_values();
+        $values_pre_del = count($values);
+        $id = $values[array_key_first($values)]->id;
+        $type_id = $values[array_key_first($values)]->type_id;
+        $manager->delete_value($id);
+
+        $values = $manager->get_all_values();
+        $this->assertGreaterThan(count($values), $values_pre_del);
+        $this->assertFalse($manager->get_value_by_id($id));
+
+        $manager->get_all_values();
+        foreach ($values as $value) {
+            if ($value->type_id === $type_id) {
+                $manager->delete_value($value->id);
+            }
+        }
+        global $DB;
+        $this->assertEquals(count($DB->get_records('oc_course_creation_value', ['type_id' => $type_id])), 0);
+        $this->assertFalse($manager->get_type_by_id($type_id));
     }
 
     public function test_create_value_and_type() {
         $manager = new manager();
+        $values_count = count($manager->get_all_values());
+        $types_count = count( $manager->get_all_types());
+        $this->assertFalse($manager->create_value_and_type("",""));
+        $this->assertFalse($manager->create_value_and_type("test",""));
+        $this->assertFalse($manager->create_value_and_type("","test"));
+        $this->assertFalse($manager->create_value_and_type("",null));
+        $this->assertFalse($manager->create_value_and_type(null,""));
+        $this->assertTrue($manager->create_value_and_type("test","test"));//4
+
+        $this->assertEquals($values_count+1,count($manager->get_all_values()));
+        $this->assertEquals($types_count+1,count($manager->get_all_types()));
     }
 
 }
