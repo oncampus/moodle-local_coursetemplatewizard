@@ -1,6 +1,6 @@
 # Course creation #
 
-This plugin will create a new course category in which tempalte courses can be created.
+This plugin will create a new course category in which template courses can be created.
 These templates can be easely copied to other categories to create courses after certaint shemes. 
 
 
