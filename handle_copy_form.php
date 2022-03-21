@@ -13,6 +13,7 @@
 use local_oc_course_creation\form\modified_copy_form;
 use local_oc_course_creation\manager;
 
+define('NO_OUTPUT_BUFFERING', true);
 global $CFG, $DB;
 
 require('../../config.php');
@@ -63,7 +64,7 @@ if ($mform->is_cancelled()) {
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
 
-    $manager->create_copy($mdata, $course);
+    $newcourseid = $manager->create_copy($mdata, $course, $PAGE->get_renderer('core','backup'));
 
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.

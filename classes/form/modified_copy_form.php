@@ -32,7 +32,7 @@ class modified_copy_form extends \moodleform {
     public function definition() {
         $manager = new manager();
         global $PAGE;
-        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', null, []);
+        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy');
 
         global $CFG, $OUTPUT, $USER;
         $mform = $this->_form;
@@ -68,7 +68,7 @@ class modified_copy_form extends \moodleform {
 
 
         // Form heading.
-        $mform->addElement('html', \html_writer::div(get_string('copycoursedesc', 'backup'), 'form-description mb-3'));
+        $mform->addElement('html', \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'), 'form-description mb-3'));
 
         // Form select image
         $summaryfields = 'summary_editor';
@@ -126,11 +126,7 @@ class modified_copy_form extends \moodleform {
 
 
         $mform->addGroup($type_group, "",
-                get_config('local_oc_course_creation', 'prefix_text') . " | " .
-                get_string('form:copy:teacher_name_placeholder', 'local_oc_course_creation') . " | " .
-                get_string('form:copy:teacher_course_type_placeholder', 'local_oc_course_creation') . "<br>" .
-                $type_names
-                , ' ', false);
+                get_string('form:copy:course_details', 'local_oc_course_creation'), ' ');
 
         // Course fullname.
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50"');
@@ -150,10 +146,12 @@ class modified_copy_form extends \moodleform {
             // Always keep current category.
             $displaylist[$course->category] = \core_course_category::get($course->category, MUST_EXIST, true)->get_formatted_name();
         }
-        $mform->addElement('select', 'category', get_string('coursecategory'), $displaylist);
+        $displaylist['default']= get_string('form:copy:select_default','local_oc_course_creation');
+
+        $select=$mform->addElement('select', 'category', get_string('coursecategory'), $displaylist );
         $mform->addRule('category', null, 'required', null, 'client');
         $mform->addHelpButton('category', 'coursecategory');
-
+        $select->setSelected('default');
         // Course visibility.
         $choices = array();
         $choices['0'] = get_string('hide');

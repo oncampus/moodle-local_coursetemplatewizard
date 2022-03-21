@@ -74,7 +74,7 @@ class manager {
     public function create_value_and_type($string, $type) {
         global $DB;
         if (is_Null($string) || $string === "" ||
-                is_Null($type) || $type === "" ) {
+                is_Null($type) || $type === "") {
             return false;
         }
 
@@ -343,7 +343,7 @@ class manager {
      * @throws dml_exception
      * @throws \backup_controller_exception
      */
-    public function create_copy(object $mdata, $course) {
+    public function create_copy(object $mdata, $course, $renderer = null) {
         global $USER, $DB, $CFG;
         $copyids = array();
 
@@ -375,7 +375,22 @@ class manager {
         $asynctask->set_blocking(false);
         $asynctask->set_custom_data($copyids);
 
-        $asynctask->execute();
+        /* test */
+        if ($renderer) {
+            $context = \context_course::instance($course->id);
+
+            $courseurl = course_get_url($course->id);
+            // Add ajax progress bar and initiate ajax via a template.
+            $restoreurl = new \moodle_url('/backup/restorefile.php', array('contextid' => $context->id));
+            $progresssetup = array(
+                    'backupid' => $rc->get_restoreid(),
+                    'contextid' => $context->id,
+                    'courseurl' => $courseurl->out(),
+                    'restoreurl' => $restoreurl->out()
+            );
+            echo $renderer->render_from_template('core/async_backup_status', $progresssetup);
+        }
+        \core\task\manager::queue_adhoc_task($asynctask);
 
         $course = $DB->get_record('course', array('id' => $newcourseid), '*', MUST_EXIST);
         $course->visible = $mdata->visible;
