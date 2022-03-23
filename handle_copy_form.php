@@ -63,7 +63,6 @@ if ($mform->is_cancelled()) {
     $mdata->startdate = time(); // Integer timestamp of the start of the destination course.
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
-
     $newcourseid = $manager->create_copy($mdata, $course, $PAGE->get_renderer('core','backup'));
 
     if (!empty($mdata->submitdisplay)) {
