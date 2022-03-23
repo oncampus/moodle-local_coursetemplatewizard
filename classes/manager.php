@@ -388,6 +388,13 @@ class manager {
                     'courseurl' => $courseurl->out(),
                     'restoreurl' => $restoreurl->out()
             );
+            $progresssetup2 = array(
+                    'backupid' => $bc->get_backupid(),
+                    'contextid' => $context->id,
+                    'courseurl' => $courseurl->out(),
+                    'restoreurl' => $restoreurl->out()
+            );
+            echo $renderer->render_from_template('core/async_backup_status', $progresssetup2);
             echo $renderer->render_from_template('core/async_backup_status', $progresssetup);
         }
         \core\task\manager::queue_adhoc_task($asynctask);

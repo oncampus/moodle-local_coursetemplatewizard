@@ -49,12 +49,15 @@ if($action && $rank){
 }
 
 //get's posted form data and creates new entry in DB
-if ($_POST && array_key_exists('text', $_POST) && !array_key_exists('id', $_POST)) {
-    $string = $_POST['text'];
-    if (!array_key_exists('type_id', $_POST)) {
-        $manager->create_value_and_type($string, $_POST['type']);
+$string = optional_param('text',null,PARAM_TEXT);
+$type = optional_param('type',null,PARAM_TEXT);
+$id = optional_param('id',null,PARAM_INT);
+$type_id = optional_param('type_id',null,PARAM_INT);
+if ($string && !$id) {
+    if (!$type_id) {
+        $manager->create_value_and_type($string, $type);
     } else {
-        $manager->create_value($string, $_POST['type_id']);
+        $manager->create_value($string, $type_id);
     }
     redirect($url, null, 1);
 }

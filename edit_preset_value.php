@@ -32,11 +32,11 @@ global $CFG;
 
 
 $id = required_param('id', PARAM_INT);
-$context = \context_course::instance($id);
+$context = \context_system::instance();
 //secure
 redirect_if_major_upgrade_required();
 require_login();
-$hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+$hassiteconfig = has_capability('moodle/site:config', $context);
 if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect(new moodle_url('/admin/index.php'));
 }
