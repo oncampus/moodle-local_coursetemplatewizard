@@ -149,7 +149,7 @@ class modified_copy_form extends \moodleform {
         $displaylist['default']= get_string('form:copy:select_default','local_oc_course_creation');
 
         $select=$mform->addElement('select', 'category', get_string('coursecategory'), $displaylist );
-        $mform->addRule('category', null, 'required', null, 'client');
+        $mform->addRule('category',  get_string('invalidcategory', 'error'), 'numeric', null, 'client');
         $mform->addHelpButton('category', 'coursecategory');
         $select->setSelected('default');
         // Course visibility.
@@ -183,10 +183,6 @@ class modified_copy_form extends \moodleform {
             $mform->addGroup($relativedatesmodegroup, 'relativedatesmodegroup', get_string('relativedatesmode'), null, false);
             $mform->addHelpButton('relativedatesmodegroup', 'relativedatesmode');
         }
-
-        $requiredcapabilities = array(
-                'moodle/restore:createuser', 'moodle/backup:userinfo', 'moodle/restore:userinfo'
-        );
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
