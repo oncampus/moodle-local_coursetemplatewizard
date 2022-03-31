@@ -30,7 +30,6 @@ $url = new moodle_url('/local/oc_course_creation/handle_copy_form.php', array('i
 $manager = new manager();
 
 // Security and access checks.
-require_login($course, false);
 
 $copycaps = [
         'moodle/course:create',
