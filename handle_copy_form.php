@@ -33,9 +33,9 @@ $manager = new manager();
 
 $copycaps = [
         'moodle/course:create',
+        'local/oc_course_creation:oc_course_creation_access_capability',
 ];
-$categorycontext = context_coursecat::instance($course->category);
-require_all_capabilities($copycaps, $categorycontext);
+require_all_capabilities($copycaps, context_system::instance());
 
 $title = get_string("addnewcourse");
 

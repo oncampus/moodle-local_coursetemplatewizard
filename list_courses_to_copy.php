@@ -31,7 +31,7 @@ if (is_null($category)) {
 }
 
 $capabilities=[
-        'moodle/course:create'
+         'local/oc_course_creation:oc_course_creation_access_capability',
 ];
 
 require_all_capabilities($capabilities,context_coursecat::instance($category->id));
