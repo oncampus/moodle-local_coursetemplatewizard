@@ -28,7 +28,7 @@ $courslist = new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'
 
 $url = new moodle_url('/local/oc_course_creation/handle_copy_form.php', array('id' => $courseid));
 $manager = new manager();
-
+$manager->check_enrol($courseid,$USER->id,1);
 // Security and access checks.
 
 $copycaps = [
@@ -47,6 +47,7 @@ $PAGE->set_title($title);
 $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
 $editoroptions['context'] = $coursecontext;
 $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'course', 'summary', 0);
+
 $mform = new modified_copy_form($url, array(
                 'editoroptions' => $editoroptions,
                 'course' => $course)
@@ -63,6 +64,8 @@ if ($mform->is_cancelled()) {
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
     $newcourseid = $manager->create_copy($mdata, $course, $PAGE->get_renderer('core','backup'));
+
+    $manager->unenrol($courseid,$USER->id);
 
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.

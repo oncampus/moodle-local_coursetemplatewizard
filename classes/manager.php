@@ -26,7 +26,6 @@ namespace local_oc_course_creation;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
-use function PHPUnit\Framework\isNull;
 
 class manager {
 
@@ -346,10 +345,10 @@ class manager {
     public function create_copy(object $mdata, $course, $renderer = null) {
         global $USER, $DB, $CFG;
         $copyids = array();
-
+        $userid = array_pop(get_admins())->id;
         // Create the initial backupcontoller.
         $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id, \backup::RELEASESESSION_NO);
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid, \backup::RELEASESESSION_NO);
         $copyids['backupid'] = $bc->get_backupid();
 
         // Create the initial restore contoller.
@@ -357,7 +356,7 @@ class manager {
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
         $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id,
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid,
                 \backup::TARGET_NEW_COURSE);
         $copyids['restoreid'] = $rc->get_restoreid();
 
@@ -411,10 +410,71 @@ class manager {
             $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course',
                     'overviewfiles', 0);
         }
+
         update_course($data, $editoroptions);
-
-        enrol_try_internal_enrol($course->id, $USER->id, $CFG->creatornewroleid);
-
+        $this->check_enrol($newcourseid, $USER->id, 3);
         return $newcourseid;
+    }
+
+    function unenrol($courseid, $userid, $enrolmethod = 'manual') {
+        $enrolinstances = enrol_get_instances($courseid, false);
+        $plugin = enrol_get_plugin($enrolmethod);
+
+        if (is_null($plugin)) {
+            return false;
+        }
+
+        foreach ($enrolinstances as $instance) {
+            // Check enrolment.
+            if ($enrolmethod == $instance->enrol) {
+                $enrolinstance = $instance;
+                break;
+            }
+        }
+        $plugin->unenrol_user($enrolinstance,$userid);
+    }
+
+    function check_enrol($courseid, $userid, $roleid, $enrolmethod = 'manual') {
+        global $DB;
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        $enrolinstances = enrol_get_instances($courseid, false);
+        $plugin = enrol_get_plugin($enrolmethod);
+
+        if (is_null($plugin)) {
+            return false;
+        }
+
+        foreach ($enrolinstances as $instance) {
+            // Check enrolment.
+            if ($enrolmethod == $instance->enrol) {
+                if ($instance->status != ENROL_INSTANCE_ENABLED) {
+                    $plugin->update_status($instance, ENROL_INSTANCE_ENABLED);
+                }
+                $enrolinstance = $instance;
+                break;
+            }
+        }
+        if (empty($enrolinstance)) {
+            $fields = $plugin->get_instance_defaults();
+            $id = $plugin->add_instance($course, $fields);
+
+            $enrolinstance = $DB->get_record('enrol', array('id' => $id));
+            $enrolinstance->expirynotify = $plugin->get_config('expirynotify');
+            $enrolinstance->expirythreshold = $plugin->get_config('expirythreshold');
+            $enrolinstance->roleid = $plugin->get_config('roleid');
+            $enrolinstance->timemodified = time();
+            $DB->update_record('enrol', $enrolinstance);
+        } // Enrol user in course.
+
+        // Get the course context.
+        $coursecontext = \context_course::instance($courseid);
+
+        // Check if user is already enrolled with another enrolment method.
+        $userisenrolled = is_enrolled($coursecontext, $userid, "", false);
+
+        // If the user is already enrolled, continue to avoid a second enrolment for the user.
+        if (!$userisenrolled) {
+            $plugin->enrol_user($enrolinstance, $userid, $roleid);
+        }
     }
 }
