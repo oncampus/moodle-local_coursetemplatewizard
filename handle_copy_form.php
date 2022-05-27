@@ -69,7 +69,7 @@ if ($mform->is_cancelled()) {
 
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.
-        $course_view_url = new moodle_url('/course/view.php', array('id' => $newcourseid));
+        $course_view_url = new moodle_url('/backup/copyprogress.php', array('id' => $courseid));
         redirect($course_view_url);
     } else {
         // Redirect to the course view page.
