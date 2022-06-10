@@ -2,9 +2,13 @@
  *  Show a delete modal instead of doing it in a seperated page
  *  @module local_message
  */
-
-define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/ajax', 'core/notification'],
-    function ($, ModalFactory, String, ModalEvents, Ajax, Notification) {
+import $ from 'jquery';
+import ModalFactory from 'core/modal_factory';
+import * as String from 'core/str';
+import ModalEvents from 'core/modal_events';
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
+export const blubb = () => {
         var trigger = $('.action-delete');
         ModalFactory.create({
             type: ModalFactory.types.SAVE_CANCEL,
@@ -12,7 +16,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
             body: String.get_string('modal_delete_message', 'local_oc_course_creation'),
             large: true,
             // Get id before modal is displayed
-            preShowCallback: function (triggerElement, modal) {
+            preShowCallback: function(triggerElement, modal) {
                 triggerElement = $(triggerElement);
                 let id = triggerElement[0].classList[0].substr(3);
                 modal.params = {'id': id};
@@ -23,7 +27,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                 modal.getRoot().on(ModalEvents.save, function(e) {
                     let footer = Y.one('.modal-footer');
                     footer.setContent('Deleting');
-                    let spinner = M.util.add_spinner(Y,footer);
+                    let spinner = M.util.add_spinner(Y, footer);
                     spinner.show();
                     e.preventDefault();
                     Y.log(modal.params);
@@ -46,4 +50,4 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
 
                 });
             });
-    });
+    };

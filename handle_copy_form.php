@@ -43,6 +43,7 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_title($title);
+$PAGE->requires->js_call_amd('core_backup/async_backup', 'asyncBackupAllStatus', array(context_course::instance($course->id)));
 // Get data ready for mform.
 $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
 $editoroptions['context'] = $coursecontext;
@@ -63,13 +64,14 @@ if ($mform->is_cancelled()) {
     $mdata->startdate = time(); // Integer timestamp of the start of the destination course.
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
-    $newcourseid = $manager->create_copy($mdata, $course, $PAGE->get_renderer('core','backup'));
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading($title);
+    $newcourseid = $manager->create_copy($mdata, $course);
 
-    $manager->unenrol($courseid,$USER->id);
-
+    $manager->check_enrol($newcourseid,$USER->id,3);
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.
-        $course_view_url = new moodle_url('/backup/copyprogress.php', array('id' => $courseid));
+        $course_view_url = new moodle_url('/course/view.php', array('id' => $newcourseid));
         redirect($course_view_url);
     } else {
         // Redirect to the course view page.
