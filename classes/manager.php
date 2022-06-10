@@ -23,6 +23,8 @@
 
 namespace local_oc_course_creation;
 
+use core\event\course_content_deleted;
+use core_contentbank\external\delete_content;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
@@ -355,11 +357,14 @@ class manager {
         list($fullname, $shortname) = \restore_dbops::calculate_course_names(
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
         $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
+
+
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
                 \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid,
-                \backup::TARGET_NEW_COURSE);
-        $copyids['restoreid'] = $rc->get_restoreid();
+                \backup::TARGET_EXISTING_ADDING);
 
+        $copyids['restoreid'] = $rc->get_restoreid();
+        \restore_dbops::delete_course_content($newcourseid);
         // Configure the controllers based on the submitted data.
         $mdata->copyids = $copyids;
         $mdata->id = $newcourseid;
@@ -371,7 +376,7 @@ class manager {
         $rc->save_controller();
 
         $asynctask = new \core\task\asynchronous_copy_task();
-        $asynctask->set_blocking(false);
+        $asynctask->set_blocking(true);
         $asynctask->set_custom_data($copyids);
 
         /* test */
@@ -431,7 +436,7 @@ class manager {
                 break;
             }
         }
-        $plugin->unenrol_user($enrolinstance,$userid);
+        $plugin->unenrol_user($enrolinstance, $userid);
     }
 
     function check_enrol($courseid, $userid, $roleid, $enrolmethod = 'manual') {
