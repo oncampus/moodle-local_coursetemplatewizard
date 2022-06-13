@@ -29,13 +29,13 @@ Technical
    - Administration -> courses -> course dublication -> create course from template
   
   The course creation plugin has settings in 
-   - Administration -> plugins -> local plugins | 
-      -- course category which hosts the template courses
-      -- Name of the checkbox used to enable a prefix
-      -- Text of the prefix field
+   - Administration -> plugins -> local plugins  
+      - course category which hosts the template courses
+      - Name of the checkbox used to enable a prefix
+      - Text of the prefix field
     
    - Administration -> courses -> course dublication -> Edit presets
-      -- let's you edit the dropdown entries in the course creation form
+      - let's you edit the dropdown entries in the course creation form
 
 ## Installing via uploaded ZIP file ##
 
