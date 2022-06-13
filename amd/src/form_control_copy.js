@@ -8,14 +8,10 @@ define([],
         var trigger = document.getElementsByClassName("modifying_type");
 
         for (let i = 0; i < trigger.length; i++) {
-            console.log(i);
-            console.log(trigger[i]);
             if (trigger[i].classList.contains('input_type')) {
                 trigger[i].addEventListener('keyup', e => change_course_name(trigger));
             } else if (trigger[i].classList.contains('select_type')) {
                 trigger[i].getElementsByTagName('select')[0].addEventListener('change', e => change_course_name(trigger));
-            } else {
-                console.log(trigger[i].classList);
             }
         }
     }
