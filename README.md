@@ -7,7 +7,7 @@
    It Allows to edit course img, name, shortname, visibility, category and description.
    The creation will be either by crontask or as an direct execute (Changing with branch used).
 
-Functionality/Use Case
+### Functionality/Use Case ###
    This plugin can be used to enable people to use courses as predefiend templates. Through the slightly 
    customized cretion interface course relatet information can be modified.
    It let's course creator manage course creation faster with less steps in the settings and a UI which displays the templates.
@@ -15,16 +15,16 @@ Functionality/Use Case
    The plugin will create an course wich will be filled with the special extra informations.
    After that it let's a crontask merge all other course settings into this created course.
    
-Version-Testet
+### Version-Testet ### 
     Moodle 3.9-4.0 Stable
     
-Current use
+### Current use ###
     --- Should not be mentiond here--- 
     
-Requires
+### Requires ### 
    Moodle core course-copy, manual enrollment 
     
-Technical
+ ### Technical ### 
    Plugin page can be found under
    - Administration -> courses -> course dublication -> create course from template
   
