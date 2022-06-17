@@ -360,7 +360,6 @@ class manager {
         // Create the initial restore contoller.
         list($fullname, $shortname) = \restore_dbops::calculate_course_names(
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
-        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
 
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
                 \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id,
@@ -411,6 +410,9 @@ class manager {
         return $newcourseid;
     }
 
+    function create_course($fullname,$shortname,$course_cat_id) {
+        return \restore_dbops::create_new_course($fullname, $shortname,$course_cat_id);
+    }
     function unenrol($courseid, $userid, $enrolmethod = 'manual') {
         $enrolinstances = enrol_get_instances($courseid, false);
         $plugin = enrol_get_plugin($enrolmethod);
