@@ -24,6 +24,7 @@
 namespace local_oc_course_creation;
 
 use core\event\course_created;
+use core_analytics\user;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
@@ -352,10 +353,10 @@ class manager {
 
         global $USER;
         $copyids = array();
-        $userid = array_pop(get_admins())->id;
+        $adminid = array_pop(get_admins())->id;
         // Create the initial backupcontoller.
         $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY,$userid, \backup::RELEASESESSION_NO);
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY,$adminid, \backup::RELEASESESSION_NO);
         $copyids['backupid'] = $bc->get_backupid();
 
         // Create the initial restore contoller.
@@ -364,7 +365,7 @@ class manager {
         $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
 
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid,
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid,
                 \backup::TARGET_NEW_COURSE);
 
         $copyids['restoreid'] = $rc->get_restoreid();
@@ -406,10 +407,9 @@ class manager {
         update_course($data, $editoroptions);
 
         // Clean up the controller.
-
-        $rc->destroy();
         $bc->destroy();
-
+        $this->check_enrol($newcourseid, $USER->id, 3);
+        $this->unenrol($newcourseid, $adminid);
         return $newcourseid;
     }
 
