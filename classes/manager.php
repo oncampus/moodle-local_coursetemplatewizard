@@ -23,6 +23,7 @@
 
 namespace local_oc_course_creation;
 
+use core\event\course_created;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
@@ -360,6 +361,7 @@ class manager {
         // Create the initial restore contoller.
         list($fullname, $shortname) = \restore_dbops::calculate_course_names(
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
+        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
 
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
                 \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id,
@@ -387,6 +389,9 @@ class manager {
         $course->idnumber = $mdata->idnumber;
         $course->enddate = $mdata->enddate;
         $course->category = $mdata->category;
+
+
+
         $DB->update_record('course', $course);
 
         $editoroptions =
@@ -403,16 +408,14 @@ class manager {
         }
         update_course($data, $editoroptions);
 
-        enrol_try_internal_enrol($course->id, $USER->id, $CFG->creatornewroleid);
-
         // Clean up the controller.
+
+        $rc->destroy();
         $bc->destroy();
+
         return $newcourseid;
     }
 
-    function create_course($fullname,$shortname,$course_cat_id) {
-        return \restore_dbops::create_new_course($fullname, $shortname,$course_cat_id);
-    }
     function unenrol($courseid, $userid, $enrolmethod = 'manual') {
         $enrolinstances = enrol_get_instances($courseid, false);
         $plugin = enrol_get_plugin($enrolmethod);

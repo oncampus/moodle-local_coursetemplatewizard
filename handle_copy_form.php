@@ -28,7 +28,6 @@ $courslist = new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'
 
 $url = new moodle_url('/local/oc_course_creation/handle_copy_form.php', array('id' => $courseid));
 $manager = new manager();
-$manager->check_enrol($courseid,$USER->id,1);
 // Security and access checks.
 
 $copycaps = [
@@ -49,6 +48,7 @@ $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG-
 $editoroptions['context'] = $coursecontext;
 $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'course', 'summary', 0);
 
+$manager->check_enrol($courseid,$USER->id,1);
 $mform = new modified_copy_form($url, array(
                 'editoroptions' => $editoroptions,
                 'course' => $course)
@@ -56,10 +56,11 @@ $mform = new modified_copy_form($url, array(
 
 if ($mform->is_cancelled()) {
     // The form has been cancelled, take them back to what ever the return to is.
+    $manager->unenrol($courseid,$USER->id);
     redirect($courslist);
 
 } else if ($mdata = $mform->get_data()) {
-
+    $manager->unenrol($courseid,$USER->id);
     // Process the form and create the copy task.
     $mdata->startdate = time(); // Integer timestamp of the start of the destination course.
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
@@ -68,7 +69,19 @@ if ($mform->is_cancelled()) {
     echo $OUTPUT->heading($title);
     $newcourseid = $manager->create_copy($mdata, $course);
 
-    $manager->check_enrol($newcourseid,$USER->id,3);
+
+
+
+    // Trigger a course created event.
+    $course = get_course($newcourseid);
+    $event = \core\event\course_created::create(array(
+            'objectid' => $course->id,
+            'context' => context_course::instance($course->id),
+            'other' => array('shortname' => $course->shortname,
+                    'fullname' => $course->fullname)
+    ));
+    $event->trigger();
+
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.
         $course_view_url = new moodle_url('/course/view.php', array('id' => $newcourseid));
@@ -86,5 +99,6 @@ if ($mform->is_cancelled()) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading($title);
     $mform->display();
+    $manager->unenrol($courseid,$USER->id);
     echo $OUTPUT->footer();
 }
