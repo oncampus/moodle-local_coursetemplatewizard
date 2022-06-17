@@ -29,7 +29,6 @@ $capabilities = [
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [
                         'manager' => CAP_ALLOW,
-                        'coursecreator' => CAP_ALLOW,
                 ],
         ],
         'local/oc_course_creation:course_cat_copy_cap' => [
