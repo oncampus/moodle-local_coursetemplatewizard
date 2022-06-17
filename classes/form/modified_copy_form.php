@@ -57,16 +57,6 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('hidden', 'idnumber', $course->idnumber);
         $mform->setType('idnumber', PARAM_RAW);
 
-        // Notifications of current copies.
-       // $copies = \core_backup\copy\copy::get_copies($USER->id);
-        if (!empty($copies)) {
-            $progresslink = new \moodle_url('/backup/copyprogress.php?', array('id' => $course->id));
-            $notificationmsg = get_string('copiesinprogress', 'backup', $progresslink->out());
-            $notification = $OUTPUT->notification($notificationmsg, 'notifymessage');
-            $mform->addElement('html', $notification);
-        }
-
-
         // Form heading.
         $mform->addElement('html', \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'), 'form-description mb-3'));
 
