@@ -352,10 +352,10 @@ class manager {
 
         global $USER;
         $copyids = array();
-
+        $userid = array_pop(get_admins())->id;
         // Create the initial backupcontoller.
         $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id, \backup::RELEASESESSION_NO);
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY,$userid, \backup::RELEASESESSION_NO);
         $copyids['backupid'] = $bc->get_backupid();
 
         // Create the initial restore contoller.
@@ -364,7 +364,7 @@ class manager {
         $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
 
         $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $USER->id,
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid,
                 \backup::TARGET_NEW_COURSE);
 
         $copyids['restoreid'] = $rc->get_restoreid();
@@ -384,18 +384,15 @@ class manager {
         $asynctask->set_custom_data($copyids);
         $asynctask->execute();
 
-        $course = $DB->get_record('course', array('id' => $newcourseid), '*', MUST_EXIST);
+        $course = get_course($newcourseid);
         $course->visible = $mdata->visible;
         $course->idnumber = $mdata->idnumber;
         $course->enddate = $mdata->enddate;
         $course->category = $mdata->category;
 
-
-
         $DB->update_record('course', $course);
 
-        $editoroptions =
-                array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
+        $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
         $context = \context_course::instance($newcourseid);
         $editoroptions['context'] = $context;
         $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
