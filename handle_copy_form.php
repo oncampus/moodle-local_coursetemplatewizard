@@ -69,8 +69,9 @@ if ($mform->is_cancelled()) {
     echo $OUTPUT->heading($title);
     $newcourseid = $manager->create_copy($mdata, $course);
 
-
-
+    fix_course_sortorder();
+    // purge appropriate caches in case fix_course_sortorder() did not change anything
+    cache_helper::purge_by_event('changesincourse');
 
     // Trigger a course created event.
     $course = get_course($newcourseid);
