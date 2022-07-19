@@ -136,6 +136,13 @@ class modified_copy_form extends \moodleform {
             // Always keep current category.
             $displaylist[$course->category] = \core_course_category::get($course->category, MUST_EXIST, true)->get_formatted_name();
         }
+
+        // We never want to create new courses in the course creation category, so remove it from the list
+        $coursecreationcategory = get_config('local_oc_course_creation', 'category');
+        if (($courseid = array_search($coursecreationcategory, $displaylist)) !== false) {
+            unset($displaylist[$courseid]);
+        }
+
         $displaylist['default']= get_string('form:copy:select_default','local_oc_course_creation');
 
         $select=$mform->addElement('select', 'category', get_string('coursecategory'), $displaylist );
