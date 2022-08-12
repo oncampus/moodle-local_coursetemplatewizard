@@ -343,41 +343,39 @@ class manager {
      * @throws \moodle_exception
      * @throws dml_exception
      * @throws \backup_controller_exception
+     * TODO copies images twice and overwrites the course descriptiopn
      */
     public function create_copy(object $mdata, $course, $renderer = null) {
         global $USER, $DB, $CFG;
         $copyids = array();
         $userid = array_pop(get_admins())->id;
         // Create the initial backupcontoller.
-        $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid, \backup::RELEASESESSION_NO);
+        $bc = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid, \backup::RELEASESESSION_YES);
         $copyids['backupid'] = $bc->get_backupid();
 
         // Create the initial restore contoller.
         list($fullname, $shortname) = \restore_dbops::calculate_course_names(
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
-        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
-
-
-        $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $userid,
-                \backup::TARGET_EXISTING_ADDING);
-
+        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $mdata->category);
+        $rc = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
+                \backup::MODE_COPY, $userid, \backup::TARGET_NEW_COURSE, null,
+                \backup::RELEASESESSION_NO, $mdata);
         $copyids['restoreid'] = $rc->get_restoreid();
+
+        $bc->set_status(\backup::STATUS_AWAITING);
+        $bc->get_status();
+        $rc->save_controller();
+
+        // Create the ad-hoc task to perform the course copy.
+        $asynctask = new \core\task\asynchronous_copy_task();
+        $asynctask->set_blocking(false);
+        $asynctask->set_custom_data($copyids);
         \restore_dbops::delete_course_content($newcourseid);
         // Configure the controllers based on the submitted data.
         $mdata->copyids = $copyids;
         $mdata->id = $newcourseid;
-
-        $bc->set_copy($mdata);
-        $bc->set_status(\backup::STATUS_AWAITING);
-
-        $rc->set_copy($mdata);
-        $rc->save_controller();
-
-        $asynctask = new \core\task\asynchronous_copy_task();
-        $asynctask->set_blocking(true);
-        $asynctask->set_custom_data($copyids);
+        $mdata->originalcourseid = $course->id;
 
         /* test */
         if ($renderer) {
@@ -418,6 +416,8 @@ class manager {
 
         update_course($data, $editoroptions);
         $this->check_enrol($newcourseid, $USER->id, 3);
+        // Clean up the controller.
+        $bc->destroy();
         return $newcourseid;
     }
 

@@ -63,13 +63,15 @@ if ($mform->is_cancelled()) {
     $mdata->startdate = time(); // Integer timestamp of the start of the destination course.
     $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
     $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
+    $mdata->courseid = $course->id; // Integer timestamp of the start of the destination course.
+    $mdata->category = $course->category; // Integer timestamp of the start of the destination course.
     $newcourseid = $manager->create_copy($mdata, $course, $PAGE->get_renderer('core','backup'));
 
     $manager->unenrol($courseid,$USER->id);
 
     if (!empty($mdata->submitdisplay)) {
         // Redirect to the copy progress overview.
-        $course_view_url = new moodle_url('/backup/copyprogress.php', array('id' => $courseid));
+        $course_view_url = new moodle_url('/course/view.php', array('id' => $newcourseid));
         redirect($course_view_url);
     } else {
         // Redirect to the course view page.
