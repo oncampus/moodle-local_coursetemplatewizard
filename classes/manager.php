@@ -347,10 +347,6 @@ class manager {
     public function create_copy(object $mdata, $course): int {
         global $DB, $CFG;
 
-        $mdata->startdate = time(); // Integer timestamp of the start of the destination course.
-        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
-        $mdata->keptroles = []; // Integer timestamp of the start of the destination course.
-
         global $USER;
         $copyids = array();
         $adminid = array_pop(get_admins())->id;
@@ -364,9 +360,9 @@ class manager {
                 0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
         $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $course->category);
 
-        $rc = new \restore_controller($copyids['backupid'], $newcourseid,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid,
-                \backup::TARGET_NEW_COURSE);
+        $rc = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
+                \backup::MODE_COPY, $adminid, \backup::TARGET_NEW_COURSE, null,
+                \backup::RELEASESESSION_NO, $mdata);
 
         $copyids['restoreid'] = $rc->get_restoreid();
 
@@ -374,10 +370,9 @@ class manager {
         $mdata->copyids = $copyids;
         $mdata->id = $newcourseid;
 
-        $bc->set_copy($mdata);
-        $bc->set_status(\backup::STATUS_AWAITING);
 
-        $rc->set_copy($mdata);
+        $bc->set_status(\backup::STATUS_AWAITING);
+        $bc->get_status();
         $rc->save_controller();
 
         $asynctask = new \core\task\asynchronous_copy_task();
