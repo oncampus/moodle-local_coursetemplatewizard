@@ -344,12 +344,13 @@ class manager {
      * @throws dml_exception
      * @throws \backup_controller_exception
      */
-    public function create_copy(object $mdata, $course): int {
+    public function create_copy($mdata, $course) {
         global $DB, $CFG;
 
         global $USER;
         $copyids = array();
-        $adminid = array_pop(get_admins())->id;
+        $adminIDs =get_admins();
+        $adminid = array_pop($adminIDs)->id;
         // Create the initial backupcontoller.
         $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id, \backup::FORMAT_MOODLE,
                 \backup::INTERACTIVE_NO, \backup::MODE_COPY,$adminid, \backup::RELEASESESSION_NO);
