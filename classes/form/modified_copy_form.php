@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Course copy form class.
  *
@@ -9,6 +8,7 @@
  * @author     Matt Porritt <mattp@catalyst-au.net>
  * @modified_by Laurenz Schindler <laurenz.schindler@oncampus.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @var $CFG
  */
 
 namespace local_oc_course_creation\form;
@@ -20,6 +20,7 @@ require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
+use core_reportbuilder\local\aggregation\count;
 use local_oc_course_creation\manager;
 
 class modified_copy_form extends \moodleform {
@@ -32,7 +33,10 @@ class modified_copy_form extends \moodleform {
     public function definition() {
         $manager = new manager();
         global $PAGE;
-        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy');
+        $enclosing = "'";
+        $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
+        $params = ['enclosing'=>$enclosing,'seperator'=>$displayseperator];
+        $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init',[$params]);
 
         global $CFG, $OUTPUT, $USER;
         $mform = $this->_form;
@@ -52,56 +56,73 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('hidden', 'userdata', 0);
         $mform->setType('userdata', PARAM_INT);
 
-
         // Course ID number (default to the current course ID number; blank for users who can't change ID numbers).
         $mform->addElement('hidden', 'idnumber', $course->idnumber);
         $mform->setType('idnumber', PARAM_RAW);
 
         // Form heading.
-        $mform->addElement('html', \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'), 'form-description mb-3'));
+        $mform->addElement('html',
+                \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'),
+                        'form-description mb-3'));
 
         // Form select image
         $summaryfields = 'summary_editor';
         if ($overviewfilesoptions = course_overviewfiles_options($course)) {
-            $mform->addElement('html', '<h3 class="qheader">' . get_string('form:copy:image_header','local_oc_course_creation') . '</h3>');
-            $mform->addElement('filemanager', 'overviewfiles_filemanager', get_string('form:copy:image_desc',"local_oc_course_creation"),null,
+            $mform->addElement('html',
+                    '<h3 class="qheader">' . get_string('form:copy:image_header', 'local_oc_course_creation') . '</h3>');
+            $mform->addElement('filemanager', 'overviewfiles_filemanager',
+                    get_string('form:copy:image_desc', "local_oc_course_creation"), null,
                     $overviewfilesoptions);
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }
-        //group prefix
-        $type_group = array();
-        // Form add prefix checkbox
-        $mform->addElement('html', '<h3 class="qheader">' . get_string('form:copy:course_name_header','local_oc_course_creation') . '</h3>');
-        $mform->addElement('checkbox', 'add_prefix', get_config('local_oc_course_creation', 'prefix_desc'));
-        // Form add prefix
-        $prefix = $mform->createElement('text', 'prefix', '',
-                array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
-                        get_config('local_oc_course_creation', 'prefix_text')));
-        $mform->setType('prefix', PARAM_TEXT);
 
-        $mform->hideIf("prefix", "add_prefix");
+        $textfield_count = 0;
+        $infix = explode("','", get_config('local_oc_course_creation', 'textfield_seperator'));
+        $infix[0] = substr($infix[0], 1);
+        $infix[array_key_last($infix)] = substr($infix[0], 0);
+        $max = count($infix);
+        for ($i = 0; $i < $max; $i++) {
+            $infix[$i] = $enclosing . $infix[$i] . $enclosing;
+        }
+        $infixcount =0;
+        //group prefix
+        if (get_config('local_oc_course_creation', 'toggle_prefix')) {
+            $type_group = array();
+
+            // Form add prefix checkbox
+            $mform->addElement('html',
+                    '<h3 class="qheader">' . get_string('form:copy:course_name_header', 'local_oc_course_creation') . '</h3>');
+            $mform->addElement('checkbox', 'add_prefix',
+                    get_config('local_oc_course_creation', 'prefix_desc'));
+            // Form add prefix
+            $prefix = $mform->createElement('text', 'prefix', '',
+                    array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
+                            get_config('local_oc_course_creation', 'prefix_text')));
+            $mform->setType('prefix', PARAM_TEXT);
+
+            $mform->hideIf("prefix", "add_prefix");
+            $mform->hideIf("infix0", "add_prefix");
+            $type_group[] = $prefix;
+            $type_group[] =  $mform->createElement('select', 'infix'.$infixcount++, "", $infix
+                    , ['class' => $displayseperator ? 'modifying_type select_type prefix': 'd-none']);
+        }
 
         // Form preset values
-        $teacher = $mform->createElement('text', 'teacher_name', '',
-                array('class' => 'mr-2 h-100 modifying_type input_type', 'placeholder' =>
-                        get_string('form:copy:teacher_name_placeholder', 'local_oc_course_creation')));
-        $mform->setType('teacher_name', PARAM_TEXT);
-
-        $course_type = $mform->createElement('text', 'course_type', '',
-                array('class' => 'mr-2 h-100 modifying_type input_type', 'placeholder' =>
-                        get_string('form:copy:teacher_course_type_placeholder', 'local_oc_course_creation')));
-        $mform->setType('course_type', PARAM_TEXT);
-
-        $type_group[] = $prefix;
-        $type_group[] = $teacher;
-        $type_group[] = $course_type;
+        foreach (explode(',', get_config('local_oc_course_creation', 'textfield_values')) as $textfield) {
+            $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count++, '',
+                    array('class' => 'mr-2 h-100 modifying_type input_type',
+                            'placeholder' => $textfield));
+            $mform->setType($textfield, PARAM_TEXT);
+            $type_group[] = $textfieldisntance;
+            $type_group[] =  $mform->createElement('select', 'infix'.$infixcount++, "", $infix
+                    , ['class' => $displayseperator ? 'modifying_type select_type': 'd-none']);
+        }
 
         $types_key_value = array();
-        $type_names = "";
         $types = $manager->get_all_types();
         $values = $manager->get_all_values();
-        foreach ($types as $type) {
+        foreach ($types as $key => $type) {
             foreach ($values as $value) {
                 if ($value->type_id === $type->id) {
                     $types_key_value[$type->id][] = $value->string;
@@ -109,23 +130,28 @@ class modified_copy_form extends \moodleform {
             }
             $type_group[] = $mform->createElement('select', 'type_' . $type->type,
                     "", $types_key_value[$type->id]
-                    , ['class' => 'modifying_type select_type']);
-            $type_names .= $type->type . "<br>";
+                    , ['class' =>  'modifying_type select_type']);
+            if ($key !== array_key_last($types)) {
+                $type_group[] = $mform->createElement('select', 'infix' . $infixcount++, "", $infix
+                        , ['class' => $displayseperator ? 'modifying_type select_type': 'd-none']);
+            }
         }
-
-
 
         $mform->addGroup($type_group, "",
                 get_string('form:copy:course_details', 'local_oc_course_creation'), ' ');
 
         // Course fullname.
-        $mform->addElement('text', 'fullname', get_string('fullnamecourse'), 'maxlength="254" size="50"');
+        $shortnamereadonly = get_config('local_oc_course_creation', 'course_shortname_readonly') ? 'readonly' :'';
+        $coursenamereadonly = get_config('local_oc_course_creation', 'course_name_readonly') ? 'readonly' :'';
+        $mform->addElement('text', 'fullname', get_string('fullnamecourse'),
+                'maxlength="254" size="50" '.$shortnamereadonly);
         $mform->addHelpButton('fullname', 'fullnamecourse');
         $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_TEXT);
-
+ 
         // Course shortname.
-        $mform->addElement('text', 'shortname', get_string('shortnamecourse'), 'maxlength="100" size="20"');
+        $mform->addElement('text', 'shortname', get_string('shortnamecourse'), 
+                'maxlength="100" size="20" '.$coursenamereadonly);
         $mform->addHelpButton('shortname', 'shortnamecourse');
         $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
         $mform->setType('shortname', PARAM_TEXT);
@@ -143,10 +169,10 @@ class modified_copy_form extends \moodleform {
             unset($displaylist[$courseid]);
         }
 
-        $displaylist['default']= get_string('form:copy:select_default','local_oc_course_creation');
+        $displaylist['default'] = get_string('form:copy:select_default', 'local_oc_course_creation');
 
-        $select=$mform->addElement('select', 'category', get_string('coursecategory'), $displaylist );
-        $mform->addRule('category',  get_string('invalidcategory', 'error'), 'numeric', null, 'client');
+        $select = $mform->addElement('select', 'category', get_string('coursecategory'), $displaylist);
+        $mform->addRule('category', get_string('invalidcategory', 'error'), 'numeric', null, 'client');
         $mform->addHelpButton('category', 'coursecategory');
         $select->setSelected('default');
         // Course visibility.
