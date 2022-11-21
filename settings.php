@@ -90,6 +90,17 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
+    $name = 'local_oc_course_creation/use_default_course_naming';
+    $description = get_string('settings:use_default_course_naming_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:use_default_course_naming', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+    
     $name = 'local_oc_course_creation/textfield_values';
     $description = get_string('settings:template_textfield_values_desc', 'local_oc_course_creation');
     $default = 'Teacher lastname, course type';
