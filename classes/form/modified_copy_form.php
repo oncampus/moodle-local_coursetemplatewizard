@@ -80,7 +80,7 @@ class modified_copy_form extends \moodleform {
             $textfield_count = 0;
             $infix = explode("','", get_config('local_oc_course_creation', 'textfield_seperator'));
             $infix[0] = substr($infix[0], 1);
-            $infix[array_key_last($infix)] = substr($infix[0], 0);
+            $infix[array_key_last($infix)] =count($infix[array_key_last($infix)]) === 0 ? count($infix[array_key_last($infix)]): substr($infix[array_key_last($infix)], 0,-1);
             $max = count($infix);
             for ($i = 0; $i < $max; $i++) {
                 $infix[$i] = $enclosing . $infix[$i] . $enclosing;
