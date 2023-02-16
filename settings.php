@@ -115,7 +115,7 @@ if ($hassiteconfig) {
     $name = 'local_oc_course_creation/course_shortname_readonly';
     $description = get_string('settings:template_course_shortname_readonly_desc', 'local_oc_course_creation');
     $default = false;
-    $setting = new admin_setting_configcheckbox_with_advanced(
+    $setting = new admin_setting_configcheckbox(
             $name,
             $visiblename = get_string('settings:template_course_shortname_readonly', 'local_oc_course_creation'),
             $description,
