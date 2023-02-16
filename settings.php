@@ -70,7 +70,6 @@ if (has_capability($capedit, $context)) {
 }
 
 if ($hassiteconfig) {
-
     $name = 'local_oc_course_creation/category';
     $description = get_string('settings:template_course_desc', 'local_oc_course_creation');
     $selection = [];
@@ -91,10 +90,100 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
+    $name = 'local_oc_course_creation/use_default_course_naming';
+    $description = get_string('settings:use_default_course_naming_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:use_default_course_naming', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+    
+    $name = 'local_oc_course_creation/course_name_readonly';
+    $description = get_string('settings:template_course_name_readonly_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:template_course_name_readonly', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+
+    $name = 'local_oc_course_creation/course_shortname_readonly';
+    $description = get_string('settings:template_course_shortname_readonly_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox_with_advanced(
+            $name,
+            $visiblename = get_string('settings:template_course_shortname_readonly', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+    
+    $name = 'local_oc_course_creation/textfield_values';
+    $description = get_string('settings:template_textfield_values_desc', 'local_oc_course_creation');
+    $default =  get_string('settings:template_textfield_values_default', 'local_oc_course_creation');
+    $setting = new admin_setting_configtextarea(
+            $name,
+            $visiblename = get_string('settings:template_textfield_values', 'local_oc_course_creation'),
+            $description,
+            $default,
+            PARAM_RAW,
+    );
+    $settingspage->add($setting);
+
+    $settingspage->add($setting);
+    $name = 'local_oc_course_creation/display_seperator';
+    $description = get_string('settings:template_display_seperator_desc', 'local_oc_course_creation');
+    $default = true;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:template_display_seperator', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+
+    $name = 'local_oc_course_creation/textfield_seperator';
+    $description = get_string('settings:template_textfield_seperator_desc', 'local_oc_course_creation');
+    $default = " ' ',' - ',': ',', '";
+    $setting = new admin_setting_configtext(
+            $name,
+            $visiblename = get_string('settings:template_textfield_seperator', 'local_oc_course_creation'),
+            $description,
+            $default,
+            PARAM_RAW,
+    );
+    $settingspage->add($setting);
+    
+    $name = 'local_oc_course_creation/course_shortname_readonly';
+    $description = get_string('settings:template_course_shortname_readonly_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:template_course_shortname_readonly', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
+
+    $name = 'local_oc_course_creation/toggle_prefix';
+    $description = get_string('settings:template_prefix_checkbox_toggle_desc', 'local_oc_course_creation');
+    $default = false;
+    $setting = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:template_prefix_checkbox_toggle', 'local_oc_course_creation'),
+            $description,
+            $default,
+    );
+
+    
     $name = 'local_oc_course_creation/prefix_desc';
     $description = get_string('settings:template_prefix_checkbox_text_desc', 'local_oc_course_creation');
-    $selection = [];
-    $default = get_string('settings:course_prefix', 'local_oc_course_creation');
+    $default = get_string('settings:edit_template_checkbox_default', 'local_oc_course_creation');
     $setting = new admin_setting_configtext(
             $name,
             $visiblename = get_string('settings:edit_template_checkbox_desc', 'local_oc_course_creation'),
@@ -105,7 +194,6 @@ if ($hassiteconfig) {
 
     $name = 'local_oc_course_creation/prefix_text';
     $description = get_string('settings:template_prefix_desc', 'local_oc_course_creation');
-    $selection = [];
     $default = get_string('settings:template_prefix_default', 'local_oc_course_creation');
     $setting = new admin_setting_configtext(
             $name,

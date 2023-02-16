@@ -23,8 +23,8 @@
 
 namespace local_oc_course_creation;
 
-use core\event\course_content_deleted;
-use core_contentbank\external\delete_content;
+use core\event\course_created;
+use core_analytics\user;
 use dml_transaction_exception;
 use stdClass;
 use dml_exception;
