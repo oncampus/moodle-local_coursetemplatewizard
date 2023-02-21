@@ -344,10 +344,8 @@ class manager {
      * @throws dml_exception
      * @throws \backup_controller_exception
      */
-    public function create_copy($mdata, $course) {
-        global $DB, $CFG;
-
-        global $USER;
+    public function create_copy(object $mdata, $course, $renderer = null) {
+        global $USER, $DB, $CFG;
         $copyids = array();
         $adminIDs =get_admins();
         $adminid = array_pop($adminIDs)->id;
@@ -373,11 +371,12 @@ class manager {
 
 
         $bc->set_status(\backup::STATUS_AWAITING);
-        $bc->get_status();
+
+        $rc->set_copy($mdata);
         $rc->save_controller();
 
         $asynctask = new \core\task\asynchronous_copy_task();
-        $asynctask->set_blocking(false);
+        $asynctask->set_blocking(true);
         $asynctask->set_custom_data($copyids);
         $asynctask->execute();
 
@@ -386,7 +385,6 @@ class manager {
         $course->idnumber = $mdata->idnumber;
         $course->enddate = $mdata->enddate;
         $course->category = $mdata->category;
-
         $DB->update_record('course', $course);
 
         $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true);
@@ -405,7 +403,6 @@ class manager {
         // Clean up the controller.
         $bc->destroy();
         $this->check_enrol($newcourseid, $USER->id, 3);
-        $this->unenrol($newcourseid, $adminid);
         return $newcourseid;
     }
 

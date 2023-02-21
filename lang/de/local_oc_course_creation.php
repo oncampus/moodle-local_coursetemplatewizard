@@ -25,13 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Kurse Duplizieren';
+$string['pluginname'] = 'Kurse duplizieren';
 $string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['settings:choose_course'] = 'Kursbereich auswählen';
 $string['settings:create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] = 'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
-$string['creation_page_title'] = 'Kurs Vorlagen';
-$string['headline_table_view'] = 'Kurs Vorlagen';
+$string['creation_page_title'] = 'Kursvorlagen';
+$string['headline_table_view'] = 'Kursvorlagen';
 $string['table_head_coursename'] = 'Kursname';
 $string['table_head_edit'] = 'Diesen Kurs als Vorlage nutzen';
 $string['course_format'] = 'Kursbereich';
@@ -71,7 +71,7 @@ $string['form:copy:teacher_name_placeholder'] = 'Nachname Dozent/in';
 $string['form:copy:course_details'] = 'Kursdetails eingeben';
 $string['form:copy:description'] = 'Dieser Kurs wird erstellt und in die angegebene Kurskategorie eingefügt.';
 $string['form:copy:select_default'] = 'Kursbereich auswählen';
-$string['settings:use_default_course_naming'] = 'Kursname ohne vorgaben erstellen';
+$string['settings:use_default_course_naming'] = 'Kursname ohne Vorgaben erstellen';
 $string['settings:use_default_course_naming_desc'] = 'Dieses Feld deaktiviert in der Kurserstellungsform alle optionen zur Vorgabe des Kursnamens.';
 $string['settings:template_textfield_values'] = 'Vorgaben für Textfelder';
 $string['settings:template_textfield_values_desc'] = 'Über die eingabe mit kommaseparierten Bezeichnungen werden freitext eingabefelder in der Kurseingabeform erstellt. Als Standard "Nachname, Kurs Typ" sind zwei Eingabefelder mit der Bezeichnung Nachname und Kurs Bezeichnung eingetragen.';

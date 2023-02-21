@@ -70,6 +70,7 @@ if (has_capability($capedit, $context)) {
 }
 
 if ($hassiteconfig) {
+
     $name = 'local_oc_course_creation/category';
     $description = get_string('settings:template_course_desc', 'local_oc_course_creation');
     $selection = [];
@@ -115,7 +116,7 @@ if ($hassiteconfig) {
     $name = 'local_oc_course_creation/course_shortname_readonly';
     $description = get_string('settings:template_course_shortname_readonly_desc', 'local_oc_course_creation');
     $default = false;
-    $setting = new admin_setting_configcheckbox_with_advanced(
+    $setting = new admin_setting_configcheckbox(
             $name,
             $visiblename = get_string('settings:template_course_shortname_readonly', 'local_oc_course_creation'),
             $description,
@@ -194,6 +195,7 @@ if ($hassiteconfig) {
 
     $name = 'local_oc_course_creation/prefix_text';
     $description = get_string('settings:template_prefix_desc', 'local_oc_course_creation');
+    $selection = [];
     $default = get_string('settings:template_prefix_default', 'local_oc_course_creation');
     $setting = new admin_setting_configtext(
             $name,

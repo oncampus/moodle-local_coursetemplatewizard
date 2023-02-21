@@ -49,8 +49,6 @@ define(['jquery'],
                         trigger[i].addEventListener('keyup',e =>
                             change_course_name(trigger, args.enclosing, args.seperator));
                     } else if (trigger[i].classList.contains('select_type')) {
-                        console.log(trigger[i]);
-                        console.log(  trigger[i].getElementsByTagName('select')[0]);
                         trigger[i].getElementsByTagName('select')[0]
                             .addEventListener('click',e =>
                                 change_course_name(trigger, args.enclosing, args.seperator));
