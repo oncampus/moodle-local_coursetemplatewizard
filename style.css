@@ -1,0 +1,24 @@
+html[lang="en"] *[lang]{
+    display: none;
+}
+html[lang="en"] *[lang="en"]{
+    display: block;
+}
+html[lang="de"] *[lang]{
+    display: none;
+}
+html[lang="de"] *[lang="de"]{
+    display: block;
+}
+html[lang="fr"] *[lang]{
+    display: none;
+}
+html[lang="fr"] *[lang="fr"]{
+    display: block;
+}
+html[lang="us"] *[lang]{
+    display: none;
+}
+html[lang="us"] *[lang="us"]{
+    display: block;
+}
