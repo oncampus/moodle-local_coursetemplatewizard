@@ -1,24 +1,24 @@
-html[lang="en"] *[lang]{
+html[lang="en"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
-html[lang="en"] *[lang="en"]{
+html[lang="en"] .path-local-oc_course_creation *[lang="en"] {
     display: block;
 }
-html[lang="de"] *[lang]{
+html[lang="de"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
-html[lang="de"] *[lang="de"]{
+html[lang="de"] .path-local-oc_course_creation *[lang="de"] {
     display: block;
 }
-html[lang="fr"] *[lang]{
+html[lang="fr"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
-html[lang="fr"] *[lang="fr"]{
+html[lang="fr"] .path-local-oc_course_creation *[lang="fr"] {
     display: block;
 }
-html[lang="us"] *[lang]{
+html[lang="us"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
-html[lang="us"] *[lang="us"]{
+html[lang="us"] .path-local-oc_course_creation *[lang="us"] {
     display: block;
 }
