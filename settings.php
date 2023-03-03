@@ -180,17 +180,6 @@ if ($hassiteconfig) {
             $description,
             $default,
     );
-
-    
-    $name = 'local_oc_course_creation/prefix_desc';
-    $description = get_string('settings:template_prefix_checkbox_text_desc', 'local_oc_course_creation');
-    $default = get_string('settings:edit_template_checkbox_default', 'local_oc_course_creation');
-    $setting = new admin_setting_configtext(
-            $name,
-            $visiblename = get_string('settings:edit_template_checkbox_desc', 'local_oc_course_creation'),
-            $description,
-            $default,
-    );
     $settingspage->add($setting);
 
     $name = 'local_oc_course_creation/prefix_text';

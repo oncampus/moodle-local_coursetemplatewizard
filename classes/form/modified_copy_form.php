@@ -80,10 +80,14 @@ class modified_copy_form extends \moodleform {
             $textfield_count = 0;
             $infix = explode("','", get_config('local_oc_course_creation', 'textfield_seperator'));
             $infix[0] = substr($infix[0], 1);
-            $infix[array_key_last($infix)] =count($infix[array_key_last($infix)]) === 0 ? count($infix[array_key_last($infix)]): substr($infix[array_key_last($infix)], 0,-1);
-            $max = count($infix);
-            for ($i = 0; $i < $max; $i++) {
-                $infix[$i] = $enclosing . $infix[$i] . $enclosing;
+            if(count($infix) !== 1 && $infix[0] !== "") {
+                $infix[array_key_last($infix)] =
+                        count($infix[array_key_last($infix)]) === 0 ? count($infix[array_key_last($infix)]) :
+                                substr($infix[array_key_last($infix)], 0, -1);
+                $max = count($infix);
+                for ($i = 0; $i < $max; $i++) {
+                    $infix[$i] = $enclosing . $infix[$i] . $enclosing;
+                }
             }
             $infixcount = 0;
             //group prefix
@@ -94,7 +98,7 @@ class modified_copy_form extends \moodleform {
                 $mform->addElement('html',
                         '<h3 class="qheader">' . get_string('form:copy:course_name_header', 'local_oc_course_creation') . '</h3>');
                 $mform->addElement('checkbox', 'add_prefix',
-                        get_config('local_oc_course_creation', 'prefix_desc'));
+                        get_string('form:copy:prefix_des c', 'local_oc_course_creation'));
                 // Form add prefix
                 $prefix = $mform->createElement('text', 'prefix', '',
                         array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
@@ -110,10 +114,10 @@ class modified_copy_form extends \moodleform {
 
             // Form preset values
             foreach (explode(',', get_config('local_oc_course_creation', 'textfield_values')) as $textfield) {
-                $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count++, '',
+                $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count, '',
                         array('class' => 'mr-2 h-100 modifying_type input_type',
                                 'placeholder' => $textfield));
-                $mform->setType($textfield, PARAM_TEXT);
+                $mform->setType('textfield' . $textfield_count++, PARAM_TEXT);
                 $type_group[] = $textfieldisntance;
                 $type_group[] = $mform->createElement('select', 'infix' . $infixcount++, "", $infix
                         , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
