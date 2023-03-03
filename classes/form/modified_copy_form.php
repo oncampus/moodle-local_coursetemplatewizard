@@ -98,7 +98,7 @@ class modified_copy_form extends \moodleform {
                 $mform->addElement('html',
                         '<h3 class="qheader">' . get_string('form:copy:course_name_header', 'local_oc_course_creation') . '</h3>');
                 $mform->addElement('checkbox', 'add_prefix',
-                        get_string('form:copy:prefix_des c', 'local_oc_course_creation'));
+                        get_string('form:copy:prefix_desc', 'local_oc_course_creation'));
                 // Form add prefix
                 $prefix = $mform->createElement('text', 'prefix', '',
                         array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
