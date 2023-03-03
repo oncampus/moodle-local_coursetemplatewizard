@@ -150,7 +150,7 @@ if ($hassiteconfig) {
 
     $name = 'local_oc_course_creation/textfield_seperator';
     $description = get_string('settings:template_textfield_seperator_desc', 'local_oc_course_creation');
-    $default = " ' ',' - ',': ',', '";
+    $default = " ': ' - '_'";
     $setting = new admin_setting_configtext(
             $name,
             $visiblename = get_string('settings:template_textfield_seperator', 'local_oc_course_creation'),

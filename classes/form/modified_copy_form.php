@@ -33,9 +33,8 @@ class modified_copy_form extends \moodleform {
     public function definition() {
         $manager = new manager();
         global $PAGE;
-        $enclosing = "'";
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
-        $params = ['enclosing' => $enclosing, 'seperator' => $displayseperator];
+        $params = ['seperator' => $displayseperator];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
 
         global $CFG, $OUTPUT, $USER;
@@ -78,18 +77,9 @@ class modified_copy_form extends \moodleform {
         }
         if (get_config('local_oc_course_creation', 'use_default_course_naming')) {
             $textfield_count = 0;
-            $infix = explode("','", get_config('local_oc_course_creation', 'textfield_seperator'));
-            $infix[0] = substr($infix[0], 1);
-            if(count($infix) !== 1 && $infix[0] !== "") {
-                $infix[array_key_last($infix)] =
-                        count($infix[array_key_last($infix)]) === 0 ? count($infix[array_key_last($infix)]) :
-                                substr($infix[array_key_last($infix)], 0, -1);
-                $max = count($infix);
-                for ($i = 0; $i < $max; $i++) {
-                    $infix[$i] = $enclosing . $infix[$i] . $enclosing;
-                }
-            }
-            $infixcount = 0;
+            $infix = explode('\'', get_config('local_oc_course_creation', 'textfield_seperator'));
+            $infix = array_combine($infix,$infix);
+            $infixcounter = 0;
             //group prefix
             if (get_config('local_oc_course_creation', 'toggle_prefix')) {
                 $type_group = array();
@@ -108,7 +98,7 @@ class modified_copy_form extends \moodleform {
                 $mform->hideIf("prefix", "add_prefix");
                 $mform->hideIf("infix0", "add_prefix");
                 $type_group[] = $prefix;
-                $type_group[] = $mform->createElement('select', 'infix' . $infixcount++, "", $infix
+                $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
                         , ['class' => $displayseperator ? 'modifying_type select_type prefix' : 'd-none']);
             }
 
@@ -119,7 +109,7 @@ class modified_copy_form extends \moodleform {
                                 'placeholder' => $textfield));
                 $mform->setType('textfield' . $textfield_count++, PARAM_TEXT);
                 $type_group[] = $textfieldisntance;
-                $type_group[] = $mform->createElement('select', 'infix' . $infixcount++, "", $infix
+                $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
                         , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
             }
 
@@ -129,14 +119,14 @@ class modified_copy_form extends \moodleform {
             foreach ($types as $key => $type) {
                 foreach ($values as $value) {
                     if ($value->type_id === $type->id) {
-                        $types_key_value[$type->id][] = $value->string;
+                        $types_key_value[$type->id][$value->string] = $value->string;
                     }
                 }
                 $type_group[] = $mform->createElement('select', 'type_' . $type->type,
                         "", $types_key_value[$type->id]
                         , ['class' => 'modifying_type select_type']);
                 if ($key !== array_key_last($types)) {
-                    $type_group[] = $mform->createElement('select', 'infix' . $infixcount++, "", $infix
+                    $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
                             , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
                 }
             }
