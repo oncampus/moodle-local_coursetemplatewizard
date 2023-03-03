@@ -71,6 +71,7 @@ $string['form:copy:teacher_name_placeholder'] = 'Nachname Dozent/in';
 $string['form:copy:course_details'] = 'Kursdetails eingeben';
 $string['form:copy:description'] = 'Dieser Kurs wird erstellt und in die angegebene Kurskategorie eingefügt.';
 $string['form:copy:select_default'] = 'Kursbereich auswählen';
+$string['form:copy:prefix_desc'] = 'Modulbezeichnung hinzufügen';
 $string['settings:use_default_course_naming'] = 'Kursname ohne Vorgaben erstellen';
 $string['settings:use_default_course_naming_desc'] = 'Dieses Feld deaktiviert in der Kurserstellungsform alle optionen zur Vorgabe des Kursnamens.';
 $string['settings:template_textfield_values'] = 'Vorgaben für Textfelder';
