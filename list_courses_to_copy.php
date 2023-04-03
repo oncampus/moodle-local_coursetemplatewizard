@@ -55,13 +55,14 @@ $i = 0;
 
 foreach ($courseIds as $courseId) {
     $course = $DB->get_record('course', array('id' => $courseId));
+    $course->fullname = format_text($course->fullname);
     $courses[$i] = $course;
     //image
     $out = html_writer::img(course_summary_exporter::get_course_image($course), "",
             ["width" => "100%;", 'style' => "max-width: 350px;"]);
     $courses[$i]->img = $out;
     //summary
-    $summary = $manager->get_course_summary((int) $courseId);
+    $summary = format_text($manager->get_course_summary((int) $courseId));
     $offset = 500; //chars until end is searched
     $end = '</p>'; //closing tag
     if (strlen($summary) > $offset && strpos($summary, $end, $offset)) {
