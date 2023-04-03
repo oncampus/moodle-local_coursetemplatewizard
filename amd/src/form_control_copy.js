@@ -8,7 +8,7 @@ define(['jquery'],
         var change_course_name = function (input_fields, seperator_on) {
             var input_fullname = '';
             let input_shortname = '';
-            let prefix_set = document.getElementById("id_add_prefix") ? document.getElementById("id_add_prefix").checked : false;
+            let prefix_set = $("#id_add_prefix") ? $("#id_add_prefix").is(':checked') : false;
             let field_len = input_fields.length;
             let seperator = seperator_on === '1' ? '' : ' ';
             for (let i = 0; field_len > i; i++) {
@@ -49,12 +49,12 @@ define(['jquery'],
                 change_course_name(trigger, args.seperator);
                 for (let i = 0; i < trigger.length; i++) {
                     if (trigger[i].classList.contains('input_type')) {
-                        trigger[i].addEventListener('keyup', e =>
-                            change_course_name(trigger, args.seperator));
+                        trigger[i].addEventListener('keyup', function (){
+                            change_course_name(trigger, args.seperator);});
                     } else if (trigger[i].classList.contains('select_type')) {
                         trigger[i].getElementsByTagName('select')[0]
-                            .addEventListener('click', e =>
-                                change_course_name(trigger, args.seperator));
+                            .addEventListener('click',function (){
+                                change_course_name(trigger, args.seperator);});
                     }
                 }
                 if (document.getElementById("id_add_prefix")) {
