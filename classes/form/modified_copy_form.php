@@ -34,14 +34,14 @@ class modified_copy_form extends \moodleform {
         $manager = new manager();
         global $PAGE;
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
-        $params = ['seperator' => $displayseperator];
+        $params           = ['seperator' => $displayseperator];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
 
         global $CFG, $OUTPUT, $USER;
-        $mform = $this->_form;
-        $course = $this->_customdata['course'];
+        $mform         = $this->_form;
+        $course        = $this->_customdata['course'];
         $coursecontext = \context_course::instance($course->id);
-        $courseconfig = get_config('moodlecourse');
+        $courseconfig  = get_config('moodlecourse');
 
         if (empty($course->category)) {
             $course->category = $course->categoryid;
@@ -70,19 +70,19 @@ class modified_copy_form extends \moodleform {
             $mform->addElement('html',
                     '<h3 class="qheader">' . get_string('form:copy:image_header', 'local_oc_course_creation') . '</h3>');
             $mform->addElement('filemanager', 'overviewfiles_filemanager',
-                    get_string('form:copy:image_desc', "local_oc_course_creation"), null,
+                    get_string('form:copy:image_desc', "local_oc_course_creation"), NULL,
                     $overviewfilesoptions);
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }
         if (get_config('local_oc_course_creation', 'use_default_course_naming')) {
             $textfield_count = 0;
-            $infix = explode('\'', get_config('local_oc_course_creation', 'textfield_seperator'));
-            $infix = array_combine($infix,$infix);
-            $infixcounter = 0;
+            $infix           = explode('\'', get_config('local_oc_course_creation', 'textfield_seperator'));
+            $infix           = array_combine($infix, $infix);
+            $infixcounter    = 0;
             //group prefix
             if (get_config('local_oc_course_creation', 'toggle_prefix')) {
-                $type_group = array();
+                $type_group = [];
 
                 // Form add prefix checkbox
                 $mform->addElement('html',
@@ -91,8 +91,9 @@ class modified_copy_form extends \moodleform {
                         get_string('form:copy:prefix_desc', 'local_oc_course_creation'));
                 // Form add prefix
                 $prefix = $mform->createElement('text', 'prefix', '',
-                        array('class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
-                                get_config('local_oc_course_creation', 'prefix_text')));
+                        ['class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
+                                get_config('local_oc_course_creation', 'prefix_text'),
+                        ]);
                 $mform->setType('prefix', PARAM_TEXT);
 
                 $mform->hideIf("prefix", "add_prefix");
@@ -105,17 +106,18 @@ class modified_copy_form extends \moodleform {
             // Form preset values
             foreach (explode(',', get_config('local_oc_course_creation', 'textfield_values')) as $textfield) {
                 $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count, '',
-                        array('class' => 'mr-2 h-100 modifying_type input_type',
-                                'placeholder' => $textfield));
+                        ['class'       => 'mr-2 h-100 modifying_type input_type',
+                         'placeholder' => $textfield,
+                        ]);
                 $mform->setType('textfield' . $textfield_count++, PARAM_TEXT);
                 $type_group[] = $textfieldisntance;
                 $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
                         , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
             }
 
-            $types_key_value = array();
-            $types = $manager->get_all_types();
-            $values = $manager->get_all_values();
+            $types_key_value = [];
+            $types           = $manager->get_all_types();
+            $values          = $manager->get_all_values();
             foreach ($types as $key => $type) {
                 foreach ($values as $value) {
                     if ($value->type_id === $type->id) {
@@ -135,19 +137,19 @@ class modified_copy_form extends \moodleform {
                     get_string('form:copy:course_details', 'local_oc_course_creation'), ' ');
         }
         // Course fullname.
-        $shortnamereadonly = get_config('local_oc_course_creation', 'course_shortname_readonly') ? 'readonly' : '';
+        $shortnamereadonly  = get_config('local_oc_course_creation', 'course_shortname_readonly') ? 'readonly' : '';
         $coursenamereadonly = get_config('local_oc_course_creation', 'course_name_readonly') ? 'readonly' : '';
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'),
                 'maxlength="254" size="50" ' . $shortnamereadonly);
         $mform->addHelpButton('fullname', 'fullnamecourse');
-        $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
+        $mform->addRule('fullname', get_string('missingfullname'), 'required', NULL, 'client');
         $mform->setType('fullname', PARAM_TEXT);
 
         // Course shortname.
         $mform->addElement('text', 'shortname', get_string('shortnamecourse'),
                 'maxlength="100" size="20" ' . $coursenamereadonly);
         $mform->addHelpButton('shortname', 'shortnamecourse');
-        $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
+        $mform->addRule('shortname', get_string('missingshortname'), 'required', NULL, 'client');
         $mform->setType('shortname', PARAM_TEXT);
 
         // Course category.
@@ -166,11 +168,11 @@ class modified_copy_form extends \moodleform {
         $displaylist['default'] = get_string('form:copy:select_default', 'local_oc_course_creation');
 
         $select = $mform->addElement('select', 'category', get_string('coursecategory'), $displaylist);
-        $mform->addRule('category', get_string('invalidcategory', 'error'), 'numeric', null, 'client');
+        $mform->addRule('category', get_string('invalidcategory', 'error'), 'numeric', NULL, 'client');
         $mform->addHelpButton('category', 'coursecategory');
         $select->setSelected('default');
         // Course visibility.
-        $choices = array();
+        $choices      = [];
         $choices['0'] = get_string('hide');
         $choices['1'] = get_string('show');
         $mform->addElement('select', 'visible', get_string('coursevisibility'), $choices);
@@ -183,21 +185,21 @@ class modified_copy_form extends \moodleform {
 
         if (!empty($CFG->enablecourserelativedates)) {
             $attributes = [
-                    'aria-describedby' => 'relativedatesmode_warning'
+                    'aria-describedby' => 'relativedatesmode_warning',
             ];
             if (!empty($course->id)) {
                 $attributes['disabled'] = true;
             }
-            $relativeoptions = [
+            $relativeoptions          = [
                     0 => get_string('no'),
                     1 => get_string('yes'),
             ];
-            $relativedatesmodegroup = [];
+            $relativedatesmodegroup   = [];
             $relativedatesmodegroup[] = $mform->createElement('select', 'relativedatesmode', get_string('relativedatesmode'),
                     $relativeoptions, $attributes);
             $relativedatesmodegroup[] = $mform->createElement('html', \html_writer::span(get_string('relativedatesmode_warning'),
                     '', ['id' => 'relativedatesmode_warning']));
-            $mform->addGroup($relativedatesmodegroup, 'relativedatesmodegroup', get_string('relativedatesmode'), null, false);
+            $mform->addGroup($relativedatesmodegroup, 'relativedatesmodegroup', get_string('relativedatesmode'), NULL, false);
             $mform->addHelpButton('relativedatesmodegroup', 'relativedatesmode');
         }
 
@@ -205,7 +207,7 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
         $mform->setExpanded('descriptionhdr');
 
-        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
+        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), NULL);
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
 
@@ -215,7 +217,7 @@ class modified_copy_form extends \moodleform {
             $mform->hardFreeze($summaryfields);
         }
 
-        $buttonarray = array();
+        $buttonarray   = [];
         $buttonarray[] = $mform->createElement('submit', 'submitreturn', get_string('savechangesandreturn'));
         $buttonarray[] = $mform->createElement('submit', 'submitdisplay', get_string('savechangesanddisplay'));
         $buttonarray[] = $mform->createElement('cancel');
@@ -235,14 +237,14 @@ class modified_copy_form extends \moodleform {
         $errors = parent::validation($data, $files);
 
         // Add field validation check for duplicate shortname.
-        $courseshortname = $DB->get_record('course', array('shortname' => $data['shortname']), 'fullname', IGNORE_MULTIPLE);
+        $courseshortname = $DB->get_record('course', ['shortname' => $data['shortname']], 'fullname', IGNORE_MULTIPLE);
         if ($courseshortname) {
             $errors['shortname'] = get_string('shortnametaken', '', $courseshortname->fullname);
         }
 
         // Add field validation check for duplicate idnumber.
         if (!empty($data['idnumber'])) {
-            $courseidnumber = $DB->get_record('course', array('idnumber' => $data['idnumber']), 'fullname', IGNORE_MULTIPLE);
+            $courseidnumber = $DB->get_record('course', ['idnumber' => $data['idnumber']], 'fullname', IGNORE_MULTIPLE);
             if ($courseidnumber) {
                 $errors['idnumber'] = get_string('courseidnumbertaken', 'error', $courseidnumber->fullname);
             }

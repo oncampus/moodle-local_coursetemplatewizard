@@ -27,33 +27,31 @@
 namespace local_oc_course_creation\form;
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
+
 use local_oc_course_creation\manager;
-class string_form extends  \moodleform {
+
+class string_form extends \moodleform {
 
     //Add elements to form
     public function definition() {
 
-        $manager = new manager();
-        $types = $manager->get_all_types();
-        $types_key_value = array();
-        foreach ($types as $type){
+        $manager         = new manager();
+        $types           = $manager->get_all_types();
+        $types_key_value = [];
+        foreach ($types as $type) {
             $types_key_value[$type->id] = $type->type;
             $types_key_value[$type->id] = $type->type;
         }
-
 
         $mform = $this->_form; // Don't forget the underscore!
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-
         $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $types_key_value, []);
-
 
         $mform->addElement('text', 'string', get_string('form:string:form_select', 'local_oc_course_creation'));
         $mform->setType('string', PARAM_TEXT);
-
 
         $this->add_action_buttons();
     }

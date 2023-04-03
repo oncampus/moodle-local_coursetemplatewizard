@@ -62,8 +62,8 @@ if ($mform->is_cancelled()) {
     redirect($courslist);
 
 } else if ($mdata = $mform->get_data()) {
-    $context          = context_course::instance($courseid);
-    $copycaps         = \core_course\management\helper::get_course_copy_capabilities();
+    $context  = context_course::instance($courseid);
+    $copycaps = \core_course\management\helper::get_course_copy_capabilities();
     require_all_capabilities($copycaps, $context);
     // Submit the form data.
     $course      = get_course($courseid);

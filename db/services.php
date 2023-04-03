@@ -22,16 +22,20 @@
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$functions = array(
-        'local_oc_course_creation_custom_preset_delete' => array(                   //web service name (unique in all Moodle)
-                'classname'   => 'local_oc_course_creation_external',                        //class containing the function implementation
-                'methodname'  => 'custom_preset_delete',                                    //name of the function into the class
-                'classpath'   => 'local/oc_course_creation/externallib.php',        //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
-                'description' => 'Delete selected preset string by its id',
-                'component'   => 'local_oc_course_creation',
-                'capabilities'=> 'local/oc_course_creation:handle_presets',
-                'type' => 'write',
-                'ajax' => 'true',
-                'capabilities' => 'true',
-        )
-);
+$functions = [
+        'local_oc_course_creation_custom_preset_delete' => [
+            //web service name (unique in all Moodle)
+            'classname'    => 'local_oc_course_creation_external',
+            //class containing the function implementation
+            'methodname'   => 'custom_preset_delete',
+            //name of the function into the class
+            'classpath'    => 'local/oc_course_creation/externallib.php',
+            //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
+            'description'  => 'Delete selected preset string by its id',
+            'component'    => 'local_oc_course_creation',
+            'capabilities' => 'local/oc_course_creation:handle_presets',
+            'type'         => 'write',
+            'ajax'         => 'true',
+            'capabilities' => 'true',
+        ],
+];

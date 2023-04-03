@@ -19,11 +19,11 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                 modal.setSaveButtonText(String.get_string('modal_delete_button', 'local_oc_course_creation'));
             },
         }, trigger)
-            .done(function(modal) {
-                modal.getRoot().on(ModalEvents.save, function(e) {
+            .done(function (modal) {
+                modal.getRoot().on(ModalEvents.save, function (e) {
                     let footer = Y.one('.modal-footer');
                     footer.setContent('Deleting');
-                    let spinner = M.util.add_spinner(Y,footer);
+                    let spinner = M.util.add_spinner(Y, footer);
                     spinner.show();
                     e.preventDefault();
                     Y.log(modal.params);
@@ -32,7 +32,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                         args: modal.params,
                     };
 
-                    Ajax.call([request])[0].done(function(data) {
+                    Ajax.call([request])[0].done(function (data) {
                         if (data === true) {
                             window.location.reload();
                             Y.log('deleted message ' + modal.params);

@@ -60,7 +60,7 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
 
     public function test_get_last_type_by_rank() {
         $manager = new manager();
-        $type = $manager->get_last_type_by_rank();
+        $type    = $manager->get_last_type_by_rank();
         $manager->create_type("testtype");
         $new_type = $manager->get_last_type_by_rank();
 
@@ -72,10 +72,10 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
 
     public function test_get_types_higher_and_equal_rank() {
         $manager = new manager();
-        $types = $manager->get_types_higher_and_equal_rank(0);
-        $types2 = $manager->get_types_higher_and_equal_rank(1);
-        $types3 = $manager->get_types_higher_and_equal_rank(2);
-        $types4 = $manager->get_types_higher_and_equal_rank(3);
+        $types   = $manager->get_types_higher_and_equal_rank(0);
+        $types2  = $manager->get_types_higher_and_equal_rank(1);
+        $types3  = $manager->get_types_higher_and_equal_rank(2);
+        $types4  = $manager->get_types_higher_and_equal_rank(3);
         $this->assertCount(2, $types);
         $this->assertCount(2, $types2);
         $this->assertCount(1, $types3);
@@ -105,7 +105,7 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
         $manager = new manager();
         $this->assertEquals($manager->get_type_by_rank(1)->id, 1); // inital assertion claims type rank 1 has id 1
         $manager->update_delete_sort(1);
-        $this->assertFalse($manager->get_type_by_id(1)); // type with id 1 does not exist
+        $this->assertFalse($manager->get_type_by_id(1));         // type with id 1 does not exist
         $this->assertNotNull($manager->get_type_by_rank(1)->id); // type with rank one exists
 
         $manager->create_type("testtype");
@@ -124,7 +124,7 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
         $this->assertEquals($manager->get_type_by_rank(6)->rank, 6);
 
         $types_pre_del = $manager->get_all_types();
-        $i = 0;
+        $i             = 0;
         while (!$manager->update_delete_sort($i)) {
             $i++;
         }
@@ -140,11 +140,11 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
     }
 
     public function test_delete_value() {
-        $manager = new manager();
-        $values = $manager->get_all_values();
+        $manager        = new manager();
+        $values         = $manager->get_all_values();
         $values_pre_del = count($values);
-        $id = $values[array_key_first($values)]->id;
-        $type_id = $values[array_key_first($values)]->type_id;
+        $id             = $values[array_key_first($values)]->id;
+        $type_id        = $values[array_key_first($values)]->type_id;
         $manager->delete_value($id);
 
         $values = $manager->get_all_values();
@@ -163,18 +163,18 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
     }
 
     public function test_create_value_and_type() {
-        $manager = new manager();
+        $manager      = new manager();
         $values_count = count($manager->get_all_values());
-        $types_count = count( $manager->get_all_types());
-        $this->assertFalse($manager->create_value_and_type("",""));
-        $this->assertFalse($manager->create_value_and_type("test",""));
-        $this->assertFalse($manager->create_value_and_type("","test"));
-        $this->assertFalse($manager->create_value_and_type("",null));
-        $this->assertFalse($manager->create_value_and_type(null,""));
-        $this->assertTrue($manager->create_value_and_type("test","test"));//4
+        $types_count  = count($manager->get_all_types());
+        $this->assertFalse($manager->create_value_and_type("", ""));
+        $this->assertFalse($manager->create_value_and_type("test", ""));
+        $this->assertFalse($manager->create_value_and_type("", "test"));
+        $this->assertFalse($manager->create_value_and_type("", NULL));
+        $this->assertFalse($manager->create_value_and_type(NULL, ""));
+        $this->assertTrue($manager->create_value_and_type("test", "test"));//4
 
-        $this->assertEquals($values_count+1,count($manager->get_all_values()));
-        $this->assertEquals($types_count+1,count($manager->get_all_types()));
+        $this->assertEquals($values_count + 1, count($manager->get_all_values()));
+        $this->assertEquals($types_count + 1, count($manager->get_all_types()));
     }
 
 }

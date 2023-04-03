@@ -49,12 +49,14 @@ define(['jquery'],
                 change_course_name(trigger, args.seperator);
                 for (let i = 0; i < trigger.length; i++) {
                     if (trigger[i].classList.contains('input_type')) {
-                        trigger[i].addEventListener('keyup', function (){
-                            change_course_name(trigger, args.seperator);});
+                        trigger[i].addEventListener('keyup', function () {
+                            change_course_name(trigger, args.seperator);
+                        });
                     } else if (trigger[i].classList.contains('select_type')) {
                         trigger[i].getElementsByTagName('select')[0]
-                            .addEventListener('click',function (){
-                                change_course_name(trigger, args.seperator);});
+                            .addEventListener('click', function () {
+                                change_course_name(trigger, args.seperator);
+                            });
                     }
                 }
                 if (document.getElementById("id_add_prefix")) {

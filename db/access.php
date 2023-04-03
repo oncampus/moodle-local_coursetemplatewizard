@@ -24,27 +24,27 @@
  */
 
 $capabilities = [
-        'local/oc_course_creation:handle_presets' => [
-                'captype' => 'write',
+        'local/oc_course_creation:handle_presets'                       => [
+                'captype'      => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
-                'archetypes' => [
-                        'manager' => CAP_ALLOW,
+                'archetypes'   => [
+                        'manager'       => CAP_ALLOW,
                         'coursecreator' => CAP_PREVENT,
                 ],
         ],
-        'local/oc_course_creation:course_cat_copy_cap' => [
-                'captype' => 'write',
+        'local/oc_course_creation:course_cat_copy_cap'                  => [
+                'captype'      => 'write',
                 'contextlevel' => CONTEXT_COURSECAT,
-                'archetypes' => [
-                        'manager' => CAP_ALLOW,
+                'archetypes'   => [
+                        'manager'       => CAP_ALLOW,
                         'coursecreator' => CAP_ALLOW,
                 ],
         ],
         'local/oc_course_creation:oc_course_creation_access_capability' => [
-                'captype' => 'write',
+                'captype'      => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
-                'archetypes' => [
-                        'manager' => CAP_ALLOW,
+                'archetypes'   => [
+                        'manager'       => CAP_ALLOW,
                         'coursecreator' => CAP_ALLOW,
                 ],
         ],

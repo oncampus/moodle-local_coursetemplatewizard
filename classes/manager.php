@@ -346,12 +346,12 @@ class manager {
      */
     public function create_copy(object $mdata) {
         global $USER, $CFG;
-        $copyids = [];
+        $copyids          = [];
         $mdata->startdate = time();                              // Integer timestamp of the start of the destination course.
         $mdata->enddate   = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
         $mdata->keptroles = [];                                  // Integer timestamp of the start of the destination course.
-        $adminIDs =get_admins();
-        $adminid = array_pop($adminIDs)->id;
+        $adminIDs         = get_admins();
+        $adminid          = array_pop($adminIDs)->id;
         // Create the initial backupcontoller.
         $bc                  = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
                 \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid, \backup::RELEASESESSION_YES);

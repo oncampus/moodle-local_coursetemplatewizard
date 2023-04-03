@@ -1,24 +1,31 @@
 html[lang="en"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
+
 html[lang="en"] .path-local-oc_course_creation *[lang="en"] {
     display: block;
 }
+
 html[lang="de"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
+
 html[lang="de"] .path-local-oc_course_creation *[lang="de"] {
     display: block;
 }
+
 html[lang="fr"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
+
 html[lang="fr"] .path-local-oc_course_creation *[lang="fr"] {
     display: block;
 }
+
 html[lang="us"] .path-local-oc_course_creation *[lang] {
     display: none;
 }
+
 html[lang="us"] .path-local-oc_course_creation *[lang="us"] {
     display: block;
 }

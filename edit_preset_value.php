@@ -30,8 +30,7 @@ use local_oc_course_creation\manager;
 require_once('../../config.php');
 global $CFG;
 
-
-$id = required_param('id', PARAM_INT);
+$id      = required_param('id', PARAM_INT);
 $context = \context_system::instance();
 //secure
 redirect_if_major_upgrade_required();
@@ -48,7 +47,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
 $PAGE->set_heading(get_site()->fullname);
 
-$mform = new string_form();
+$mform   = new string_form();
 $manager = new manager();
 
 if ($mform->is_cancelled()) {

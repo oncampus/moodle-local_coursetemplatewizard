@@ -36,7 +36,7 @@ class local_oc_course_creation_external extends external_api {
     public static function custom_preset_delete_parameters() {
         return new external_function_parameters(
                 [
-                        'id' => new external_value(PARAM_INT, 'id of the message')
+                        'id' => new external_value(PARAM_INT, 'id of the message'),
                 ]
         );
     }
@@ -49,7 +49,7 @@ class local_oc_course_creation_external extends external_api {
      * @throws invalid_parameter_exception
      */
     public static function custom_preset_delete($id) {
-        self::validate_parameters(self::custom_preset_delete_parameters(), array('id' => $id));
+        self::validate_parameters(self::custom_preset_delete_parameters(), ['id' => $id]);
 
         $manager = new manager();
         return $manager->delete_value($id);

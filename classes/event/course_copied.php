@@ -22,7 +22,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * 
+ *
  *
  * @package    local_oc_course_creation
  * @author     Laurenz Schindler <laruenz.schindler@oncampus.de>
@@ -36,8 +36,8 @@ class course_copied extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'r';
-        $this->data['edulevel'] = self::LEVEL_OTHER;
+        $this->data['crud']        = 'r';
+        $this->data['edulevel']    = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'facetoface_sessions';
     }
 
@@ -65,7 +65,7 @@ class course_copied extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/facetoface/sessions.php', array('s' => $this->objectid));
+        return new \moodle_url('/mod/facetoface/sessions.php', ['s' => $this->objectid]);
     }
 
     /**
@@ -74,15 +74,16 @@ class course_copied extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'add session', 'sessions.php?s=' . $this->objectid,
-                $this->objectid, $this->contextinstanceid);
+        return [$this->courseid, $this->objecttable, 'add session', 'sessions.php?s=' . $this->objectid,
+                $this->objectid, $this->contextinstanceid,
+        ];
     }
 
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

@@ -1,4 +1,3 @@
-
 <?php
 // This file is part of Moodle - https://moodle.org/
 //
@@ -26,13 +25,13 @@
  */
 defined('MOODLE_INTERNAL') || die();
 global $DB, $CFG;
-$sql_type = "DROP TABLE IF EXISTS {oc_course_creation_type}";
+$sql_type   = "DROP TABLE IF EXISTS {oc_course_creation_type}";
 $sql_values = "DROP TABLE IF EXISTS {oc_course_creation_value}";
 
-$transaction = $DB->start_delegated_transaction();
-$drop_type = $DB->execute($sql_type);
-$drop_value = $DB->execute($sql_values);
-$drop_settings = $DB->delete_records('config_plugins',['name' => 'local_oc_course_creation']);
-if($drop_type && $drop_value && $drop_settings){
+$transaction   = $DB->start_delegated_transaction();
+$drop_type     = $DB->execute($sql_type);
+$drop_value    = $DB->execute($sql_values);
+$drop_settings = $DB->delete_records('config_plugins', ['name' => 'local_oc_course_creation']);
+if ($drop_type && $drop_value && $drop_settings) {
     $DB->commit_delegated_transaction($transaction);
 }
