@@ -96,4 +96,7 @@ $string['settings:template_prefix_checkbox_toggle_desc']           = 'Der Kursna
 $string['settings:template_display_seperator']                     = 'Ein-/ Ausschalten der Trennelemente';
 $string['settings:template_display_seperator_desc']                =
         'Die Trennelemente werden (nicht) im Formular angezeigt und durch ein einfaches Leerzeichen ersetzt.';
+$string['settings:use_after_creation_name']                        = 'Templates nach Kurserstellung';
+$string['settings:use_after_creation_desc']                        =
+        'Durch Aktivierung werden Templates nach der Kursertellung zur Auswahl angezeigt.';
 

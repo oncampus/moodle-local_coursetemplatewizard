@@ -96,3 +96,6 @@ $string['settings:template_prefix_checkbox_toggle_desc']           = 'The course
 $string['settings:template_display_seperator']                     = 'Toggle separator elements';
 $string['settings:template_display_seperator_desc']                =
         'The separator elements are (not) displayed in the form and replaced by a single space.';
+$string['settings:use_after_creation_name']                        = 'Show Templates after course creation';
+$string['settings:use_after_creation_desc']                        =
+        'Activation displays templates for selection after course creation.';
