@@ -49,7 +49,6 @@ $editoroptions            =
 $editoroptions['context'] = $coursecontext;
 $editoroptions['subdirs'] = file_area_contains_subdirs($coursecontext, 'course', 'summary', 0);
 
-$manager->check_enrol($courseid, $USER->id, 1);
 $mform = new modified_copy_form($url, [
                 'editoroptions' => $editoroptions,
                 'course'        => $course,
@@ -58,7 +57,6 @@ $mform = new modified_copy_form($url, [
 
 if ($mform->is_cancelled()) {
     // The form has been cancelled, take them back to what ever the return to is.
-    $manager->unenrol($courseid, $USER->id);
     redirect($courslist);
 
 } else if ($mdata = $mform->get_data()) {
