@@ -35,7 +35,7 @@ class modified_copy_form extends \moodleform {
         global $PAGE;
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
         $charnumber = get_config('local_oc_course_creation', 'cshortname_charnumber');
-        $charnumber = is_int($charnumber) ? $charnumber : 3;
+        $charnumber = (int)$charnumber ? $charnumber : 3;
         $params = ['seperator' => $displayseperator, 'charnumber' => $charnumber];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
 

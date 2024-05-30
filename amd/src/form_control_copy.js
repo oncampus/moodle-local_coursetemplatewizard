@@ -50,12 +50,12 @@ define(['jquery'],
                 for (let i = 0; i < trigger.length; i++) {
                     if (trigger[i].classList.contains('input_type')) {
                         trigger[i].addEventListener('keyup', function () {
-                            change_course_name(trigger, args.seperator);
+                            change_course_name(trigger, args.seperator, args.charnumber);
                         });
                     } else if (trigger[i].classList.contains('select_type')) {
                         trigger[i].getElementsByTagName('select')[0]
                             .addEventListener('click', function () {
-                                change_course_name(trigger, args.seperator);
+                                change_course_name(trigger, args.seperator, args.charnumber);
                             });
                     }
                 }
