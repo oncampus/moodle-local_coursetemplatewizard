@@ -34,14 +34,14 @@ class modified_copy_form extends \moodleform {
         $manager = new manager();
         global $PAGE;
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
-        $params           = ['seperator' => $displayseperator];
+        $params = ['seperator' => $displayseperator];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
 
         global $CFG, $OUTPUT, $USER;
-        $mform         = $this->_form;
-        $course        = $this->_customdata['course'];
+        $mform = $this->_form;
+        $course = $this->_customdata['course'];
         $coursecontext = \context_course::instance($course->id);
-        $courseconfig  = get_config('moodlecourse');
+        $courseconfig = get_config('moodlecourse');
 
         if (empty($course->category)) {
             $course->category = $course->categoryid;
@@ -61,63 +61,67 @@ class modified_copy_form extends \moodleform {
 
         // Form heading.
         $mform->addElement('html',
-                \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'),
-                        'form-description mb-3'));
+            \html_writer::div(get_string('form:copy:description', 'local_oc_course_creation'),
+                'form-description mb-3'));
 
         // Form select image
         $summaryfields = 'summary_editor';
         if ($overviewfilesoptions = course_overviewfiles_options($course)) {
             $mform->addElement('html',
-                    '<h3 class="qheader">' . get_string('form:copy:image_header', 'local_oc_course_creation') . '</h3>');
+                '<h3 class="qheader">' . get_string('form:copy:image_header', 'local_oc_course_creation') . '</h3>');
             $mform->addElement('filemanager', 'overviewfiles_filemanager',
-                    get_string('form:copy:image_desc', "local_oc_course_creation"), NULL,
-                    $overviewfilesoptions);
+                get_string('form:copy:image_desc', "local_oc_course_creation"), null,
+                $overviewfilesoptions);
             $mform->addHelpButton('overviewfiles_filemanager', 'courseoverviewfiles');
             $summaryfields .= ',overviewfiles_filemanager';
         }
         if (get_config('local_oc_course_creation', 'use_default_course_naming')) {
+
+            $types = $manager->get_all_types();
+            $values = $manager->get_all_values();
             $textfield_count = 0;
-            $infix           = explode('\'', get_config('local_oc_course_creation', 'textfield_seperator'));
-            $infix           = array_combine($infix, $infix);
-            $infixcounter    = 0;
+            $infix = explode('\'', get_config('local_oc_course_creation', 'textfield_seperator'));
+            $infix = array_combine($infix, $infix);
+            $infixcounter = 0;
             //group prefix
             if (get_config('local_oc_course_creation', 'toggle_prefix')) {
                 $type_group = [];
 
                 // Form add prefix checkbox
                 $mform->addElement('html',
-                        '<h3 class="qheader">' . get_string('form:copy:course_name_header', 'local_oc_course_creation') . '</h3>');
+                    '<h3 class="qheader">' . get_string('form:copy:course_name_header', 'local_oc_course_creation') . '</h3>');
                 $mform->addElement('checkbox', 'add_prefix',
-                        get_string('form:copy:prefix_desc', 'local_oc_course_creation'));
+                    get_string('form:copy:prefix_desc', 'local_oc_course_creation'));
                 // Form add prefix
                 $prefix = $mform->createElement('text', 'prefix', '',
-                        ['class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
-                                get_config('local_oc_course_creation', 'prefix_text'),
-                        ]);
+                    ['class' => 'mr-2 h-100 modifying_type prefix input_type', 'placeholder' =>
+                        get_config('local_oc_course_creation', 'prefix_text'),
+                    ]);
                 $mform->setType('prefix', PARAM_TEXT);
 
                 $mform->hideIf("prefix", "add_prefix");
                 $mform->hideIf("infix0", "add_prefix");
                 $type_group[] = $prefix;
                 $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
-                        , ['class' => $displayseperator ? 'modifying_type select_type prefix' : 'd-none']);
+                    , ['class' => $displayseperator ? 'modifying_type select_type prefix' : 'd-none']);
             }
 
             // Form preset values
-            foreach (explode(',', get_config('local_oc_course_creation', 'textfield_values')) as $textfield) {
+            $textfieldvalues = explode(',', get_config('local_oc_course_creation', 'textfield_values'));
+            foreach ( $textfieldvalues as $key => $textfield) {
                 $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count, '',
-                        ['class'       => 'mr-2 h-100 modifying_type input_type',
-                         'placeholder' => $textfield,
-                        ]);
+                    ['class' => 'mr-2 h-100 modifying_type input_type',
+                        'placeholder' => $textfield,
+                    ]);
                 $mform->setType('textfield' . $textfield_count++, PARAM_TEXT);
                 $type_group[] = $textfieldisntance;
-                $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
+                if (count($types) > 0 || $key !== array_key_last($textfieldvalues)) {
+                    $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
                         , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
+                }
             }
 
             $types_key_value = [];
-            $types           = $manager->get_all_types();
-            $values          = $manager->get_all_values();
             foreach ($types as $key => $type) {
                 foreach ($values as $value) {
                     if ($value->type_id === $type->id) {
@@ -125,31 +129,31 @@ class modified_copy_form extends \moodleform {
                     }
                 }
                 $type_group[] = $mform->createElement('select', 'type_' . $type->type,
-                        "", $types_key_value[$type->id]
-                        , ['class' => 'modifying_type select_type']);
+                    "", $types_key_value[$type->id]
+                    , ['class' => 'modifying_type select_type']);
                 if ($key !== array_key_last($types)) {
                     $type_group[] = $mform->createElement('select', 'infix' . $infixcounter++, "", $infix
-                            , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
+                        , ['class' => $displayseperator ? 'modifying_type select_type' : 'd-none']);
                 }
             }
 
             $mform->addGroup($type_group, "",
-                    get_string('form:copy:course_details', 'local_oc_course_creation'), ' ');
+                get_string('form:copy:course_details', 'local_oc_course_creation'), ' ');
         }
         // Course fullname.
-        $shortnamereadonly  = get_config('local_oc_course_creation', 'course_shortname_readonly') ? 'readonly' : '';
+        $shortnamereadonly = get_config('local_oc_course_creation', 'course_shortname_readonly') ? 'readonly' : '';
         $coursenamereadonly = get_config('local_oc_course_creation', 'course_name_readonly') ? 'readonly' : '';
         $mform->addElement('text', 'fullname', get_string('fullnamecourse'),
-                'maxlength="254" size="50" ' . $shortnamereadonly);
+            'maxlength="254" size="50" ' . $shortnamereadonly);
         $mform->addHelpButton('fullname', 'fullnamecourse');
-        $mform->addRule('fullname', get_string('missingfullname'), 'required', NULL, 'client');
+        $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
         $mform->setType('fullname', PARAM_TEXT);
 
         // Course shortname.
         $mform->addElement('text', 'shortname', get_string('shortnamecourse'),
-                'maxlength="100" size="20" ' . $coursenamereadonly);
+            'maxlength="100" size="20" ' . $coursenamereadonly);
         $mform->addHelpButton('shortname', 'shortnamecourse');
-        $mform->addRule('shortname', get_string('missingshortname'), 'required', NULL, 'client');
+        $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
         $mform->setType('shortname', PARAM_TEXT);
 
         // Course category.
@@ -168,11 +172,11 @@ class modified_copy_form extends \moodleform {
         $displaylist['default'] = get_string('form:copy:select_default', 'local_oc_course_creation');
 
         $select = $mform->addElement('select', 'category', get_string('coursecategory'), $displaylist);
-        $mform->addRule('category', get_string('invalidcategory', 'error'), 'numeric', NULL, 'client');
+        $mform->addRule('category', get_string('invalidcategory', 'error'), 'numeric', null, 'client');
         $mform->addHelpButton('category', 'coursecategory');
         $select->setSelected('default');
         // Course visibility.
-        $choices      = [];
+        $choices = [];
         $choices['0'] = get_string('hide');
         $choices['1'] = get_string('show');
         $mform->addElement('select', 'visible', get_string('coursevisibility'), $choices);
@@ -185,21 +189,21 @@ class modified_copy_form extends \moodleform {
 
         if (!empty($CFG->enablecourserelativedates)) {
             $attributes = [
-                    'aria-describedby' => 'relativedatesmode_warning',
+                'aria-describedby' => 'relativedatesmode_warning',
             ];
             if (!empty($course->id)) {
                 $attributes['disabled'] = true;
             }
-            $relativeoptions          = [
-                    0 => get_string('no'),
-                    1 => get_string('yes'),
+            $relativeoptions = [
+                0 => get_string('no'),
+                1 => get_string('yes'),
             ];
-            $relativedatesmodegroup   = [];
+            $relativedatesmodegroup = [];
             $relativedatesmodegroup[] = $mform->createElement('select', 'relativedatesmode', get_string('relativedatesmode'),
-                    $relativeoptions, $attributes);
+                $relativeoptions, $attributes);
             $relativedatesmodegroup[] = $mform->createElement('html', \html_writer::span(get_string('relativedatesmode_warning'),
-                    '', ['id' => 'relativedatesmode_warning']));
-            $mform->addGroup($relativedatesmodegroup, 'relativedatesmodegroup', get_string('relativedatesmode'), NULL, false);
+                '', ['id' => 'relativedatesmode_warning']));
+            $mform->addGroup($relativedatesmodegroup, 'relativedatesmodegroup', get_string('relativedatesmode'), null, false);
             $mform->addHelpButton('relativedatesmodegroup', 'relativedatesmode');
         }
 
@@ -207,7 +211,7 @@ class modified_copy_form extends \moodleform {
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
         $mform->setExpanded('descriptionhdr');
 
-        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), NULL);
+        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
 
@@ -217,7 +221,7 @@ class modified_copy_form extends \moodleform {
             $mform->hardFreeze($summaryfields);
         }
 
-        $buttonarray   = [];
+        $buttonarray = [];
         $buttonarray[] = $mform->createElement('submit', 'submitreturn', get_string('savechangesandreturn'));
         $buttonarray[] = $mform->createElement('submit', 'submitdisplay', get_string('savechangesanddisplay'));
         $buttonarray[] = $mform->createElement('cancel');
