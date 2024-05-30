@@ -5,7 +5,7 @@
 
 define(['jquery'],
     function ($) {
-        var change_course_name = function (input_fields, seperator_on) {
+        var change_course_name = function (input_fields, seperator_on, charnumber) {
             var input_fullname = '';
             let input_shortname = '';
             let prefix_set = $("#id_add_prefix") ? $("#id_add_prefix").is(':checked') : false;
@@ -17,7 +17,7 @@ define(['jquery'],
                 let shortselect = null;
                 if (input_fields[i].classList.contains('input_type')) {
                     select = input_fields[i].getElementsByTagName('input')[0].value;
-                    shortselect = select.substring(0, 3);
+                    shortselect = select.substring(0, charnumber);
                 } else if (input_fields[i].classList.contains('select_type')) {
                     select = input_fields[i].getElementsByTagName('select')[0].value;
                 }

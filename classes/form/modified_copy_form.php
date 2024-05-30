@@ -34,7 +34,9 @@ class modified_copy_form extends \moodleform {
         $manager = new manager();
         global $PAGE;
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
-        $params = ['seperator' => $displayseperator];
+        $charnumber = get_config('local_oc_course_creation', 'cshortname_charnumber');
+        $charnumber = is_int($charnumber) ? $charnumber : 3;
+        $params = ['seperator' => $displayseperator, 'charnumber' => $charnumber];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
 
         global $CFG, $OUTPUT, $USER;
@@ -108,7 +110,7 @@ class modified_copy_form extends \moodleform {
 
             // Form preset values
             $textfieldvalues = explode(',', get_config('local_oc_course_creation', 'textfield_values'));
-            foreach ( $textfieldvalues as $key => $textfield) {
+            foreach ($textfieldvalues as $key => $textfield) {
                 $textfieldisntance = $mform->createElement('text', 'textfield' . $textfield_count, '',
                     ['class' => 'mr-2 h-100 modifying_type input_type',
                         'placeholder' => $textfield,

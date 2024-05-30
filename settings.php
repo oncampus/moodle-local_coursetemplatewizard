@@ -194,6 +194,18 @@ if ($hassiteconfig) {
             $default,
     );
     $settingspage->add($setting);
+    
+    $name        = 'local_oc_course_creation/cshortname_charnumber';
+    $description = get_string('settings:cshortname_charnumber_desc', $component);
+    $selection   = [];
+    $default     = 3;
+    $setting     = new admin_setting_configtext(
+            $name,
+            $visiblename = get_string('settings:cshortname_charnumber', $component),
+            $description,
+            $default,
+    );
+    $settingspage->add($setting);
 
     $ADMIN->add('localplugins', $settingspage);
 }
