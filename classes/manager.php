@@ -77,8 +77,7 @@ class manager {
      */
     public function create_value_and_type(string $string, string $type): bool {
         global $DB;
-        if (is_Null($string) || $string === "" ||
-            is_Null($type) || $type === "") {
+        if (!$string || !$type) {
             return false;
         }
 
