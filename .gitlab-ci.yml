@@ -1,0 +1,57 @@
+#basic ci.yml only setting up the plugin and running its unit tests
+image: gitlab.oncampus-system.de:5050/moodle/docker-templates:p81m401
+
+stages:
+  - test
+
+variables:
+  DBUNIT_NAME: moodletest
+  PLUGIN_TYPE: "local"
+  PLUGIN_PATH: "local"
+  PLUGIN_NAME: "oc_exam_appointment_scheduler"
+  MOODLE_ROOT: "/var/www/moodle"
+
+before_script:
+  - service mariadb start
+  - cp -R $CI_PROJECT_DIR $MOODLE_ROOT/$PLUGIN_PATH/$PLUGIN_NAME
+
+unit-tests:
+  tags:
+  - moodle
+  stage: test
+  script:
+    - php ${MOODLE_ROOT}/admin/cli/upgrade.php --non-interactive
+    - php ${MOODLE_ROOT}/admin/tool/phpunit/cli/init.php
+    - cd $MOODLE_ROOT
+    - vendor/bin/phpunit --testsuite ${PLUGIN_TYPE}_${PLUGIN_NAME}_testsuite --dont-report-useless-tests
+
+moodlecheck:
+  tags:
+  - moodle
+  stage: test
+  script:
+    - git clone https://github.com/moodlehq/moodle-local_moodlecheck.git ${MOODLE_ROOT}/local/moodlecheck
+    - php ${MOODLE_ROOT}/admin/cli/upgrade.php --non-interactive
+    - if php ${MOODLE_ROOT}/local/moodlecheck/cli/moodlecheck.php -p=${PLUGIN_PATH}/${PLUGIN_NAME} 
+      | grep -i "error"; 
+      then
+        echo "Errors found"; 
+        exit 1; 
+      else 
+        echo "No errors found"; fi
+
+codechecker:
+  tags:
+  - moodle
+  stage: test
+  script:
+    - git clone https://github.com/moodlehq/moodle-local_codechecker.git ${MOODLE_ROOT}/local/codechecker
+    - php ${MOODLE_ROOT}/admin/cli/upgrade.php --non-interactive
+    - cd ${MOODLE_ROOT}/local/codechecker
+    - git clone https://github.com/squizlabs/PHP_CodeSniffer.git
+    - cd PHP_CodeSniffer
+    - php bin/phpcs --config-set installed_paths ..
+    - php bin/phpcs --config-set default_standard moodle
+
+#after_script:
+  #- echo "Clean up any resources if necessary"
