@@ -5,7 +5,6 @@ stages:
   - test
 
 variables:
-  DBUNIT_NAME: moodletest
   PLUGIN_TYPE: "local"
   PLUGIN_PATH: "local"
   PLUGIN_NAME: "oc_exam_appointment_scheduler"
