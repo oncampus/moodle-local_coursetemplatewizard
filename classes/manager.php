@@ -23,9 +23,12 @@
 
 namespace local_oc_course_creation;
 
+use coding_exception;
 use core\event\course_created;
 use core_analytics\user;
 use dml_transaction_exception;
+use moodle_exception;
+use restore_controller_exception;
 use stdClass;
 use dml_exception;
 
@@ -46,50 +49,50 @@ class manager {
     /**
      * Creates an value
      *
-     * @param $string
-     * @param $type_id
+     * @param string $string
+     * @param int $type_id
      * @return bool
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public function create_value($string, $type_id): bool {
+    public function create_value(string $string, int $type_id): bool {
         if (is_Null($string) || $string === "" || !$this->get_type_by_id($type_id)) {
             return false;
         }
         global $DB;
-        $value          = new stdClass();
-        $value->string  = $string;
+        $value = new stdClass();
+        $value->string = $string;
         $value->type_id = $type_id;
         return $DB->insert_record("oc_course_creation_value", $value, false);
     }
 
     /**
-     * Creates an type and the value with new type_id
+     * Creates a type and the value with new type_id
      *
-     * @param $string
-     * @param $type
+     * @param string $string
+     * @param string $type
      * @return bool
      * @throws dml_exception
      * @throws dml_transaction_exception
      */
-    public function create_value_and_type($string, $type) {
+    public function create_value_and_type(string $string, string $type): bool {
         global $DB;
         if (is_Null($string) || $string === "" ||
-                is_Null($type) || $type === "") {
+            is_Null($type) || $type === "") {
             return false;
         }
 
         $transaction = $DB->start_delegated_transaction();
 
-        $new_type       = new stdClass();
+        $new_type = new stdClass();
         $new_type->type = $type;
         $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-        $insert_type    = $DB->insert_record('oc_course_creation_type', $new_type);
+        $insert_type = $DB->insert_record('oc_course_creation_type', $new_type);
 
-        $value          = new stdClass();
-        $value->string  = $string;
+        $value = new stdClass();
+        $value->string = $string;
         $value->type_id = $this->get_last_type_by_rank()->id;
-        $insert_value   = $DB->insert_record("oc_course_creation_value", $value);
+        $insert_value = $DB->insert_record("oc_course_creation_value", $value);
 
         if ($insert_value && $insert_type) {
             $DB->commit_delegated_transaction($transaction);
@@ -99,20 +102,19 @@ class manager {
     }
 
     /**
-     * Updates an value with
+     * Updates a value with
      *
-     * @param $id
-     * @param $string
-     * @param $type_id
+     * @param int $id
+     * @param string $string
+     * @param int $type_id
      * @return bool
      * @throws dml_exception
-     * @throws dml_transaction_exception
      */
-    public function update_value($id, $string, $type_id) {
+    public function update_value(int $id, string $string, int $type_id): bool {
         global $DB;
-        $value          = new stdClass();
-        $value->id      = $id;
-        $value->string  = $string;
+        $value = new stdClass();
+        $value->id = $id;
+        $value->string = $string;
         $value->type_id = $type_id;
         return $DB->update_record('oc_course_creation_value', $value);
     }
@@ -120,19 +122,19 @@ class manager {
     /**
      * Deletes a string and records for an id
      *
-     * @param $id int
+     * @param int $id
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function delete_value($id) {
+    public function delete_value(int $id): bool {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
-        $value       = $DB->get_record('oc_course_creation_value', ['id' => $id]);
+        $value = $DB->get_record('oc_course_creation_value', ['id' => $id]);
         if (!$value) {
             return false;
         }
-        $types       = $DB->get_records('oc_course_creation_value', ['type_id' => $value->type_id]);
+        $types = $DB->get_records('oc_course_creation_value', ['type_id' => $value->type_id]);
         $delete_type = true;
         if (count($types) === 1) {
             $delete_type = $this->update_delete_sort($value->type_id);
@@ -148,27 +150,27 @@ class manager {
     /**
      * Deletes a type and changes other ranks down
      *
-     * @param $id int
+     * @param int $id
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function update_delete_sort($id) {
+    public function update_delete_sort(int $id): bool {
         global $DB;
         $record_to_delete = $this->get_type_by_id($id);
         if (!$record_to_delete) {
             return $record_to_delete;
         }
-        $new_rank     = $record_to_delete->rank;
+        $new_rank = $record_to_delete->rank;
         $transactions = [];
 
         $records = $this->get_types_higher_and_equal_rank($new_rank);
 
-        $transaction    = $DB->start_delegated_transaction();
+        $transaction = $DB->start_delegated_transaction();
         $transactions[] = $DB->delete_records('oc_course_creation_type', ['id' => $id]);
         foreach ($records as $record) {
             if ($record->id != $id) {
-                $record->rank   -= 1;
+                $record->rank -= 1;
                 $transactions[] = $DB->update_record('oc_course_creation_type', $record, true);
             }
         }
@@ -182,14 +184,14 @@ class manager {
     /**
      * Inserts a type at highest rank
      *
-     * @param $string String
+     * @param string $string
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function create_type($string) {
+    public function create_type(string $string): bool {
         global $DB;
-        $new_type       = new stdClass();
+        $new_type = new stdClass();
         $new_type->type = $string;
         if ($string && $string !== "") {
             $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
@@ -201,12 +203,12 @@ class manager {
     /**
      * Get a value by id
      *
-     * @param $id int
+     * @param int $id
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function get_value_by_id($id) {
+    public function get_value_by_id(int $id): bool {
         global $DB;
         return $DB->get_record('oc_course_creation_value', ['id' => $id]);
     }
@@ -238,13 +240,13 @@ class manager {
     /**
      * Swaps two ranks of type
      *
-     * @param $type_rank1 int
-     * @param $type_rank2 int
+     * @param int $type_rank1
+     * @param int $type_rank2
      * @return bool DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function swap($type_rank1, $type_rank2) {
+    public function swap(int $type_rank1, int $type_rank2): bool {
         global $DB;
         $record_to_swap1 = $this->get_type_by_rank($type_rank1);
         $record_to_swap2 = $this->get_type_by_rank($type_rank2);
@@ -271,12 +273,10 @@ class manager {
     /**
      * gets all types where rank is same or greater than given
      *
-     * @param $rank int
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
+     * @param int $rank
+     * @return array|false DB transaction successful
      */
-    public function get_types_higher_and_equal_rank($rank) {
+    public function get_types_higher_and_equal_rank(int $rank): array|false {
         global $DB;
         $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
         try {
@@ -289,12 +289,12 @@ class manager {
     /**
      * Get A type by its id
      *
-     * @param $id int
+     * @param int $id
      * @return mixed DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function get_type_by_id($id) {
+    public function get_type_by_id(int $id): mixed {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['id' => $id]);
     }
@@ -302,12 +302,12 @@ class manager {
     /**
      * Get A type by its rank
      *
-     * @param $rank int
+     * @param int $rank
      * @return mixed DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function get_type_by_rank($rank) {
+    public function get_type_by_rank(int $rank): mixed {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
     }
@@ -325,9 +325,9 @@ class manager {
         if ($rank = $DB->get_record_sql($sql)) {
             return $rank;
         } else {
-            $rank       = new stdClass();
+            $rank = new stdClass();
             $rank->rank = 0;
-            $rank->id   = 0;
+            $rank->id = 0;
             $rank->type = "";
             return $rank;
         }
@@ -336,34 +336,32 @@ class manager {
     /**
      * Create the copy
      *
-     * @param object $mdata
-     * @param $course
+     * @param stdClass $mdata
      * @return int courseid
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @throws dml_exception
-     * @throws \backup_controller_exception
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws restore_controller_exception
      */
-    public function create_copy(object $mdata) {
+    public function create_copy(stdClass $mdata): int {
         global $USER, $CFG;
-        $copyids          = [];
+        $copyids = [];
         $mdata->startdate = time();                              // Integer timestamp of the start of the destination course.
-        $mdata->enddate   = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
+        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
         $mdata->keptroles = [];                                  // Integer timestamp of the start of the destination course.
-        $adminIDs         = get_admins();
-        $adminid          = array_pop($adminIDs)->id;
+        $adminIDs = get_admins();
+        $adminid = array_pop($adminIDs)->id;
         // Create the initial backupcontoller.
-        $bc                  = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid, \backup::RELEASESESSION_YES);
+        $bc = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid, \backup::RELEASESESSION_YES);
         $copyids['backupid'] = $bc->get_backupid();
 
         // Create the initial restore contoller.
         [$fullname, $shortname] = \restore_dbops::calculate_course_names(
-                0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
-        $newcourseid          = \restore_dbops::create_new_course($fullname, $shortname, $mdata->category);
-        $rc                   = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
-                \backup::MODE_COPY, $adminid, \backup::TARGET_NEW_COURSE, NULL,
-                \backup::RELEASESESSION_NO, $mdata);
+            0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
+        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $mdata->category);
+        $rc = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
+            \backup::MODE_COPY, $adminid, \backup::TARGET_NEW_COURSE, null,
+            \backup::RELEASESESSION_NO, $mdata);
         $copyids['restoreid'] = $rc->get_restoreid();
 
         $bc->set_status(\backup::STATUS_AWAITING);
@@ -377,9 +375,9 @@ class manager {
         // Clean up the controller.
         $bc->destroy();
 
-        $editoroptions            =
-                ['maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true];
-        $context                  = \context_course::instance($newcourseid);
+        $editoroptions =
+            ['maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true];
+        $context = \context_course::instance($newcourseid);
         $editoroptions['context'] = $context;
         $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
         if ($editoroptions) {
@@ -387,7 +385,7 @@ class manager {
         }
         if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
             $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $context, 'course',
-                    'overviewfiles', 0);
+                'overviewfiles', 0);
         }
         $data->id = $newcourseid;
         update_course($data, $editoroptions);
@@ -397,7 +395,7 @@ class manager {
 
     function unenrol($courseid, $userid, $enrolmethod = 'manual') {
         $enrolinstances = enrol_get_instances($courseid, false);
-        $plugin         = enrol_get_plugin($enrolmethod);
+        $plugin = enrol_get_plugin($enrolmethod);
 
         if (is_null($plugin)) {
             return false;
@@ -415,9 +413,9 @@ class manager {
 
     function check_enrol($courseid, $userid, $roleid, $enrolmethod = 'manual') {
         global $DB;
-        $course         = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
         $enrolinstances = enrol_get_instances($courseid, false);
-        $plugin         = enrol_get_plugin($enrolmethod);
+        $plugin = enrol_get_plugin($enrolmethod);
 
         if (is_null($plugin)) {
             return false;
@@ -435,13 +433,13 @@ class manager {
         }
         if (empty($enrolinstance)) {
             $fields = $plugin->get_instance_defaults();
-            $id     = $plugin->add_instance($course, $fields);
+            $id = $plugin->add_instance($course, $fields);
 
-            $enrolinstance                  = $DB->get_record('enrol', ['id' => $id]);
-            $enrolinstance->expirynotify    = $plugin->get_config('expirynotify');
+            $enrolinstance = $DB->get_record('enrol', ['id' => $id]);
+            $enrolinstance->expirynotify = $plugin->get_config('expirynotify');
             $enrolinstance->expirythreshold = $plugin->get_config('expirythreshold');
-            $enrolinstance->roleid          = $plugin->get_config('roleid');
-            $enrolinstance->timemodified    = time();
+            $enrolinstance->roleid = $plugin->get_config('roleid');
+            $enrolinstance->timemodified = time();
             $DB->update_record('enrol', $enrolinstance);
         } // Enrol user in course.
 
