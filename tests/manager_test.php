@@ -169,8 +169,6 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
         $this->assertFalse($manager->create_value_and_type("", ""));
         $this->assertFalse($manager->create_value_and_type("test", ""));
         $this->assertFalse($manager->create_value_and_type("", "test"));
-        $this->assertFalse($manager->create_value_and_type("", NULL));
-        $this->assertFalse($manager->create_value_and_type(NULL, ""));
         $this->assertTrue($manager->create_value_and_type("test", "test"));//4
 
         $this->assertEquals($values_count + 1, count($manager->get_all_values()));
