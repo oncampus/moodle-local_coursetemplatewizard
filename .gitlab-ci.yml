@@ -14,7 +14,11 @@ before_script:
   - service mariadb start
   - cp -R $CI_PROJECT_DIR $MOODLE_ROOT/$PLUGIN_PATH/$PLUGIN_NAME
 
-unit-tests:
+before_script:
+  - service mariadb start
+  - cp -R $CI_PROJECT_DIR $MOODLE_ROOT/$PLUGIN_PATH/$PLUGIN_NAME
+
+unit_tests:
   tags:
   - moodle
   stage: test
@@ -24,7 +28,7 @@ unit-tests:
     - cd $MOODLE_ROOT
     - vendor/bin/phpunit --testsuite ${PLUGIN_TYPE}_${PLUGIN_NAME}_testsuite --dont-report-useless-tests
 
-moodlecheck:
+phpdoc_check:
   tags:
   - moodle
   stage: test
@@ -51,6 +55,25 @@ codechecker:
     - cd PHP_CodeSniffer
     - php bin/phpcs --config-set installed_paths ..
     - php bin/phpcs --config-set default_standard moodle
+    - cd .. 
+    - if php run.php ${PLUGIN_PATH}/${PLUGIN_NAME} | grep -i "| ERROR |"; 
+      then
+        echo "Errors found";
+        exit 1;
+      else
+        echo "No errors found"; fi
+
+
+jsmodule_check:
+  tags:
+  - moodle
+  stage: test
+  script:
+    - cd ${MOODLE_ROOT}
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use #load nvm
+    - nvm install 20 && nvm use 20 && npm install && npm install -g grunt-cli
+    - cd ${PLUGIN_PATH}/${PLUGIN_NAME}
+    - grunt amd
 
 #after_script:
   #- echo "Clean up any resources if necessary"
