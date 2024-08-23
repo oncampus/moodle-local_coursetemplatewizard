@@ -75,7 +75,7 @@ $string['form:copy:description'] =
     'This course will be created and added to the specified course category.';
 $string['form:copy:select_default'] = 'Select course category';
 $string['form:copy:prefix_desc'] = 'Add module name';
-$string['settings:use_default_course_naming'] = 'Create course name without preselections';
+$string['settings:use_default_course_naming'] = 'Create course name with preselections';
 $string['settings:use_default_course_naming_desc'] =
     'This field disables all course name template options in the course creation form.';
 $string['settings:template_textfield_values'] = 'Textfield input masks';
