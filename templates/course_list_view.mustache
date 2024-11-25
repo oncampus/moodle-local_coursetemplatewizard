@@ -16,12 +16,14 @@
             {{#courses}}
                 {{{out}}}
                 <tr class="table-body-courlist">
-                    <td class="col-2"><a href="{{course_url}}">{{{fullname}}}</a></td>
-                    <td class="col-3">
+                    <td class="col-2 align-middle">
+                        <a href="{{course_url}}">{{{fullname}}}</a>
+                    </td>
+                    <td class="col-3 align-middle">
                         {{{img}}}
                     </td>
-                    <td class="col-4">{{{desc}}}</td>
-                    <td class="col-2">
+                    <td class="col-4 align-middle">{{{desc}}}</td>
+                    <td class="col-2 align-middle">
                         <a class="action-copy btn btn-primary" href="{{copy_url}}?id={{id}}">
                         <i class="icon fa fa-copy"><!-- --></i>
                         {{#str}} table_head_edit, local_oc_course_creation {{/str}}

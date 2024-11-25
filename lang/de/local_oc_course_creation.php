@@ -102,7 +102,7 @@ $string['settings:use_after_creation_desc'] =
 $string['settings:cshortname_charnumber'] = 'Kurzer Kursname übernommene Zeichen';
 $string['settings:cshortname_charnumber_desc'] =
         'Wie viele Zeichen aus den Kursdetails Vorgabe feldern in den Kurs Kurznamen übernommen werden sollen.';
-$string['settings:async_process_desc'] = 'Kurskopieprozess asynchron ausführen';
-$string['settings:async_process'] = 'Wenn der Kurskopieprozess asynchron ausgeführt wird, wird dieser als Adhoc-Task eingereiht 
+$string['settings:async_process'] = 'Kurskopieprozess asynchron ausführen';
+$string['settings:async_process_desc'] = 'Wenn der Kurskopieprozess asynchron ausgeführt wird, wird dieser als Adhoc-Task eingereiht 
 und im nächsten Chronjob-Zyklus ausgeführt.
 Andernfalls wird der Nutzerthread direkt zur ausführung genutzt.';

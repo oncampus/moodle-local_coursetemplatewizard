@@ -35,6 +35,7 @@ class modified_copy_form extends \moodleform {
         global $PAGE;
         $displayseperator = get_config('local_oc_course_creation', 'display_seperator');
         $charnumber = get_config('local_oc_course_creation', 'cshortname_charnumber');
+        $async = get_config('local_oc_course_creation', 'async_process');
         $charnumber = (int)$charnumber ? $charnumber : 3;
         $params = ['seperator' => $displayseperator, 'charnumber' => $charnumber];
         $PAGE->requires->js_call_amd('local_oc_course_creation/form_control_copy', 'init', [$params]);
@@ -210,19 +211,20 @@ class modified_copy_form extends \moodleform {
         }
 
         // Description.
-        $mform->addElement('header', 'descriptionhdr', get_string('description'));
-        $mform->setExpanded('descriptionhdr');
+        if(!$async) {
+            $mform->addElement('header', 'descriptionhdr', get_string('description'));
+            $mform->setExpanded('descriptionhdr');
 
-        $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
-        $mform->addHelpButton('summary_editor', 'coursesummary');
-        $mform->setType('summary_editor', PARAM_RAW);
+            $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
+            $mform->addHelpButton('summary_editor', 'coursesummary');
+            $mform->setType('summary_editor', PARAM_RAW);
 
-        if (!empty($course->id) and !has_capability('moodle/course:changesummary', $coursecontext)) {
-            // Remove the description header it does not contain anything any more.
-            $mform->removeElement('descriptionhdr');
-            $mform->hardFreeze($summaryfields);
+            if (!empty($course->id) and !has_capability('moodle/course:changesummary', $coursecontext)) {
+                // Remove the description header it does not contain anything any more.
+                $mform->removeElement('descriptionhdr');
+                $mform->hardFreeze($summaryfields);
+            }
         }
-
         $buttonarray = [];
         $buttonarray[] = $mform->createElement('submit', 'submitreturn', get_string('savechangesandreturn'));
         $buttonarray[] = $mform->createElement('submit', 'submitdisplay', get_string('savechangesanddisplay'));

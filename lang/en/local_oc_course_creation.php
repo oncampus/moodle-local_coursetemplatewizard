@@ -102,7 +102,7 @@ $string['settings:use_after_creation_desc'] =
 $string['settings:cshortname_charnumber'] = 'Short course name adopted characters';
 $string['settings:cshortname_charnumber_desc'] =
         'How many characters from the course details default fields should be included in the course short name.';
-$string['settings:async_process_desc'] = 'Execute cursor copy process asynchronously';
-$string['settings:async_process'] = 'If the course copy process is executed asynchronously, it is classified as an ad hoc task 
+$string['settings:async_process'] = 'Execute cursor copy process asynchronously';
+$string['settings:async_process_desc'] = 'If the course copy process is executed asynchronously, it is classified as an ad hoc task 
 and executed in the next chronjob cycle.
 Otherwise, the user thread is used directly for execution.';

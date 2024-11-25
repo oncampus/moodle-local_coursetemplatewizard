@@ -29,6 +29,8 @@ use core\task\scheduled_task;
 use core_analytics\user;
 use dml_transaction_exception;
 use moodle_exception;
+use moodle_url;
+use restore_controller;
 use restore_controller_exception;
 use stdClass;
 use dml_exception;
@@ -246,7 +248,7 @@ class manager {
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function swap(int $type_rank1, int $type_rank2): bool {
+    public function swap($type_rank1, $type_rank2) {
         global $DB;
         $record_to_swap1 = $this->get_type_by_rank($type_rank1);
         $record_to_swap2 = $this->get_type_by_rank($type_rank2);
@@ -276,7 +278,7 @@ class manager {
      * @param int $rank
      * @return array|false DB transaction successful
      */
-    public function get_types_higher_and_equal_rank(int $rank): array|false {
+    public function get_types_higher_and_equal_rank($rank) {
         global $DB;
         $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
         try {
@@ -302,12 +304,12 @@ class manager {
     /**
      * Get A type by its rank
      *
-     * @param int $rank
+     * @param $rank int
      * @return mixed DB transaction successful
      * @throws dml_transaction_exception
      * @throws dml_exception
      */
-    public function get_type_by_rank(int $rank): mixed {
+    public function get_type_by_rank($rank) {
         global $DB;
         return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
     }
@@ -336,13 +338,94 @@ class manager {
     /**
      * Create the copy
      *
+     * @param object $mdata
+     * @param $course
+     * @return int courseid
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @throws dml_exception
+     * @throws \backup_controller_exception
+     */
+    public function create_copy(object $mdata, bool $async) {
+        global $USER, $DB, $CFG, $PAGE;
+        $copyids = [];
+        $mdata->startdate = time();
+        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60);
+        $mdata->keptroles = [];
+        $adminIDs = get_admins();
+        $adminid = array_pop($adminIDs)->id;
+        // Create the initial backupcontoller.
+        $bc = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
+                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid, \backup::RELEASESESSION_YES);
+        $copyids['backupid'] = $bc->get_backupid();
+
+        // Create the initial restore contoller.
+        [$fullname, $shortname] = \restore_dbops::calculate_course_names(
+                0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
+        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $mdata->category);
+        $rc = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
+                \backup::MODE_COPY, $adminid, \backup::TARGET_NEW_COURSE, null,
+                \backup::RELEASESESSION_NO, $mdata);
+        $copyids['restoreid'] = $rc->get_restoreid();
+        $newcorusecontext = \context_course::instance($newcourseid);
+        $bc->set_status(\backup::STATUS_AWAITING);
+        $rc->save_controller();
+
+        $context = \context_course::instance($mdata->courseid);
+        $courseurl = course_get_url($mdata->courseid);
+
+        $restoreurl = new moodle_url('/backup/restorefile.php', array('contextid' => $newcorusecontext->id));
+        $progresssetup = array(
+                'backupid' => $rc->get_restoreid(),
+                'contextid' => $context->id,
+                'courseurl' => $courseurl->out(),
+                'restoreurl' => $restoreurl->out(),
+                'headingident' => 'copy'
+        );
+        echo $PAGE->get_renderer('core', 'backup')->render_from_template('core/async_backup_status', $progresssetup);
+
+        // Create the ad-hoc task to perform the course copy.
+        $asynctask = new \core\task\asynchronous_copy_task();
+        $asynctask->set_blocking(false);
+        $asynctask->set_custom_data($copyids);
+
+        \restore_dbops::delete_course_content($newcourseid);
+        if (!$async) {
+            $asynctask->execute();
+            // Clean up the controller.
+            $bc->destroy();
+        } else {
+            \core\task\manager::queue_adhoc_task($asynctask);
+        }
+
+        $editoroptions =
+                ['maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true];
+
+        $editoroptions['context'] = $newcorusecontext;
+        $editoroptions['subdirs'] = file_area_contains_subdirs($newcorusecontext, 'course', 'summary', 0);
+        if ($editoroptions) {
+            $data = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcorusecontext, 'course', 'summary', 0);
+        }
+        if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
+            $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $newcorusecontext, 'course',
+                    'overviewfiles', 0);
+        }
+        $data->id = $newcourseid;
+        update_course($data, $editoroptions);
+        $this->check_enrol($newcourseid, $USER->id, 3);
+        return $newcourseid;
+    }
+
+    /**
+     * Create the copy
+     *
      * @param stdClass $mdata
      * @return int courseid
      * @throws coding_exception
      * @throws moodle_exception
      * @throws restore_controller_exception
      */
-    public function create_copy(object $mdata) {
+    public function create_copy_async(object $mdata) {
         global $USER, $DB, $CFG, $PAGE;
         $mdata->startdate = time();
         $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60); // Integer timestamp of the start of the destination course.
