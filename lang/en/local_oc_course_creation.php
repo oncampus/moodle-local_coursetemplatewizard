@@ -30,7 +30,7 @@ $string['plugin_categoryname'] = 'Oncampus course creation category';
 $string['settings:choose_course'] = 'Select course area';
 $string['settings:create_course'] = 'Create course from template';
 $string['settings:template_course_desc'] =
-    'Set the course area in which the course templates are stored.';
+        'Set the course area in which the course templates are stored.';
 $string['creation_page_title'] = 'Course Templates';
 $string['headline_table_view'] = 'Course Templates';
 $string['table_head_coursename'] = 'Course name';
@@ -65,40 +65,44 @@ $string['oc_course_creation:handle_presets'] = 'Edit course copy presets';
 $string['oc_course_creation:oc_course_creation_access_capability'] = 'Access to course creation from template';
 $string['oc_course_creation:course_cat_copy_cap'] = 'Course creation by Template';
 $string['form:copy:image_desc'] =
-    'Please select an image from our collection (left gray button) or upload your own image for your course.';
+        'Please select an image from our collection (left gray button) or upload your own image for your course.';
 $string['form:copy:image_header'] = 'Select course image';
 $string['form:copy:course_name_header'] = 'Enter course data';
 $string['form:copy:teacher_course_type_placeholder'] = 'Course name';
 $string['form:copy:teacher_name_placeholder'] = 'Surname lecturer';
 $string['form:copy:course_details'] = 'Enter course details';
 $string['form:copy:description'] =
-    'This course will be created and added to the specified course category.';
+        'This course will be created and added to the specified course category.';
 $string['form:copy:select_default'] = 'Select course category';
 $string['form:copy:prefix_desc'] = 'Add module name';
 $string['settings:use_default_course_naming'] = 'Create course name with preselections';
 $string['settings:use_default_course_naming_desc'] =
-    'This field disables all course name template options in the course creation form.';
+        'This field disables all course name template options in the course creation form.';
 $string['settings:template_textfield_values'] = 'Textfield input masks';
 $string['settings:template_textfield_values_desc'] =
-    'Entering with comma-separated names creates free text input fields in the course input form. As default "last name, course type" two input fields with the name last name and course name are entered.';
+        'Entering with comma-separated names creates free text input fields in the course input form. As default "last name, course type" two input fields with the name last name and course name are entered.';
 $string['settings:template_textfield_values_default'] = 'last name, course designation';
 $string['settings:template_textfield_seperator'] = 'Separators';
 $string['settings:template_textfield_seperator_desc'] =
-    'The separators are displayed between each element of the input mask as a drop-down and offer the possibility to make the course name readable.';
+        'The separators are displayed between each element of the input mask as a drop-down and offer the possibility to make the course name readable.';
 $string['settings:template_course_name_readonly'] = 'Read full course name only';
 $string['settings:template_course_name_readonly_desc'] =
-    'Revokes the user\'s editing rights of the form input of the full course name.';
+        'Revokes the user\'s editing rights of the form input of the full course name.';
 $string['settings:template_course_shortname_readonly'] = 'Short course name read only';
 $string['settings:template_course_shortname_readonly_desc'] =
-    'Revokes the user\'s editing rights of the form input of the short course name.';
+        'Revokes the user\'s editing rights of the form input of the short course name.';
 $string['settings:template_prefix_checkbox_toggle'] = 'Toggle prefix';
 $string['settings:template_prefix_checkbox_toggle_desc'] = 'The course name prefix is (not) displayed in the form.';
 $string['settings:template_display_seperator'] = 'Toggle separator elements';
 $string['settings:template_display_seperator_desc'] =
-    'The separator elements are (not) displayed in the form and replaced by a single space.';
+        'The separator elements are (not) displayed in the form and replaced by a single space.';
 $string['settings:use_after_creation_name'] = 'Show Templates after course creation';
 $string['settings:use_after_creation_desc'] =
-    'Activation displays templates for selection after course creation.';
+        'Activation displays templates for selection after course creation.';
 $string['settings:cshortname_charnumber'] = 'Short course name adopted characters';
 $string['settings:cshortname_charnumber_desc'] =
-    'How many characters from the course details default fields should be included in the course short name.';
+        'How many characters from the course details default fields should be included in the course short name.';
+$string['settings:async_process_desc'] = 'Execute cursor copy process asynchronously';
+$string['settings:async_process'] = 'If the course copy process is executed asynchronously, it is classified as an ad hoc task 
+and executed in the next chronjob cycle.
+Otherwise, the user thread is used directly for execution.';

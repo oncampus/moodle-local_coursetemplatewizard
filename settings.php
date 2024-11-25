@@ -207,6 +207,16 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
+    $name        = 'local_oc_course_creation/async_process';
+    $description = get_string('settings:async_process_desc', $component);
+    $setting     = new admin_setting_configcheckbox(
+            $name,
+            $visiblename = get_string('settings:async_process', $component),
+            $description,
+            0,
+    );
+    $settingspage->add($setting);
+
     $ADMIN->add('localplugins', $settingspage);
 }
 

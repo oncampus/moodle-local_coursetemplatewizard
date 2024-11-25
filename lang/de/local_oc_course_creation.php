@@ -30,7 +30,7 @@ $string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
 $string['settings:choose_course'] = 'Kursbereich auswählen';
 $string['settings:create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] =
-    'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
+        'Setzte den Kursbereich fest, im welchen die Kursvorlagen gespeichert sind';
 $string['creation_page_title'] = 'Kursvorlagen';
 $string['headline_table_view'] = 'Kursvorlagen';
 $string['table_head_coursename'] = 'Kursname';
@@ -65,39 +65,44 @@ $string['oc_course_creation:handle_presets'] = 'Kurskopie Voreinstellungen bearb
 $string['oc_course_creation:oc_course_creation_access_capability'] = 'Zugriff auf Kurserstellung aus Vorlage';
 $string['oc_course_creation:course_cat_copy_cap'] = 'Kurserstellung aus einer Vorlage';
 $string['form:copy:image_desc'] =
-    'Wählen Sie bitte ein Bild aus unserer Sammlung (linker grauer Button) aus oder laden Sie ein eigenes Bild für Ihren Kurs hoch.';
+        'Wählen Sie bitte ein Bild aus unserer Sammlung (linker grauer Button) aus oder laden Sie ein eigenes Bild für Ihren Kurs hoch.';
 $string['form:copy:image_header'] = 'Kursbild auswählen';
 $string['form:copy:course_name_header'] = 'Kursdaten eingeben';
 $string['form:copy:teacher_course_type_placeholder'] = 'Kursname';
 $string['form:copy:teacher_name_placeholder'] = 'Nachname Dozent/in';
 $string['form:copy:course_details'] = 'Kursdetails eingeben';
 $string['form:copy:description'] =
-    'Dieser Kurs wird erstellt und in die angegebene Kurskategorie eingefügt.';
+        'Dieser Kurs wird erstellt und in die angegebene Kurskategorie eingefügt.';
 $string['form:copy:select_default'] = 'Kursbereich auswählen';
 $string['form:copy:prefix_desc'] = 'Modulbezeichnung hinzufügen';
 $string['settings:use_default_course_naming'] = 'Kursname mit Vorgaben erstellen';
 $string['settings:use_default_course_naming_desc'] =
-    'Dieses Feld deaktiviert in der Kurserstellungsform alle optionen zur Vorgabe des Kursnamens.';
+        'Dieses Feld deaktiviert in der Kurserstellungsform alle optionen zur Vorgabe des Kursnamens.';
 $string['settings:template_textfield_values'] = 'Vorgaben für Textfelder';
 $string['settings:template_textfield_values_desc'] =
-    'Über die eingabe mit kommaseparierten Bezeichnungen werden freitext eingabefelder in der Kurseingabeform erstellt. Als Standard "Nachname, Kurs Typ" sind zwei Eingabefelder mit der Bezeichnung Nachname und Kurs Bezeichnung eingetragen.';
+        'Über die eingabe mit kommaseparierten Bezeichnungen werden freitext eingabefelder in der Kurseingabeform erstellt. Als Standard "Nachname, Kurs Typ" sind zwei Eingabefelder mit der Bezeichnung Nachname und Kurs Bezeichnung eingetragen.';
 $string['settings:template_textfield_values_default'] = 'Nachname, Kurs Bezeichnung';
 $string['settings:template_textfield_seperator'] = 'Trennelemente';
 $string['settings:template_textfield_seperator_desc'] =
-    'Die Trennelemente werden zwischen jedem Element der eingabemaske als Drop-Down angezeigt und bieten die möglichkeit den Kursnamen lesbar zu gestalten.';
+        'Die Trennelemente werden zwischen jedem Element der eingabemaske als Drop-Down angezeigt und bieten die möglichkeit den Kursnamen lesbar zu gestalten.';
 $string['settings:template_course_name_readonly'] = 'Vollständiger Kursname nur lesen';
 $string['settings:template_course_name_readonly_desc'] =
-    'Entzieht dem Nutzer die Bearbeitungsrechte der Formulareingabe des vollständigen Kursnamens.';
+        'Entzieht dem Nutzer die Bearbeitungsrechte der Formulareingabe des vollständigen Kursnamens.';
 $string['settings:template_course_shortname_readonly'] = 'Kurzer Kursname nur lesen';
 $string['settings:template_course_shortname_readonly_desc'] =
-    'Entzieht dem Nutzer die Bearbeitungsrechte der Formulareingabe des kurzen Kursnamens.';
+        'Entzieht dem Nutzer die Bearbeitungsrechte der Formulareingabe des kurzen Kursnamens.';
 $string['settings:template_prefix_checkbox_toggle'] = 'Ein-/ Ausschalten des Prefix';
 $string['settings:template_prefix_checkbox_toggle_desc'] = 'Der Kursnamens Prefix wird (nicht) im Formular angezeigt.';
 $string['settings:template_display_seperator'] = 'Ein-/ Ausschalten der Trennelemente';
 $string['settings:template_display_seperator_desc'] =
-    'Die Trennelemente werden (nicht) im Formular angezeigt und durch ein einfaches Leerzeichen ersetzt.';
+        'Die Trennelemente werden (nicht) im Formular angezeigt und durch ein einfaches Leerzeichen ersetzt.';
 $string['settings:use_after_creation_name'] = 'Templates nach Kurserstellung';
 $string['settings:use_after_creation_desc'] =
-    'Durch Aktivierung werden Templates nach der Kursertellung zur Auswahl angezeigt.';
+        'Durch Aktivierung werden Templates nach der Kursertellung zur Auswahl angezeigt.';
 $string['settings:cshortname_charnumber'] = 'Kurzer Kursname übernommene Zeichen';
-$string['settings:cshortname_charnumber_desc'] = 'Wie viele Zeichen aus den Kursdetails Vorgabe feldern in den Kurs Kurznamen übernommen werden sollen.';
+$string['settings:cshortname_charnumber_desc'] =
+        'Wie viele Zeichen aus den Kursdetails Vorgabe feldern in den Kurs Kurznamen übernommen werden sollen.';
+$string['settings:async_process_desc'] = 'Kurskopieprozess asynchron ausführen';
+$string['settings:async_process'] = 'Wenn der Kurskopieprozess asynchron ausgeführt wird, wird dieser als Adhoc-Task eingereiht 
+und im nächsten Chronjob-Zyklus ausgeführt.
+Andernfalls wird der Nutzerthread direkt zur ausführung genutzt.';
