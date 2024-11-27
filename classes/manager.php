@@ -398,20 +398,25 @@ class manager {
             \core\task\manager::queue_adhoc_task($asynctask);
         }
 
-        $editoroptions =
-                ['maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true];
+        $editoroptions = [
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'maxbytes' => $CFG->maxbytes,
+                'trusttext' => false,
+                'noclean' => true,
+                'context' => $newcorusecontext,
+        ];
 
-        $editoroptions['context'] = $newcorusecontext;
-        $editoroptions['subdirs'] = file_area_contains_subdirs($newcorusecontext, 'course', 'summary', 0);
-        if ($editoroptions && !$async) {
-            $data = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcorusecontext, 'course', 'summary', 0);
+        if ($editoroptions && object_property_exists($mdata,'summary_editor')) {
+            $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
+            $mdata = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcorusecontext, 'course', 'summary', 0);
+            update_course($mdata, $editoroptions);
         }
         if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
-            $data = file_postupdate_standard_filemanager($data, 'overviewfiles', $overviewfilesoptions, $newcorusecontext, 'course',
+            $mdata = file_postupdate_standard_filemanager($mdata, 'overviewfiles', $overviewfilesoptions, $newcorusecontext,
+                    'course',
                     'overviewfiles', 0);
         }
-        $data->id = $newcourseid;
-        update_course($data, $editoroptions);
+        $mdata->id = $newcourseid;
         $this->check_enrol($newcourseid, $USER->id, 3);
         return $newcourseid;
     }
