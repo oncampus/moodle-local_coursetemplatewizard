@@ -406,7 +406,10 @@ class manager {
                 'context' => $newcorusecontext,
         ];
 
-        if ($editoroptions && object_property_exists($mdata,'summary_editor')) {
+        if ($editoroptions && !$async &&
+                object_property_exists($mdata, 'summary_editor') &&
+                array_key_exists('text', $mdata->summary_editor) &&
+                $mdata->summary_editor['text'] != '') {
             $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
             $mdata = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcorusecontext, 'course', 'summary', 0);
             update_course($mdata, $editoroptions);
