@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Kurse duplizieren';
-$string['plugin_categoryname'] = 'Oncampus Kurserstellungs-Kategorie';
+$string['plugin_categoryname'] = 'BSFB Kurserstellungs-Kategorie';
 $string['settings:choose_course'] = 'Kursbereich auswählen';
 $string['settings:create_course'] = 'Kurs aus Vorlage erstellen';
 $string['template_course_desc'] =

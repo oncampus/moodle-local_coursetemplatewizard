@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Course duplication';
-$string['plugin_categoryname'] = 'Oncampus course creation category';
+$string['plugin_categoryname'] = 'BSFB course creation category';
 $string['settings:choose_course'] = 'Select course area';
 $string['settings:create_course'] = 'Create course from template';
 $string['settings:template_course_desc'] =
