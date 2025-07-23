@@ -17,16 +17,16 @@
 /**
  * Functional test for class course_image
  *
- * @package    oc_course_creation
+ * @package    ocbsbcoursecreation
  * @author     Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @copyright  2022 oncampus
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\manager;
 
-class local_oc_course_creation_manager_test extends \advanced_testcase {
+class local_ocbsbcoursecreation_manager_test extends \advanced_testcase {
 
     /**
      * Initial setup.
@@ -158,7 +158,7 @@ class local_oc_course_creation_manager_test extends \advanced_testcase {
             }
         }
         global $DB;
-        $this->assertEquals(count($DB->get_records('oc_course_creation_value', ['type_id' => $type_id])), 0);
+        $this->assertEquals(count($DB->get_records('ocbsbcoursecreation_value', ['type_id' => $type_id])), 0);
         $this->assertFalse($manager->get_type_by_id($type_id));
     }
 

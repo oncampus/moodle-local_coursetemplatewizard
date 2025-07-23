@@ -2,12 +2,12 @@
     <div>
         <table class="table table-striped" id="course-table">
 
-            <h2>{{#str}} headline_table_view, local_oc_course_creation {{/str}}</h2>
+            <h2>{{#str}} headline_table_view, local_ocbsbcoursecreation {{/str}}</h2>
             <thead class="table-head-courslist">
             <tr>
-                <th class="th-sm col-2">{{#str}} table_head_coursename, local_oc_course_creation {{/str}}</th>
-                <th class="th-sm col-3">{{#str}} table_head_courseimg, local_oc_course_creation {{/str}}</th>
-                <th class="th-sm col-4">{{#str}} table_head_coursetext, local_oc_course_creation {{/str}}</th>
+                <th class="th-sm col-2">{{#str}} table_head_coursename, local_ocbsbcoursecreation {{/str}}</th>
+                <th class="th-sm col-3">{{#str}} table_head_courseimg, local_ocbsbcoursecreation {{/str}}</th>
+                <th class="th-sm col-4">{{#str}} table_head_coursetext, local_ocbsbcoursecreation {{/str}}</th>
                 <th class="th-sm col-2">
                 </th>
             </tr>
@@ -26,7 +26,7 @@
                     <td class="col-2 align-middle">
                         <a class="action-copy btn btn-primary" href="{{copy_url}}?id={{id}}">
                         <i class="icon fa fa-copy"><!-- --></i>
-                        {{#str}} table_head_edit, local_oc_course_creation {{/str}}
+                        {{#str}} table_head_edit, local_ocbsbcoursecreation {{/str}}
                         </a>
                     </td>
                 </tr>
@@ -37,7 +37,7 @@
 
     <br>
     {{^coursesInCat}}
-        {{#str}} info_no_courses, local_oc_course_creation {{/str}} <br>
+        {{#str}} info_no_courses, local_ocbsbcoursecreation {{/str}} <br>
     {{/coursesInCat}}
-    <p><small>{{#str}} course_format, local_oc_course_creation {{/str}}: {{courseCategoryName}}</small></p>
+    <p><small>{{#str}} course_format, local_ocbsbcoursecreation {{/str}}: {{courseCategoryName}}</small></p>
 </div>

@@ -8,15 +8,15 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
         var trigger = $('.action-delete');
         ModalFactory.create({
             type: ModalFactory.types.SAVE_CANCEL,
-            title: String.get_string('modal_delete_title', 'local_oc_course_creation'),
-            body: String.get_string('modal_delete_message', 'local_oc_course_creation'),
+            title: String.get_string('modal_delete_title', 'local_ocbsbcoursecreation'),
+            body: String.get_string('modal_delete_message', 'local_ocbsbcoursecreation'),
             large: true,
             // Get id before modal is displayed
             preShowCallback: function (triggerElement, modal) {
                 triggerElement = $(triggerElement);
                 let id = triggerElement[0].classList[0].substr(3);
                 modal.params = {'id': id};
-                modal.setSaveButtonText(String.get_string('modal_delete_button', 'local_oc_course_creation'));
+                modal.setSaveButtonText(String.get_string('modal_delete_button', 'local_ocbsbcoursecreation'));
             },
         }, trigger)
             .done(function (modal) {
@@ -28,7 +28,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                     e.preventDefault();
                     Y.log(modal.params);
                     let request = {
-                        methodname: 'local_oc_course_creation_custom_preset_delete',
+                        methodname: 'local_ocbsbcoursecreation_custom_preset_delete',
                         args: modal.params,
                     };
 
@@ -38,7 +38,7 @@ define(['jquery', 'core/modal_factory', 'core/str', "core/modal_events", 'core/a
                             Y.log('deleted message ' + modal.params);
                         } else {
                             Notification.addNotification({
-                                message: String.get_string('modal_delete_preset_failed', 'local_oc_course_creation'),
+                                message: String.get_string('modal_delete_preset_failed', 'local_ocbsbcoursecreation'),
                                 type: 'error'
                             });
                         }

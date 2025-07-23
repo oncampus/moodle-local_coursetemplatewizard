@@ -1,76 +1,83 @@
-# Course creation #
+# Local Plugin ocbsbcoursecreation
 
-## Descripton ##
+**Local ocbsbcoursecreation** ist ein **lokales Plugin** für Moodle, welches die Nutzung und Verwaltung von Kursvorlagen vereinfacht. Lehrkräfte und Keyuser bei BSFB Hamburg können damit Kursvorlagen auswählen und in ihren eigenen Kursbereich kopieren, um schneller standardisierte Kurse zu erstellen.  
+Das Plugin basiert auf [local_oc_course_creation](https://gitlab.oncampus-system.de/moodle/plugins/local/local_oc_course_creation/-/tree/MOODLE_405_STABLE?ref_type=heads).
 
-This plugin will create a new course category in which template courses can be created. These templates can be easely copied to other categories to create courses after certaint
-shemes. It Allows to edit course img, name, shortname, visibility, category and description. The creation will be either by crontask or as an direct execute (Changing with branch
-used).
+## Features
 
-### Functionality/Use Case ###
+- **Kursvorlagenverwaltung**: Automatische Anlage einer Kategorie für Vorlagenkurse.
+- **Kurskopien**: Kopieren von Vorlagen in beliebige Kategorien (manuell oder per Cronjob).
+- **Einfache Anpassung**: Konfiguration von Namen, Kurznamen, Sichtbarkeit, Kategorie und Beschreibung beim Kopieren.
+- **Preset-Verwaltung**: Bearbeiten von vorgefertigten Werten (Semester, Jahr etc.).
+- **Webservice-Unterstützung**: Löschen und Bearbeiten von Preset-Werten via Webservice.
+- **Rollen- und Zugriffssteuerung**: Berechtigungen für Manager und Kurscreator.
 
-This plugin can be used to enable people to use courses as predefiend templates. Through the slightly customized cretion interface course relatet information can be modified. It
-let's course creator manage course creation faster with less steps in the settings and a UI which displays the templates.
+## Installation
 
-The plugin will create an course wich will be filled with the special extra informations. After that it let's a crontask merge all other course settings into this created course.
+1. Kopiere das Plugin in das Verzeichnis:  
+   ```bash
+   /local/ocbsbcoursecreation
+   ```
 
-### Version-Testet ### 
+2. Starte die Installation über:  
+   **Website-Administration → Mitteilungen**  
+   oder führe den CLI-Upgrade aus:  
+   ```bash
+   php admin/cli/upgrade.php
+   ```
 
-    Moodle 3.9-4.0 Stable
+### Voraussetzungen
+- Moodle-Version: `2020061511` oder höher.
 
-### Current use ###
+## Konfiguration
 
-    --- Should not be mentiond here--- 
+Nach der Installation ist das Plugin über folgende Seite konfigurierbar:  
+**Website-Administration → Plugins → Lokale Plugins → ocbsbcoursecreation**
 
-### Requires ### 
+Wichtige Einstellungen:
+- **Vorlagen-Kategorie**: Standard-Kategorie für Kursvorlagen.
+- **Namenskonvention**: Verwendung von Prefix, Separator und Textfeldern.
+- **Voreinstellungen**: `use_default_course_naming`, `course_name_readonly`, `course_shortname_readonly`.
+- **Asynchroner Modus**: Optionale Aktivierung der Kurskopie über Cronjobs.
+- **Preset-Verwaltung**: Hinzufügen, Bearbeiten oder Löschen von Preset-Werten.
 
-Moodle core course-copy, manual enrollment
+## Nutzung
 
-### Technical ### 
+- Lehrkräfte und Keyuser sehen verfügbare Vorlagenkurse und können diese mit wenigen Klicks in ihre eigenen Bereiche kopieren.
+- Das Kopieren kann entweder direkt oder über einen asynchronen Task (Cronjob) erfolgen.
+- Administratoren können Preset-Werte wie Semester oder Jahr vordefinieren und diese im UI bereitstellen.
 
-Plugin page can be found under
+## Rechte
 
-- Administration -> courses -> course dublication -> create course from template
+Dieses Plugin definiert folgende Rechte:
 
-The course creation plugin has settings in
+| Name des Rechts                                        | Beschreibung                                    | Standardrolle       |
+|--------------------------------------------------------|-------------------------------------------------|---------------------|
+| `local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability` | Zugriff auf die Kursvorlagen-Übersicht         | Manager, Kurscreator |
+| `local/ocbsbcoursecreation:handle_presets`             | Verwaltung von Preset-Werten                    | Manager             |
+| `local/ocbsbcoursecreation:course_cat_copy_cap`        | Erlaubt das Kopieren von Kursvorlagen           | Manager, Kurscreator |
 
-- Administration -> plugins -> local plugins
-    - course category which hosts the template courses
-    - Name of the checkbox used to enable a prefix
-    - Text of the prefix field
+## Cronjobs
 
-- Administration -> courses -> course dublication -> Edit presets
-    - let's you edit the dropdown entries in the course creation form
+Dieses Plugin definiert folgende Cronjobs:
 
-## Installing via uploaded ZIP file ##
+| Task Class | Beschreibung            | Standardintervall der Ausführung |
+|------------|-------------------------|----------------------------------|
+| *(optional)* | Asynchrone Kurskopien | Manuell oder nach Bedarf         |
 
-1. Log in to your Moodle site as an admin and go to _Site administration >
-   Plugins > Install plugins_.
-2. Upload the ZIP file with the plugin code. You should only be prompted to add extra details if your plugin type is not automatically detected.
-3. Check the plugin validation report and finish the installation.
+## Web Services
 
-## Installing manually ##
+Dieses Plugin stellt folgende Webservice-Funktionen zur Verfügung:
 
-The plugin can be also installed by putting the contents of this directory to
+| Webservice-Funktion                              | Beschreibung                                |
+|--------------------------------------------------|---------------------------------------------|
+| `local_ocbsbcoursecreation_custom_preset_delete` | Löscht einen definierten Preset-Eintrag per ID |
 
-    {your/moodle/dirroot}/local/oc_course_creation
+## Lizenz
 
-Afterwards, log in to your Moodle site as an admin and go to _Site administration >
-Notifications_ to complete the installation.
+Dieses Plugin ist lizensiert unter [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-Alternatively, you can run
+## Credits
 
-    $ php admin/cli/upgrade.php
-
-to complete the installation from the command line.
-
-## License ##
-
-2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either
-version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+Autor: Jordan Krause ([jordan.krause@oncampus.de](mailto:jordan.krause@oncampus.de))  
+Inspired by / thanks to: oncampus GmbH, Laurenz Schindler

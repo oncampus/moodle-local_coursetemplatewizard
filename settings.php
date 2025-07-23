@@ -18,7 +18,7 @@
  * Plugin administration pages are defined here.
  *
  * @package     local
- * @subpackage  local_oc_course_creation
+ * @subpackage  local_ocbsbcoursecreation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,13 +33,13 @@ require_once($CFG->dirroot . '/config.php');
 
 $context = context_system::instance();
 
-$capuse    = 'local/oc_course_creation:oc_course_creation_access_capability';
-$capedit   = 'local/oc_course_creation:handle_presets';
-$component = 'local_oc_course_creation';
+$capuse    = 'local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability';
+$capedit   = 'local/ocbsbcoursecreation:handle_presets';
+$component = 'local_ocbsbcoursecreation';
 
 if (has_any_capability([$capuse, $capedit], $context)) {
     $ADMIN->add('courses',
-            new admin_category('courses_local_oc_course_creation',
+            new admin_category('courses_local_ocbsbcoursecreation',
                     get_string('pluginname', $component)
             ));
 }
@@ -54,17 +54,17 @@ if (has_capability($capuse, $context)) {
 
     //list plugin pages
 
-    $ADMIN->add('courses_local_oc_course_creation',
+    $ADMIN->add('courses_local_ocbsbcoursecreation',
             new admin_externalpage('list_courses_to_copy', get_string('settings:create_course', $component),
-                    new moodle_url('/local/oc_course_creation/list_courses_to_copy.php', []),
+                    new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php', []),
                     [$capuse]
             ));
 }
 
 if (has_capability($capedit, $context)) {
-    $ADMIN->add('courses_local_oc_course_creation',
+    $ADMIN->add('courses_local_ocbsbcoursecreation',
             new admin_externalpage('list_preset_values', get_string('settings:edit_presets', $component),
-                    new moodle_url('/local/oc_course_creation/list_preset_values.php', []),
+                    new moodle_url('/local/ocbsbcoursecreation/list_preset_values.php', []),
                     [$capedit]
             ));
 
@@ -72,7 +72,7 @@ if (has_capability($capedit, $context)) {
 
 if ($hassiteconfig) {
 
-    $name        = 'local_oc_course_creation/category';
+    $name        = 'local_ocbsbcoursecreation/category';
     $description = get_string('settings:template_course_desc', $component);
     $selection   = [];
     $categories  = core_course_category::get_all(['returnhidden']);
@@ -92,7 +92,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/use_default_course_naming';
+    $name        = 'local_ocbsbcoursecreation/use_default_course_naming';
     $description = get_string('settings:use_default_course_naming_desc', $component);
     $default     = false;
     $setting     = new admin_setting_configcheckbox(
@@ -103,7 +103,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/course_name_readonly';
+    $name        = 'local_ocbsbcoursecreation/course_name_readonly';
     $description = get_string('settings:template_course_name_readonly_desc', $component);
     $default     = false;
     $setting     = new admin_setting_configcheckbox(
@@ -114,7 +114,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/course_shortname_readonly';
+    $name        = 'local_ocbsbcoursecreation/course_shortname_readonly';
     $description = get_string('settings:template_course_shortname_readonly_desc', $component);
     $default     = false;
     $setting     = new admin_setting_configcheckbox(
@@ -125,7 +125,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/textfield_values';
+    $name        = 'local_ocbsbcoursecreation/textfield_values';
     $description = get_string('settings:template_textfield_values_desc', $component);
     $default     = get_string('settings:template_textfield_values_default', $component);
     $setting     = new admin_setting_configtextarea(
@@ -138,7 +138,7 @@ if ($hassiteconfig) {
     $settingspage->add($setting);
 
     $settingspage->add($setting);
-    $name        = 'local_oc_course_creation/display_seperator';
+    $name        = 'local_ocbsbcoursecreation/display_seperator';
     $description = get_string('settings:template_display_seperator_desc', $component);
     $default     = true;
     $setting     = new admin_setting_configcheckbox(
@@ -149,7 +149,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/textfield_seperator';
+    $name        = 'local_ocbsbcoursecreation/textfield_seperator';
     $description = get_string('settings:template_textfield_seperator_desc', $component);
     $default     = " ': ' - '_'";
     $setting     = new admin_setting_configtext(
@@ -161,7 +161,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/course_shortname_readonly';
+    $name        = 'local_ocbsbcoursecreation/course_shortname_readonly';
     $description = get_string('settings:template_course_shortname_readonly_desc', $component);
     $default     = false;
     $setting     = new admin_setting_configcheckbox(
@@ -172,7 +172,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/toggle_prefix';
+    $name        = 'local_ocbsbcoursecreation/toggle_prefix';
     $description = get_string('settings:template_prefix_checkbox_toggle_desc', $component);
     $default     = false;
     $setting     = new admin_setting_configcheckbox(
@@ -183,7 +183,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/prefix_text';
+    $name        = 'local_ocbsbcoursecreation/prefix_text';
     $description = get_string('settings:template_prefix_desc', $component);
     $selection   = [];
     $default     = get_string('settings:template_prefix_default', $component);
@@ -195,7 +195,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
     
-    $name        = 'local_oc_course_creation/cshortname_charnumber';
+    $name        = 'local_ocbsbcoursecreation/cshortname_charnumber';
     $description = get_string('settings:cshortname_charnumber_desc', $component);
     $selection   = [];
     $default     = 3;
@@ -207,7 +207,7 @@ if ($hassiteconfig) {
     );
     $settingspage->add($setting);
 
-    $name        = 'local_oc_course_creation/async_process';
+    $name        = 'local_ocbsbcoursecreation/async_process';
     $description = get_string('settings:async_process_desc', $component);
     $setting     = new admin_setting_configcheckbox(
             $name,

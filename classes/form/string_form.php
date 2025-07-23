@@ -17,18 +17,18 @@
 /**
  * form for presets
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 //moodleform is defined in formslib.php
 
-namespace local_oc_course_creation\form;
+namespace local_ocbsbcoursecreation\form;
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\manager;
 
 class string_form extends \moodleform {
 
@@ -50,7 +50,7 @@ class string_form extends \moodleform {
 
         $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $types_key_value, []);
 
-        $mform->addElement('text', 'string', get_string('form:string:form_select', 'local_oc_course_creation'));
+        $mform->addElement('text', 'string', get_string('form:string:form_select', 'local_ocbsbcoursecreation'));
         $mform->setType('string', PARAM_TEXT);
 
         $this->add_action_buttons();

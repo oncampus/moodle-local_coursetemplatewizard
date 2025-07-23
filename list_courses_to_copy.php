@@ -3,7 +3,7 @@
 /**
  * List courses to copy
  *
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
@@ -13,12 +13,12 @@ global $CFG, $DB;
 require('../../config.php');
 require_once($CFG->dirroot . '/course/classes/category.php');
 
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\manager;
 use core_course\external\course_summary_exporter;
 
 require_login();
 
-$setCourseCategory = get_config('local_oc_course_creation', 'category');
+$setCourseCategory = get_config('local_ocbsbcoursecreation', 'category');
 $categories        = core_course_category::get_all(['returnhidden' => true]);
 $category          = NULL;
 
@@ -32,14 +32,14 @@ if (is_null($category)) {
 }
 
 $capabilities = [
-        'local/oc_course_creation:oc_course_creation_access_capability',
+        'local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability',
 ];
 
 require_all_capabilities($capabilities, context_coursecat::instance($category->id));
 
-$PAGE->set_url(new moodle_url('/local/oc_course_creation/list_courses_to_copy.php'));
+$PAGE->set_url(new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php'));
 $PAGE->set_context(\context_system::instance());
-$PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
+$PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
 $PAGE->set_pagelayout('admin');
 $PAGE->set_heading(get_site()->fullname);
 
@@ -49,7 +49,7 @@ $courseIds = $category->get_courses(['idonly' => true]);
 
 $context = context_coursecat::instance($category->id);
 
-$copy_url = new moodle_url('/local/oc_course_creation/handle_copy_form.php');
+$copy_url = new moodle_url('/local/ocbsbcoursecreation/handle_copy_form.php');
 
 $courses = [];
 $i       = 0;
@@ -89,7 +89,7 @@ $templatecontext = (object) [
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->render_from_template('local_oc_course_creation/course_list_view', $templatecontext);
+echo $OUTPUT->render_from_template('local_ocbsbcoursecreation/course_list_view', $templatecontext);
 
 echo $OUTPUT->footer();
 

@@ -17,15 +17,15 @@
 /**
  * Changes presets values via form
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
  * @var $OUTPUT
  */
 
-use local_oc_course_creation\form\string_form;
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\form\string_form;
+use local_ocbsbcoursecreation\manager;
 
 require_once('../../config.php');
 global $CFG;
@@ -39,12 +39,12 @@ $hassiteconfig = has_capability('moodle/site:config', $context);
 if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect(new moodle_url('/admin/index.php'));
 }
-require_capability('local/oc_course_creation:handle_presets', $context);
+require_capability('local/ocbsbcoursecreation:handle_presets', $context);
 
-$PAGE->set_url(new moodle_url('/local/oc_course_creation/edit_preset_value.php'));
+$PAGE->set_url(new moodle_url('/local/ocbsbcoursecreation/edit_preset_value.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('edit_preset_value_title', 'local_oc_course_creation'));
+$PAGE->set_title(get_string('edit_preset_value_title', 'local_ocbsbcoursecreation'));
 $PAGE->set_heading(get_site()->fullname);
 
 $mform   = new string_form();
@@ -52,12 +52,12 @@ $manager = new manager();
 
 if ($mform->is_cancelled()) {
     //go back to manage page
-    redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
+    redirect($CFG->wwwroot . '/local/ocbsbcoursecreation/list_preset_values.php');
 } else if ($fromform = $mform->get_data()) {
     //insert the data in the db
 
     $manager->update_value($fromform->id, $fromform->string, $fromform->type_id);
-    redirect($CFG->wwwroot . '/local/oc_course_creation/list_preset_values.php');
+    redirect($CFG->wwwroot . '/local/ocbsbcoursecreation/list_preset_values.php');
 
 }
 

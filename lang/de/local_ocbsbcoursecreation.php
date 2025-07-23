@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @category    string
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -61,9 +61,9 @@ $string['settings:template_prefix_default'] = 'Modul 1';
 $string['settings:edit_template_prefix'] = 'Kursnamens-Prefix';
 $string['settings:edit_template_checkbox_desc'] = 'Beschreibung der Checkbox';
 $string['settings:edit_template_checkbox_default'] = 'Füge ein Präfix zum Kursnamen hinzufügen';
-$string['oc_course_creation:handle_presets'] = 'Kurskopie Voreinstellungen bearbeiten';
-$string['oc_course_creation:oc_course_creation_access_capability'] = 'Zugriff auf Kurserstellung aus Vorlage';
-$string['oc_course_creation:course_cat_copy_cap'] = 'Kurserstellung aus einer Vorlage';
+$string['ocbsbcoursecreation:handle_presets'] = 'Kurskopie Voreinstellungen bearbeiten';
+$string['ocbsbcoursecreation:ocbsbcoursecreation_access_capability'] = 'Zugriff auf Kurserstellung aus Vorlage';
+$string['ocbsbcoursecreation:course_cat_copy_cap'] = 'Kurserstellung aus einer Vorlage';
 $string['form:copy:image_desc'] =
         'Wählen Sie bitte ein Bild aus unserer Sammlung (linker grauer Button) aus oder laden Sie ein eigenes Bild für Ihren Kurs hoch.';
 $string['form:copy:image_header'] = 'Kursbild auswählen';

@@ -7,7 +7,7 @@ stages:
 variables:
   PLUGIN_TYPE: "local"
   PLUGIN_PATH: "local"
-  PLUGIN_NAME: "oc_course_creation"
+  PLUGIN_NAME: "ocbsbcoursecreation"
   MOODLE_ROOT: "/var/www/moodle"
 
 before_script:

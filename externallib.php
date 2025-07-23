@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_oc_course_creation externallib will specify additional functions
+ * local_ocbsbcoursecreation externallib will specify additional functions
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @copyright  2021 SysBind Ltd. <service@sysbind.co.il>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\manager;
 
-class local_oc_course_creation_external extends external_api {
+class local_ocbsbcoursecreation_external extends external_api {
     /**
      * Returns the description of method parameters
      *

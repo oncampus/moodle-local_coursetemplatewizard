@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @author     Laurenz Schindler <laruenz.schindler@oncampus.de>
  */
 
@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  *
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @author     Laurenz Schindler <laruenz.schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -56,7 +56,7 @@ class course_copied extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventaddsession', 'local_oc_course_creation');
+        return get_string('eventaddsession', 'local_ocbsbcoursecreation');
     }
 
     /**

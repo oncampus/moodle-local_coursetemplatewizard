@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/->.
 
 /**
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @auther      schindlerl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_oc_course_creation;
+namespace local_ocbsbcoursecreation;
 
 use coding_exception;
 use core\event\course_created;
@@ -66,7 +66,7 @@ class manager {
         $value = new stdClass();
         $value->string = $string;
         $value->type_id = $type_id;
-        return $DB->insert_record("oc_course_creation_value", $value, false);
+        return $DB->insert_record("ocbsbcoursecreation_value", $value, false);
     }
 
     /**
@@ -89,12 +89,12 @@ class manager {
         $new_type = new stdClass();
         $new_type->type = $type;
         $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-        $insert_type = $DB->insert_record('oc_course_creation_type', $new_type);
+        $insert_type = $DB->insert_record('ocbsbcoursecreation_type', $new_type);
 
         $value = new stdClass();
         $value->string = $string;
         $value->type_id = $this->get_last_type_by_rank()->id;
-        $insert_value = $DB->insert_record("oc_course_creation_value", $value);
+        $insert_value = $DB->insert_record("ocbsbcoursecreation_value", $value);
 
         if ($insert_value && $insert_type) {
             $DB->commit_delegated_transaction($transaction);
@@ -118,7 +118,7 @@ class manager {
         $value->id = $id;
         $value->string = $string;
         $value->type_id = $type_id;
-        return $DB->update_record('oc_course_creation_value', $value);
+        return $DB->update_record('ocbsbcoursecreation_value', $value);
     }
 
     /**
@@ -132,16 +132,16 @@ class manager {
     public function delete_value(int $id): bool {
         global $DB;
         $transaction = $DB->start_delegated_transaction();
-        $value = $DB->get_record('oc_course_creation_value', ['id' => $id]);
+        $value = $DB->get_record('ocbsbcoursecreation_value', ['id' => $id]);
         if (!$value) {
             return false;
         }
-        $types = $DB->get_records('oc_course_creation_value', ['type_id' => $value->type_id]);
+        $types = $DB->get_records('ocbsbcoursecreation_value', ['type_id' => $value->type_id]);
         $delete_type = true;
         if (count($types) === 1) {
             $delete_type = $this->update_delete_sort($value->type_id);
         }
-        $delete_value = $DB->delete_records('oc_course_creation_value', ['id' => $id]);
+        $delete_value = $DB->delete_records('ocbsbcoursecreation_value', ['id' => $id]);
         if ($delete_value && $delete_type) {
             $DB->commit_delegated_transaction($transaction);
             return true;
@@ -169,11 +169,11 @@ class manager {
         $records = $this->get_types_higher_and_equal_rank($new_rank);
 
         $transaction = $DB->start_delegated_transaction();
-        $transactions[] = $DB->delete_records('oc_course_creation_type', ['id' => $id]);
+        $transactions[] = $DB->delete_records('ocbsbcoursecreation_type', ['id' => $id]);
         foreach ($records as $record) {
             if ($record->id != $id) {
                 $record->rank -= 1;
-                $transactions[] = $DB->update_record('oc_course_creation_type', $record, true);
+                $transactions[] = $DB->update_record('ocbsbcoursecreation_type', $record, true);
             }
         }
         if (!in_array(false, $transactions, true)) {
@@ -197,7 +197,7 @@ class manager {
         $new_type->type = $string;
         if ($string && $string !== "") {
             $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-            return $DB->insert_record('oc_course_creation_type', $new_type);
+            return $DB->insert_record('ocbsbcoursecreation_type', $new_type);
         }
         return false;
     }
@@ -212,7 +212,7 @@ class manager {
      */
     public function get_value_by_id(int $id): bool {
         global $DB;
-        return $DB->get_record('oc_course_creation_value', ['id' => $id]);
+        return $DB->get_record('ocbsbcoursecreation_value', ['id' => $id]);
     }
 
     /**
@@ -224,7 +224,7 @@ class manager {
      */
     public function get_all_values() {
         global $DB;
-        return $DB->get_records('oc_course_creation_value');
+        return $DB->get_records('ocbsbcoursecreation_value');
     }
 
     /**
@@ -236,7 +236,7 @@ class manager {
      */
     public function get_all_types() {
         global $DB;
-        return $DB->get_records('oc_course_creation_type', [], "rank ASC");
+        return $DB->get_records('ocbsbcoursecreation_type', [], "rank ASC");
     }
 
     /**
@@ -261,8 +261,8 @@ class manager {
 
             $transaction = $DB->start_delegated_transaction();
 
-            $tr1 = $DB->update_record('oc_course_creation_type', $record_to_swap1);
-            $tr2 = $DB->update_record('oc_course_creation_type', $record_to_swap2);
+            $tr1 = $DB->update_record('ocbsbcoursecreation_type', $record_to_swap1);
+            $tr2 = $DB->update_record('ocbsbcoursecreation_type', $record_to_swap2);
 
             if ($tr1 && $tr2) {
                 $DB->commit_delegated_transaction($transaction);
@@ -280,7 +280,7 @@ class manager {
      */
     public function get_types_higher_and_equal_rank($rank) {
         global $DB;
-        $sql = "SELECT * FROM {oc_course_creation_type} WHERE rank >= ?";
+        $sql = "SELECT * FROM {ocbsbcoursecreation_type} WHERE rank >= ?";
         try {
             return $DB->get_records_sql($sql, [$rank]);
         } catch (dml_exception $e) {
@@ -298,7 +298,7 @@ class manager {
      */
     public function get_type_by_id(int $id): mixed {
         global $DB;
-        return $DB->get_record('oc_course_creation_type', ['id' => $id]);
+        return $DB->get_record('ocbsbcoursecreation_type', ['id' => $id]);
     }
 
     /**
@@ -311,7 +311,7 @@ class manager {
      */
     public function get_type_by_rank($rank) {
         global $DB;
-        return $DB->get_record('oc_course_creation_type', ['rank' => $rank]);
+        return $DB->get_record('ocbsbcoursecreation_type', ['rank' => $rank]);
     }
 
     /**
@@ -323,7 +323,7 @@ class manager {
      */
     public function get_last_type_by_rank() {
         global $DB;
-        $sql = "SELECT * from {oc_course_creation_type} ORDER BY rank DESC LIMIT 1";
+        $sql = "SELECT * from {ocbsbcoursecreation_type} ORDER BY rank DESC LIMIT 1";
         if ($rank = $DB->get_record_sql($sql)) {
             return $rank;
         } else {

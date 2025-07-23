@@ -17,14 +17,14 @@
 /**
  * creates special access for users
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @auther     schindlerl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $capabilities = [
-        'local/oc_course_creation:handle_presets'                       => [
+        'local/ocbsbcoursecreation:handle_presets'                       => [
                 'captype'      => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes'   => [
@@ -32,7 +32,7 @@ $capabilities = [
                         'coursecreator' => CAP_PREVENT,
                 ],
         ],
-        'local/oc_course_creation:course_cat_copy_cap'                  => [
+        'local/ocbsbcoursecreation:course_cat_copy_cap'                  => [
                 'captype'      => 'write',
                 'contextlevel' => CONTEXT_COURSECAT,
                 'archetypes'   => [
@@ -40,7 +40,7 @@ $capabilities = [
                         'coursecreator' => CAP_ALLOW,
                 ],
         ],
-        'local/oc_course_creation:oc_course_creation_access_capability' => [
+        'local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability' => [
                 'captype'      => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes'   => [

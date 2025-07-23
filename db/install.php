@@ -18,7 +18,7 @@
  * install.php will create a new course category
  * adds preset values to db
  *
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_local_oc_course_creation_install() {
+function xmldb_local_ocbsbcoursecreation_install() {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/course/lib.php');
 
@@ -34,7 +34,7 @@ function xmldb_local_oc_course_creation_install() {
      * Creates a default course category
      */
     $data              = new stdClass();
-    $data->name        = get_string('plugin_categoryname', 'local_oc_course_creation');
+    $data->name        = get_string('plugin_categoryname', 'local_ocbsbcoursecreation');
     $data->description = 'This is the default course category for course templates oc course creation will use.';
     $data->idnumber    = '';
     $data->visible     = '0';
@@ -51,7 +51,7 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2->rank = 2;
     $record_type2->id   = 2;
 
-    $DB->insert_records('oc_course_creation_type', [$record_type1, $record_type2]);
+    $DB->insert_records('ocbsbcoursecreation_type', [$record_type1, $record_type2]);
 
     $record_type1_value1 = new stdClass();
     $record_type1_value2 = new stdClass();
@@ -59,10 +59,10 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2_value1 = new stdClass();
     $record_type2_value2 = new stdClass();
 
-    $record_type1_value1->string  = get_string('record_type1_value1', 'local_oc_course_creation');
+    $record_type1_value1->string  = get_string('record_type1_value1', 'local_ocbsbcoursecreation');
     $record_type1_value1->type_id = $record_type1->id;
 
-    $record_type1_value2->string  = get_string('record_type1_value2', 'local_oc_course_creation');
+    $record_type1_value2->string  = get_string('record_type1_value2', 'local_ocbsbcoursecreation');
     $record_type1_value2->type_id = $record_type1->id;
 
     $record_type2_value1->string  = date("Y");
@@ -71,7 +71,7 @@ function xmldb_local_oc_course_creation_install() {
     $record_type2_value2->string  = date("Y") + 1;
     $record_type2_value2->type_id = $record_type2->id;
 
-    $DB->insert_records('oc_course_creation_value',
+    $DB->insert_records('ocbsbcoursecreation_value',
             [$record_type1_value1, $record_type1_value2, $record_type2_value1, $record_type2_value2]);
 }
 

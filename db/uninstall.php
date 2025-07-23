@@ -18,20 +18,20 @@
  * Deinstall the plugin and the plugin settings
  * Won't deinstall course category to ensure course templates are sustained
  *
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @category    admin
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 global $DB, $CFG;
-$sql_type   = "DROP TABLE IF EXISTS {oc_course_creation_type}";
-$sql_values = "DROP TABLE IF EXISTS {oc_course_creation_value}";
+$sql_type   = "DROP TABLE IF EXISTS {ocbsbcoursecreation_type}";
+$sql_values = "DROP TABLE IF EXISTS {ocbsbcoursecreation_value}";
 
 $transaction   = $DB->start_delegated_transaction();
 $drop_type     = $DB->execute($sql_type);
 $drop_value    = $DB->execute($sql_values);
-$drop_settings = $DB->delete_records('config_plugins', ['name' => 'local_oc_course_creation']);
+$drop_settings = $DB->delete_records('config_plugins', ['name' => 'local_ocbsbcoursecreation']);
 if ($drop_type && $drop_value && $drop_settings) {
     $DB->commit_delegated_transaction($transaction);
 }

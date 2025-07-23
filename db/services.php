@@ -17,23 +17,23 @@
 /**
  * Defines the api for deleting an preset value
  *
- * @package    local_oc_course_creation
+ * @package    local_ocbsbcoursecreation
  * @auther     schindlerl
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $functions = [
-        'local_oc_course_creation_custom_preset_delete' => [
+        'local_ocbsbcoursecreation_custom_preset_delete' => [
             //web service name (unique in all Moodle)
-            'classname'    => 'local_oc_course_creation_external',
+            'classname'    => 'local_ocbsbcoursecreation_external',
             //class containing the function implementation
             'methodname'   => 'custom_preset_delete',
             //name of the function into the class
-            'classpath'    => 'local/oc_course_creation/externallib.php',
+            'classpath'    => 'local/ocbsbcoursecreation/externallib.php',
             //file containing the class (only used for core external function, not needed if your file is 'component/externallib.php'),
             'description'  => 'Delete selected preset string by its id',
-            'component'    => 'local_oc_course_creation',
-            'capabilities' => 'local/oc_course_creation:handle_presets',
+            'component'    => 'local_ocbsbcoursecreation',
+            'capabilities' => 'local/ocbsbcoursecreation:handle_presets',
             'type'         => 'write',
             'ajax'         => 'true',
             'capabilities' => 'true',

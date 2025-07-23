@@ -3,7 +3,7 @@
 /**
  * list preset values and also create new or delete them
  *
- * @package     local_oc_course_creation
+ * @package     local_ocbsbcoursecreation
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
@@ -13,7 +13,7 @@ global $CFG, $DB;
 require('../../config.php');
 require_once($CFG->dirroot . '/course/classes/category.php');
 
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\manager;
 
 //secure
 redirect_if_major_upgrade_required();
@@ -23,16 +23,16 @@ $context       = \context_system::instance();
 if ($hassiteconfig && moodle_needs_upgrading()) {
     redirect(new moodle_url('/admin/index.php'));
 }
-require_capability('local/oc_course_creation:handle_presets', $context);
+require_capability('local/ocbsbcoursecreation:handle_presets', $context);
 
-$url    = new moodle_url('/local/oc_course_creation/list_preset_values.php');
+$url    = new moodle_url('/local/ocbsbcoursecreation/list_preset_values.php');
 $action = optional_param('action', '', PARAM_ALPHA);
 $rank   = optional_param('rank', '', PARAM_INT);
 $PAGE->set_url($url);
 $PAGE->set_context($context);
-$PAGE->set_title(get_string('creation_page_title', 'local_oc_course_creation'));
+$PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
 $PAGE->set_pagelayout('admin');
-$PAGE->requires->js_call_amd('local_oc_course_creation/delete_preset_value');
+$PAGE->requires->js_call_amd('local_ocbsbcoursecreation/delete_preset_value');
 $PAGE->set_heading(get_site()->fullname);
 
 $manager = new manager();
@@ -103,11 +103,11 @@ foreach ($types as $type) {
 //returns values to page
 $templatecontext = (object) [
         'entries' => $entries,
-        'editURL' => new moodle_url('/local/oc_course_creation/edit_preset_value.php'),
+        'editURL' => new moodle_url('/local/ocbsbcoursecreation/edit_preset_value.php'),
 ];
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_oc_course_creation/values_list_view', $templatecontext);
+echo $OUTPUT->render_from_template('local_ocbsbcoursecreation/values_list_view', $templatecontext);
 echo $OUTPUT->footer();
 
 //die after printing footer

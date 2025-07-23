@@ -2,7 +2,7 @@
 /**
  * handle copy form
  *
- * @package    local/oc_course_creation
+ * @package    local/ocbsbcoursecreation
  * @author     Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
@@ -10,8 +10,8 @@
  * @var $USER
  */
 
-use local_oc_course_creation\form\modified_copy_form;
-use local_oc_course_creation\manager;
+use local_ocbsbcoursecreation\form\modified_copy_form;
+use local_ocbsbcoursecreation\manager;
 
 define('NO_OUTPUT_BUFFERING', true);
 global $CFG, $DB;
@@ -24,15 +24,15 @@ require_once($CFG->libdir . '/filelib.php');
 $courseid = required_param('id', PARAM_INT);
 $course = get_course($courseid);
 $coursecontext = context_course::instance($course->id);
-$courslist = new moodle_url('/local/oc_course_creation/list_courses_to_copy.php');
+$courslist = new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php');
 
-$url = new moodle_url('/local/oc_course_creation/handle_copy_form.php', ['id' => $courseid]);
+$url = new moodle_url('/local/ocbsbcoursecreation/handle_copy_form.php', ['id' => $courseid]);
 $manager = new manager();
 // Security and access checks.
 
 $copycaps = [
         'moodle/course:create',
-        'local/oc_course_creation:oc_course_creation_access_capability',
+        'local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability',
 ];
 require_all_capabilities($copycaps, context_system::instance());
 
@@ -70,7 +70,7 @@ if ($mform->is_cancelled()) {
     require_all_capabilities($copycaps, $context);
     // Submit the form data.
     $course = get_course($courseid);
-    $async = get_config('local_oc_course_creation', 'async_process');
+    $async = get_config('local_ocbsbcoursecreation', 'async_process');
     $newcourseid = $manager->create_copy($mdata, $async);
 
     // Trigger a course created event.
