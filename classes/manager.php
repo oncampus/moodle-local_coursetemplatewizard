@@ -1,41 +1,156 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/->.
-
-/**
- * @package     local_ocbsbcoursecreation
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
- * @auther      schindlerl
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_ocbsbcoursecreation;
 
-use coding_exception;
-use core\event\course_created;
-use core\task\scheduled_task;
-use core_analytics\user;
-use dml_transaction_exception;
 use moodle_exception;
 use moodle_url;
-use restore_controller;
-use restore_controller_exception;
-use stdClass;
-use dml_exception;
 
+/**
+ * Manager class for handling course template copy logic.
+ *
+ * @package     local_ocbsbcoursecreation
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class manager {
+
+    public function replace_course_with_template(object $mdata): int {
+        global $USER, $CFG, $PAGE, $DB;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        $copyids = [];
+        $mdata->startdate = time();
+        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60);
+        $mdata->keptroles = [];
+
+        $templateid = $mdata->templateid;
+        $targetcourseid = $mdata->targetcourseid;
+        $targetcourse = get_course($targetcourseid, false);
+
+        // Admin-ID für Backup/Restore.
+        $adminids = get_admins();
+        $adminid = array_pop($adminids)->id;
+
+        // Backup des Templates.
+        $bc = new \backup_controller(
+            \backup::TYPE_1COURSE,
+            $templateid,
+            \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_COPY,
+            $adminid,
+            \backup::RELEASESESSION_YES
+        );
+        $copyids['backupid'] = $bc->get_backupid();
+
+        // Restore in neuen Kurs (anstelle des Zielkurses).
+        [$fullname, $shortname] = \restore_dbops::calculate_course_names(
+            0,
+            $mdata->fullname ?? get_string('copyingcourse', 'backup'),
+            $mdata->shortname ?? get_string('copyingcourseshortname', 'backup')
+        );
+        $categoryid = $DB->get_field('course', 'category', ['id' => $targetcourseid]);
+        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $categoryid);
+
+        $newidnumber = !empty($targetcourse->idnumber) ? $targetcourse->idnumber : "";
+        $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
+        $mdata->idnumber = $newidnumber;
+        $mdata->visible = true;
+        $mdata->id = $newcourseid;
+
+        $rc = new \restore_controller(
+            $copyids['backupid'],
+            $newcourseid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_COPY,
+            $adminid,
+            \backup::TARGET_NEW_COURSE,
+            null,
+            \backup::RELEASESESSION_NO,
+            $mdata
+        );
+        $copyids['restoreid'] = $rc->get_restoreid();
+
+        $newcontext = \context_course::instance($newcourseid);
+        $bc->set_status(\backup::STATUS_AWAITING);
+        $rc->save_controller();
+
+        // Fortschrittsanzeige.
+        $context = \context_course::instance($templateid);
+        $courseurl = course_get_url($templateid);
+        $restoreurl = new moodle_url('/backup/restorefile.php', ['contextid' => $newcontext->id]);
+
+        echo $PAGE->get_renderer('core', 'backup')->render_from_template('core/async_backup_status', [
+            'backupid'   => $rc->get_restoreid(),
+            'contextid'  => $context->id,
+            'courseurl'  => $courseurl->out(),
+            'restoreurl' => $restoreurl->out(),
+            'headingident' => 'copy',
+        ]);
+
+        // Task synchron ausführen.
+        $asynctask = new \core\task\asynchronous_copy_task();
+        $asynctask->set_blocking(false);
+        $asynctask->set_custom_data($copyids);
+
+        \restore_dbops::delete_course_content($newcourseid);
+        $asynctask->execute();
+        $bc->destroy();
+
+        // idnumber nach Task erneut setzen.
+        $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
+
+        // Metadaten aus $mdata anwenden.
+        $newcourse = get_course($newcourseid, false);
+        $newcourse->fullname  = $mdata->fullname ?? $targetcourse->fullname;
+        $newcourse->shortname = $mdata->shortname ?? $targetcourse->shortname;
+        $newcourse->idnumber  = $newidnumber;
+        $newcourse->summary   = !empty($mdata->summary_editor['text']) ?
+                                $mdata->summary_editor['text'] : $targetcourse->summary;
+        update_course($newcourse);
+
+        // Beschreibung + Bild.
+        if (!empty($mdata->summary_editor['text'])) {
+            $editoroptions = [
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'maxbytes' => $CFG->maxbytes,
+                'context' => $newcontext,
+            ];
+            $mdata = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcontext, 'course', 'summary', 0);
+            update_course($mdata);
+        }
+
+        // Nutzer aus Zielkurs migrieren.
+        $targetcontext = \context_course::instance($targetcourseid);
+        $users = get_enrolled_users($targetcontext, '', 0, 'u.id');
+        foreach ($users as $user) {
+            $roles = get_user_roles($targetcontext, $user->id);
+            foreach ($roles as $role) {
+                $this->check_enrol($newcourseid, $user->id, $role->roleid);
+            }
+        }
+
+        // Zielkurs löschen.
+        delete_course(get_course($targetcourseid), false);
+
+        return $newcourseid;
+    }
+
+    /**
+     * Kopiert Nutzer & Rollen vom alten in den neuen Kurs.
+     */
+    private function clone_enrolments(int $sourcecourseid, int $targetcourseid): void {
+        $contextsource = \context_course::instance($sourcecourseid);
+        $contexttarget = \context_course::instance($targetcourseid);
+
+        $users = get_enrolled_users($contextsource);
+        foreach ($users as $user) {
+            $roles = get_user_roles($contextsource, $user->id);
+            foreach ($roles as $role) {
+                role_assign($role->roleid, $user->id, $contexttarget);
+            }
+        }
+    }
 
     /**
      * Get's the course summary
@@ -44,416 +159,25 @@ class manager {
      * @return bool|\stored_file[]
      * @throws dml_exception
      */
-    public function get_course_summary(int $course_id) {
+    public function get_course_summary(int $courseid) {
         global $DB;
-        return $DB->get_field("course", "summary", ["id" => $course_id]);
+        return $DB->get_field("course", "summary", ["id" => $courseid]);
     }
+
+
 
     /**
-     * Creates an value
-     *
-     * @param string $string
-     * @param int $type_id
-     * @return bool
-     * @throws dml_exception
-     * @throws dml_transaction_exception
+     * Prüft die Einschreibung und meldet Nutzer mit entsprechender Rolle an.
      */
-    public function create_value(string $string, int $type_id): bool {
-        if (is_Null($string) || $string === "" || !$this->get_type_by_id($type_id)) {
-            return false;
-        }
-        global $DB;
-        $value = new stdClass();
-        $value->string = $string;
-        $value->type_id = $type_id;
-        return $DB->insert_record("ocbsbcoursecreation_value", $value, false);
-    }
-
-    /**
-     * Creates a type and the value with new type_id
-     *
-     * @param string $string
-     * @param string $type
-     * @return bool
-     * @throws dml_exception
-     * @throws dml_transaction_exception
-     */
-    public function create_value_and_type(string $string, string $type): bool {
-        global $DB;
-        if (!$string || !$type) {
-            return false;
-        }
-
-        $transaction = $DB->start_delegated_transaction();
-
-        $new_type = new stdClass();
-        $new_type->type = $type;
-        $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-        $insert_type = $DB->insert_record('ocbsbcoursecreation_type', $new_type);
-
-        $value = new stdClass();
-        $value->string = $string;
-        $value->type_id = $this->get_last_type_by_rank()->id;
-        $insert_value = $DB->insert_record("ocbsbcoursecreation_value", $value);
-
-        if ($insert_value && $insert_type) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Updates a value with
-     *
-     * @param int $id
-     * @param string $string
-     * @param int $type_id
-     * @return bool
-     * @throws dml_exception
-     */
-    public function update_value(int $id, string $string, int $type_id): bool {
-        global $DB;
-        $value = new stdClass();
-        $value->id = $id;
-        $value->string = $string;
-        $value->type_id = $type_id;
-        return $DB->update_record('ocbsbcoursecreation_value', $value);
-    }
-
-    /**
-     * Deletes a string and records for an id
-     *
-     * @param int $id
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function delete_value(int $id): bool {
-        global $DB;
-        $transaction = $DB->start_delegated_transaction();
-        $value = $DB->get_record('ocbsbcoursecreation_value', ['id' => $id]);
-        if (!$value) {
-            return false;
-        }
-        $types = $DB->get_records('ocbsbcoursecreation_value', ['type_id' => $value->type_id]);
-        $delete_type = true;
-        if (count($types) === 1) {
-            $delete_type = $this->update_delete_sort($value->type_id);
-        }
-        $delete_value = $DB->delete_records('ocbsbcoursecreation_value', ['id' => $id]);
-        if ($delete_value && $delete_type) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Deletes a type and changes other ranks down
-     *
-     * @param int $id
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function update_delete_sort(int $id): bool {
-        global $DB;
-        $record_to_delete = $this->get_type_by_id($id);
-        if (!$record_to_delete) {
-            return $record_to_delete;
-        }
-        $new_rank = $record_to_delete->rank;
-        $transactions = [];
-
-        $records = $this->get_types_higher_and_equal_rank($new_rank);
-
-        $transaction = $DB->start_delegated_transaction();
-        $transactions[] = $DB->delete_records('ocbsbcoursecreation_type', ['id' => $id]);
-        foreach ($records as $record) {
-            if ($record->id != $id) {
-                $record->rank -= 1;
-                $transactions[] = $DB->update_record('ocbsbcoursecreation_type', $record, true);
-            }
-        }
-        if (!in_array(false, $transactions, true)) {
-            $DB->commit_delegated_transaction($transaction);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Inserts a type at highest rank
-     *
-     * @param string $string
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function create_type(string $string): bool {
-        global $DB;
-        $new_type = new stdClass();
-        $new_type->type = $string;
-        if ($string && $string !== "") {
-            $new_type->rank = $this->get_last_type_by_rank()->rank + 1;
-            return $DB->insert_record('ocbsbcoursecreation_type', $new_type);
-        }
-        return false;
-    }
-
-    /**
-     * Get a value by id
-     *
-     * @param int $id
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_value_by_id(int $id): bool {
-        global $DB;
-        return $DB->get_record('ocbsbcoursecreation_value', ['id' => $id]);
-    }
-
-    /**
-     * Get all preset values
-     *
-     * @return array DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_all_values() {
-        global $DB;
-        return $DB->get_records('ocbsbcoursecreation_value');
-    }
-
-    /**
-     * Get all preset types ascending by rank
-     *
-     * @return array DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_all_types() {
-        global $DB;
-        return $DB->get_records('ocbsbcoursecreation_type', [], "rank ASC");
-    }
-
-    /**
-     * Swaps two ranks of type
-     *
-     * @param int $type_rank1
-     * @param int $type_rank2
-     * @return bool DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function swap($type_rank1, $type_rank2) {
-        global $DB;
-        $record_to_swap1 = $this->get_type_by_rank($type_rank1);
-        $record_to_swap2 = $this->get_type_by_rank($type_rank2);
-
-        if ($record_to_swap1 && $record_to_swap2) {
-            $tmp_rank = $record_to_swap1->rank;
-
-            $record_to_swap1->rank = $record_to_swap2->rank;
-            $record_to_swap2->rank = $tmp_rank;
-
-            $transaction = $DB->start_delegated_transaction();
-
-            $tr1 = $DB->update_record('ocbsbcoursecreation_type', $record_to_swap1);
-            $tr2 = $DB->update_record('ocbsbcoursecreation_type', $record_to_swap2);
-
-            if ($tr1 && $tr2) {
-                $DB->commit_delegated_transaction($transaction);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * gets all types where rank is same or greater than given
-     *
-     * @param int $rank
-     * @return array|false DB transaction successful
-     */
-    public function get_types_higher_and_equal_rank($rank) {
-        global $DB;
-        $sql = "SELECT * FROM {ocbsbcoursecreation_type} WHERE rank >= ?";
-        try {
-            return $DB->get_records_sql($sql, [$rank]);
-        } catch (dml_exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Get A type by its id
-     *
-     * @param int $id
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_type_by_id(int $id): mixed {
-        global $DB;
-        return $DB->get_record('ocbsbcoursecreation_type', ['id' => $id]);
-    }
-
-    /**
-     * Get A type by its rank
-     *
-     * @param $rank int
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_type_by_rank($rank) {
-        global $DB;
-        return $DB->get_record('ocbsbcoursecreation_type', ['rank' => $rank]);
-    }
-
-    /**
-     * Returns the
-     *
-     * @return mixed DB transaction successful
-     * @throws dml_transaction_exception
-     * @throws dml_exception
-     */
-    public function get_last_type_by_rank() {
-        global $DB;
-        $sql = "SELECT * from {ocbsbcoursecreation_type} ORDER BY rank DESC LIMIT 1";
-        if ($rank = $DB->get_record_sql($sql)) {
-            return $rank;
-        } else {
-            $rank = new stdClass();
-            $rank->rank = 0;
-            $rank->id = 0;
-            $rank->type = "";
-            return $rank;
-        }
-    }
-
-    /**
-     * Create the copy
-     *
-     * @param object $mdata
-     * @param $course
-     * @return int courseid
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     * @throws dml_exception
-     * @throws \backup_controller_exception
-     */
-    public function create_copy(object $mdata, bool $async) {
-        global $USER, $DB, $CFG, $PAGE;
-        $copyids = [];
-        $mdata->startdate = time();
-        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60);
-        $mdata->keptroles = [];
-        $adminIDs = get_admins();
-        $adminid = array_pop($adminIDs)->id;
-        // Create the initial backupcontoller.
-        $bc = new \backup_controller(\backup::TYPE_1COURSE, $mdata->courseid, \backup::FORMAT_MOODLE,
-                \backup::INTERACTIVE_NO, \backup::MODE_COPY, $adminid, \backup::RELEASESESSION_YES);
-        $copyids['backupid'] = $bc->get_backupid();
-
-        // Create the initial restore contoller.
-        [$fullname, $shortname] = \restore_dbops::calculate_course_names(
-                0, get_string('copyingcourse', 'backup'), get_string('copyingcourseshortname', 'backup'));
-        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $mdata->category);
-        $rc = new \restore_controller($copyids['backupid'], $newcourseid, \backup::INTERACTIVE_NO,
-                \backup::MODE_COPY, $adminid, \backup::TARGET_NEW_COURSE, null,
-                \backup::RELEASESESSION_NO, $mdata);
-        $copyids['restoreid'] = $rc->get_restoreid();
-        $newcorusecontext = \context_course::instance($newcourseid);
-        $bc->set_status(\backup::STATUS_AWAITING);
-        $rc->save_controller();
-
-        $context = \context_course::instance($mdata->courseid);
-        $courseurl = course_get_url($mdata->courseid);
-
-        $restoreurl = new moodle_url('/backup/restorefile.php', array('contextid' => $newcorusecontext->id));
-        $progresssetup = array(
-                'backupid' => $rc->get_restoreid(),
-                'contextid' => $context->id,
-                'courseurl' => $courseurl->out(),
-                'restoreurl' => $restoreurl->out(),
-                'headingident' => 'copy'
-        );
-        echo $PAGE->get_renderer('core', 'backup')->render_from_template('core/async_backup_status', $progresssetup);
-
-        // Create the ad-hoc task to perform the course copy.
-        $asynctask = new \core\task\asynchronous_copy_task();
-        $asynctask->set_blocking(false);
-        $asynctask->set_custom_data($copyids);
-
-        \restore_dbops::delete_course_content($newcourseid);
-        if (!$async) {
-            $asynctask->execute();
-            // Clean up the controller.
-            $bc->destroy();
-        } else {
-            \core\task\manager::queue_adhoc_task($asynctask);
-        }
-
-        $editoroptions = [
-                'maxfiles' => EDITOR_UNLIMITED_FILES,
-                'maxbytes' => $CFG->maxbytes,
-                'trusttext' => false,
-                'noclean' => true,
-                'context' => $newcorusecontext,
-        ];
-
-        if ($editoroptions && !$async &&
-                object_property_exists($mdata, 'summary_editor') &&
-                array_key_exists('text', $mdata->summary_editor) &&
-                $mdata->summary_editor['text'] != '') {
-            $editoroptions['subdirs'] = file_area_contains_subdirs($context, 'course', 'summary', 0);
-            $mdata = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcorusecontext, 'course', 'summary', 0);
-            update_course($mdata, $editoroptions);
-        }
-        if ($overviewfilesoptions = course_overviewfiles_options($newcourseid)) {
-            $mdata = file_postupdate_standard_filemanager($mdata, 'overviewfiles', $overviewfilesoptions, $newcorusecontext,
-                    'course',
-                    'overviewfiles', 0);
-        }
-        $mdata->id = $newcourseid;
-        $this->check_enrol($newcourseid, $USER->id, 3);
-        return $newcourseid;
-    }
-
-    function unenrol($courseid, $userid, $enrolmethod = 'manual') {
+    public function check_enrol($courseid, $userid, $roleid, $enrolmethod = 'manual') {
         $enrolinstances = enrol_get_instances($courseid, false);
         $plugin = enrol_get_plugin($enrolmethod);
 
-        if (is_null($plugin)) {
+        if (!$plugin) {
             return false;
         }
 
         foreach ($enrolinstances as $instance) {
-            // Check enrolment.
-            if ($enrolmethod == $instance->enrol) {
-                $enrolinstance = $instance;
-                break;
-            }
-        }
-        $plugin->unenrol_user($enrolinstance, $userid);
-    }
-
-    function check_enrol($courseid, $userid, $roleid, $enrolmethod = 'manual') {
-        global $DB;
-        $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
-        $enrolinstances = enrol_get_instances($courseid, false);
-        $plugin = enrol_get_plugin($enrolmethod);
-
-        if (is_null($plugin)) {
-            return false;
-        }
-
-        foreach ($enrolinstances as $instance) {
-            // Check enrolment.
             if ($enrolmethod == $instance->enrol) {
                 if ($instance->status != ENROL_INSTANCE_ENABLED) {
                     $plugin->update_status($instance, ENROL_INSTANCE_ENABLED);
@@ -462,27 +186,34 @@ class manager {
                 break;
             }
         }
+
         if (empty($enrolinstance)) {
             $fields = $plugin->get_instance_defaults();
-            $id = $plugin->add_instance($course, $fields);
+            $id = $plugin->add_instance(get_course($courseid), $fields);
+            $enrolinstance = enrol_get_instance($id);
+        }
 
-            $enrolinstance = $DB->get_record('enrol', ['id' => $id]);
-            $enrolinstance->expirynotify = $plugin->get_config('expirynotify');
-            $enrolinstance->expirythreshold = $plugin->get_config('expirythreshold');
-            $enrolinstance->roleid = $plugin->get_config('roleid');
-            $enrolinstance->timemodified = time();
-            $DB->update_record('enrol', $enrolinstance);
-        } // Enrol user in course.
-
-        // Get the course context.
-        $coursecontext = \context_course::instance($courseid);
-
-        // Check if user is already enrolled with another enrolment method.
-        $userisenrolled = is_enrolled($coursecontext, $userid, "", false);
-
-        // If the user is already enrolled, continue to avoid a second enrolment for the user.
-        if (!$userisenrolled) {
+        if (!is_enrolled(\context_course::instance($courseid), $userid)) {
             $plugin->enrol_user($enrolinstance, $userid, $roleid);
+        }
+    }
+
+    /**
+     * Meldet einen User ab.
+     */
+    public function unenrol($courseid, $userid, $enrolmethod = 'manual') {
+        $enrolinstances = enrol_get_instances($courseid, false);
+        $plugin = enrol_get_plugin($enrolmethod);
+
+        if (!$plugin) {
+            return false;
+        }
+
+        foreach ($enrolinstances as $instance) {
+            if ($enrolmethod == $instance->enrol) {
+                $plugin->unenrol_user($instance, $userid);
+                break;
+            }
         }
     }
 }
