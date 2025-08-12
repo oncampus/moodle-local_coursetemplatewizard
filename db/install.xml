@@ -1,28 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/ocbsbcoursecreation/db" VERSION="20211201" COMMENT="XMLDB file for Moodle local/ocbsbcoursecreation/"
+<XMLDB PATH="local/ocbsbcoursecreation/db" VERSION="20250812" COMMENT="No tables required for local_ocbsbcoursecreation"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
->
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
     <TABLES>
-        <TABLE NAME="ocbsbcoursecreation_type" COMMENT="Saves preset types for the local_ocbsbcoursecreation plugin.">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="type" TYPE="text" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-        </TABLE>
-        <TABLE NAME="ocbsbcoursecreation_value" COMMENT="Saves preset values for the local_ocbsbcoursecreation plugin.">
-            <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="string" TYPE="text" LENGTH="30" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="type_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-            </FIELDS>
-            <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-            </KEYS>
-        </TABLE>
+        <!-- No tables. -->
     </TABLES>
 </XMLDB>

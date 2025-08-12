@@ -15,25 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    local_ocbsbcoursecreation
- * @author     Laurenz Schindler <laruenz.schindler@oncampus.de>
- */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- *
+ * course_copied
  *
  * @package    local_ocbsbcoursecreation
- * @author     Laurenz Schindler <laruenz.schindler@oncampus.de>
+ * @copyright   2025 Oncampus GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_copied extends \core\event\base {
 
+/**
+ * course_copied
+ */
+class course_copied extends \core\event\base {
     /**
      * Init method.
-     *
-     * @return void
      */
     protected function init() {
         $this->data['crud']        = 'r';

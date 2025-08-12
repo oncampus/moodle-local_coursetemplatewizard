@@ -18,10 +18,11 @@
  * creates special access for users
  *
  * @package    local_ocbsbcoursecreation
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
- * @auther     schindlerl
+ * @copyright   2025 Oncampus GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
         'local/ocbsbcoursecreation:handle_presets'                       => [

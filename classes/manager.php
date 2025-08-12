@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_ocbsbcoursecreation;
 
 use moodle_exception;
@@ -8,10 +23,13 @@ use moodle_url;
  * Manager class for handling course template copy logic.
  *
  * @package     local_ocbsbcoursecreation
+ * @copyright   2025 Oncampus GmbH
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-
+    /**
+     * replace_course_with_template
+     */
     public function replace_course_with_template(object $mdata): int {
         global $USER, $CFG, $PAGE, $DB;
 
@@ -97,7 +115,7 @@ class manager {
         $asynctask->execute();
         $bc->destroy();
 
-        // idnumber nach Task erneut setzen.
+        // Idnumber nach Task erneut setzen.
         $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
 
         // Metadaten aus $mdata anwenden.

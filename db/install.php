@@ -15,63 +15,48 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * install.php will create a new course category
- * adds preset values to db
+ * Install script: creates (if needed) a default hidden course category
+ * and stores its ID in plugin config.
  *
- * @package     local_ocbsbcoursecreation
- * @category    admin
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_ocbsbcoursecreation
+ * @category   admin
+ * @copyright   2025 Oncampus GmbH
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * xmldb_local_ocbsbcoursecreation_install
+ */
+function xmldb_local_ocbsbcoursecreation_install(): void {
+    global $CFG;
 
-function xmldb_local_ocbsbcoursecreation_install() {
-    global $CFG, $DB;
     require_once($CFG->dirroot . '/course/lib.php');
 
-    /*
-     * Creates a default course category
-     */
+    // If an admin already picked a category in settings, keep it.
+    $existingcatid = get_config('local_ocbsbcoursecreation', 'categoryid');
+    if (!empty($existingcatid)) {
+        return;
+    }
+
+    // Create a hidden default category (if not already present by name).
+    $defaultname = get_string('plugin_categoryname', 'local_ocbsbcoursecreation');
+
+    // Try to find an existing category with that name first.
+    $existing = \core_course_category::get_all(['returnhidden' => true]);
+    foreach ($existing as $cat) {
+        if ($cat->name === $defaultname) {
+            set_config('categoryid', $cat->id, 'local_ocbsbcoursecreation');
+            return;
+        }
+    }
+
+    // Create new category.
     $data              = new stdClass();
-    $data->name        = get_string('plugin_categoryname', 'local_ocbsbcoursecreation');
-    $data->description = 'This is the default course category for course templates oc course creation will use.';
+    $data->name        = $defaultname;
     $data->idnumber    = '';
-    $data->visible     = '0';
-    core_course_category::create($data);
+    $data->description = 'Default course template category for local_ocbsbcoursecreation.';
+    $data->visible     = 0; // Hidden by default.
 
-    $record_type1 = new stdClass();
-    $record_type2 = new stdClass();
-
-    $record_type1->type = "Semester";
-    $record_type1->rank = 1;
-    $record_type1->id   = 1;
-
-    $record_type2->type = "Year";
-    $record_type2->rank = 2;
-    $record_type2->id   = 2;
-
-    $DB->insert_records('ocbsbcoursecreation_type', [$record_type1, $record_type2]);
-
-    $record_type1_value1 = new stdClass();
-    $record_type1_value2 = new stdClass();
-
-    $record_type2_value1 = new stdClass();
-    $record_type2_value2 = new stdClass();
-
-    $record_type1_value1->string  = get_string('record_type1_value1', 'local_ocbsbcoursecreation');
-    $record_type1_value1->type_id = $record_type1->id;
-
-    $record_type1_value2->string  = get_string('record_type1_value2', 'local_ocbsbcoursecreation');
-    $record_type1_value2->type_id = $record_type1->id;
-
-    $record_type2_value1->string  = date("Y");
-    $record_type2_value1->type_id = $record_type2->id;
-
-    $record_type2_value2->string  = date("Y") + 1;
-    $record_type2_value2->type_id = $record_type2->id;
-
-    $DB->insert_records('ocbsbcoursecreation_value',
-            [$record_type1_value1, $record_type1_value2, $record_type2_value1, $record_type2_value2]);
+    $created = \core_course_category::create($data);
+    set_config('categoryid', $created->id, 'local_ocbsbcoursecreation');
 }
-

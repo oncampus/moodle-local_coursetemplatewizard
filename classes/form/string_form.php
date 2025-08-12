@@ -18,11 +18,9 @@
  * form for presets
  *
  * @package    local_ocbsbcoursecreation
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
- * @auther     schindlerl
+ * @copyright   2025 Oncampus GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//moodleform is defined in formslib.php
 
 namespace local_ocbsbcoursecreation\form;
 defined('MOODLE_INTERNAL') || die();
@@ -30,17 +28,21 @@ require_once("$CFG->libdir/formslib.php");
 
 use local_ocbsbcoursecreation\manager;
 
+/**
+ * string_form
+ */
 class string_form extends \moodleform {
-
-    //Add elements to form
+    /**
+     * definition()
+     */
     public function definition() {
 
         $manager         = new manager();
         $types           = $manager->get_all_types();
-        $types_key_value = [];
+        $typeskeyvalue = [];
         foreach ($types as $type) {
-            $types_key_value[$type->id] = $type->type;
-            $types_key_value[$type->id] = $type->type;
+            $typeskeyvalue[$type->id] = $type->type;
+            $typeskeyvalue[$type->id] = $type->type;
         }
 
         $mform = $this->_form; // Don't forget the underscore!
@@ -48,7 +50,7 @@ class string_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $types_key_value, []);
+        $mform->addElement('select', 'type_id', get_string('forumtype', 'forum'), $typeskeyvalue, []);
 
         $mform->addElement('text', 'string', get_string('form:string:form_select', 'local_ocbsbcoursecreation'));
         $mform->setType('string', PARAM_TEXT);

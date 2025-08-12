@@ -18,45 +18,43 @@
  * Plugin strings are defined here.
  *
  * @package     local_ocbsbcoursecreation
+ * @copyright   2025 Oncampus GmbH
  * @category    string
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Kursvorlagen & Kopieren';
-$string['creation_page_title'] = 'Kursvorlagen';
-$string['headline_table_view'] = 'Kursvorlagenübersicht';
-$string['table_head_coursename'] = 'Kursname';
-$string['table_head_courseimg'] = 'Vorschaubild';
-$string['table_head_coursetext'] = 'Beschreibung';
-$string['table_head_edit'] = 'Diese Vorlage verwenden';
+$string['apply_template'] = 'Vorlage anwenden';
+$string['confirm_overwrite_checkbox'] = 'Ich habe verstanden: Der ausgewählte Zielkurs wird vollständig mit der Vorlage überschrieben.';
+$string['confirm_overwrite_message'] = 'Achtung! Der ausgewählte Zielkurs wird mit der gewählten Vorlage überschrieben. Möchten Sie fortfahren?';
+$string['confirm_overwrite_no'] = 'Nein, abbrechen';
+$string['confirm_overwrite_note'] = 'Achtung: Dieser Vorgang ist endgültig und kann <strong>nicht</strong> rückgängig gemacht werden.';
+$string['confirm_overwrite_required'] = 'Bitte bestätigen Sie die Überschreibung, indem Sie die Checkbox aktivieren.';
+$string['confirm_overwrite_title'] = 'Kurs überschreiben';
+$string['confirm_overwrite_yes'] = 'Ja, überschreiben';
 $string['course_format'] = 'Kursbereich';
-$string['info_no_courses'] = 'Es wurde kein Kurs in der ausgewählten Kursvorlagen-Kategorie gefunden.';
-
-$string['settings_choose_course'] = 'Vorlagen-Kursbereich auswählen';
-$string['settings_create_course'] = 'Kurs aus Vorlage erstellen';
-$string['template_course_desc'] = 'Wählen Sie den Kursbereich, in dem sich die Kursvorlagen befinden.';
-
-$string['form_copy_image_desc'] = 'Wählen Sie ein Kursbild aus oder laden Sie ein eigenes Bild für den Zielkurs hoch.';
-$string['form_copy_image_header'] = 'Kursbild auswählen';
+$string['coursesummary'] = 'Kursbeschreibung';
+$string['creation_page_title'] = 'BSFB Kursvorlagen';
 $string['form_copy_course_name_header'] = 'Kursdaten';
 $string['form_copy_description'] = 'Wählen Sie den Zielkurs, der mit der Vorlage überschrieben wird.';
+$string['form_copy_header'] = 'Kursbild und Kursnamen auswählen';
+$string['form_copy_image_desc'] = 'Wählen Sie ein Kursbild aus oder laden Sie ein eigenes Bild für den Zielkurs hoch.';
 $string['form_copy_select_default'] = 'Zielkurs auswählen';
-$string['select_target_course'] = 'Zielkurs';
-
 $string['fullnamecourse'] = 'Vollständiger Kursname';
-$string['shortnamecourse'] = 'Kurzer Kursname';
-$string['coursesummary'] = 'Kursbeschreibung';
+$string['headline_table_view'] = 'BSFB Kursvorlagenübersicht';
+$string['info_no_courses'] = 'Es wurde kein Kurs in der ausgewählten Kursvorlagen-Kategorie gefunden.';
 $string['missingfullname'] = 'Bitte geben Sie einen vollständigen Kursnamen ein.';
 $string['missingshortname'] = 'Bitte geben Sie einen kurzen Kursnamen ein.';
-
-$string['apply_template'] = 'Vorlage anwenden';
-$string['template_applied'] = 'Die Vorlage wurde erfolgreich auf den Zielkurs angewendet.';
-
-$string['confirm_overwrite_title'] = 'Kurs überschreiben';
-$string['confirm_overwrite_message'] = 'Achtung! Der ausgewählte Zielkurs wird mit der gewählten Vorlage überschrieben. Möchten Sie fortfahren?';
-$string['confirm_overwrite_yes'] = 'Ja, überschreiben';
-$string['confirm_overwrite_no'] = 'Nein, abbrechen';
-
 $string['ocbsbcoursecreation:ocbsbcoursecreation_access_capability'] = 'Zugriff auf Kursvorlagen und Kopierfunktion';
+$string['pluginname'] = 'Kursvorlagen & Kopieren';
+$string['select_target_course'] = 'Zielkurs';
+$string['settings_choose_course'] = 'Vorlagen-Kursbereich auswählen';
+$string['settings_create_course'] = 'Kurs aus Vorlage erstellen';
+$string['shortnamecourse'] = 'Kurzer Kursname';
+$string['table_head_courseimg'] = 'Vorschaubild';
+$string['table_head_coursename'] = 'Kursname';
+$string['table_head_coursetext'] = 'Beschreibung';
+$string['table_head_edit'] = 'Diese Vorlage verwenden';
+$string['template_applied'] = 'Die Vorlage wurde erfolgreich auf den Zielkurs angewendet.';
+$string['template_course_desc'] = 'Wählen Sie den Kursbereich, in dem sich die Kursvorlagen befinden.';

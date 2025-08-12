@@ -20,18 +20,18 @@
  *
  * @package     local_ocbsbcoursecreation
  * @category    admin
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
+ * @copyright   2025 Oncampus GmbH
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 global $DB, $CFG;
-$sql_type   = "DROP TABLE IF EXISTS {ocbsbcoursecreation_type}";
-$sql_values = "DROP TABLE IF EXISTS {ocbsbcoursecreation_value}";
+$sqltype   = "DROP TABLE IF EXISTS {ocbsbcoursecreation_type}";
+$sqlvalues = "DROP TABLE IF EXISTS {ocbsbcoursecreation_value}";
 
 $transaction   = $DB->start_delegated_transaction();
-$drop_type     = $DB->execute($sql_type);
-$drop_value    = $DB->execute($sql_values);
-$drop_settings = $DB->delete_records('config_plugins', ['name' => 'local_ocbsbcoursecreation']);
-if ($drop_type && $drop_value && $drop_settings) {
+$droptype     = $DB->execute($sqltype);
+$dropvalue    = $DB->execute($sqlvalues);
+$dropsettings = $DB->delete_records('config_plugins', ['name' => 'local_ocbsbcoursecreation']);
+if ($droptype && $dropvalue && $dropsettings) {
     $DB->commit_delegated_transaction($transaction);
 }
