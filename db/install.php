@@ -39,7 +39,7 @@ function xmldb_local_ocbsbcoursecreation_install(): void {
     }
 
     // Create a hidden default category (if not already present by name).
-    $defaultname = get_string('plugin_categoryname', 'local_ocbsbcoursecreation');
+    $defaultname = get_string('creation_page_title', 'local_ocbsbcoursecreation');
 
     // Try to find an existing category with that name first.
     $existing = \core_course_category::get_all(['returnhidden' => true]);
