@@ -29,7 +29,7 @@ require('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/formslib.php');
 
-$templateid = required_param('templateid', PARAM_INT); // ID der Vorlage (Template-Kurs).
+$templateid = required_param('templateid', PARAM_INT);
 
 // GET-Param getrennt ermitteln, um echte „Lock aus Navigation“-Fälle zu unterscheiden.
 $fixedtargetidfromget = isset($_GET['targetcourseid']) ? (int)$_GET['targetcourseid'] : 0;
@@ -37,7 +37,7 @@ $fixedtargetidfromget = isset($_GET['targetcourseid']) ? (int)$_GET['targetcours
 // Aktuelle Auswahl aus Request (POST oder GET) – für Defaults & URL-Persistenz.
 $currenttargetid = optional_param('targetcourseid', 0, PARAM_INT);
 
-require_login(); // Kein Zwang zur Einschreibung in den Vorlagenkurs.
+require_login();
 
 $systemcontext = context_system::instance();
 
@@ -75,7 +75,7 @@ if ($currenttargetid && isset($courselist[$currenttargetid])) {
 }
 
 // Seite konfigurieren.
-$PAGE->set_url($url); // Seitennavigation – hier HTML-encoding egal.
+$PAGE->set_url($url);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_context($systemcontext);
 $PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ocbsbcoursecreation';
-$plugin->release   = '1.1.1';
+$plugin->release   = '1.2.0';
 $plugin->version   = 2025072300;
 $plugin->requires  = 2020061511;
 $plugin->maturity  = MATURITY_STABLE;

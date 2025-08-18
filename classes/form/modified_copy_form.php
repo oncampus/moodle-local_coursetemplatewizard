@@ -44,9 +44,10 @@ class modified_copy_form extends \moodleform {
 
         $manager        = new manager();
         $mform          = $this->_form;
-
-        $courses        = $this->_customdata['courses'];            // Kurse, in denen der/die Nutzer:in Trainer ist.
-        $course         = $this->_customdata['course'] ?? null;     // Für Overviewfiles-Optionen.
+        // Kurse, in denen der/die Nutzer:in Trainer ist.
+        $courses        = $this->_customdata['courses'];
+        // Für Overviewfiles-Optionen.
+        $course         = $this->_customdata['course'] ?? null;
         $fixedtargetid  = (int)($this->_customdata['fixedtargetid'] ?? 0);
         $lockonload     = !empty($this->_customdata['locktarget_on_load']);
 
