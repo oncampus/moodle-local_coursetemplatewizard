@@ -106,6 +106,9 @@ class manager {
             'headingident' => 'copy',
         ]);
 
+        // Custom-Course-Fields vom alten Zielkurs in den neuen Kurs übernehmen.
+        $this->copy_custom_coursefields($targetcourseid, $newcourseid);
+
         // Task synchron ausführen.
         $asynctask = new \core\task\asynchronous_copy_task();
         $asynctask->set_blocking(false);
@@ -231,6 +234,132 @@ class manager {
             if ($enrolmethod == $instance->enrol) {
                 $plugin->unenrol_user($instance, $userid);
                 break;
+            }
+        }
+    }
+
+    /**
+     * Kopiert Custom-Course-Fields (core_customfield) vom Quellkurs in den Zielkurs.
+     * Arbeitet schema-robust (mit/ohne 'value', mit/ohne Typspalten).
+     *
+     * @param int      $sourcecourseid
+     * @param int      $targetcourseid
+     * @param string[] $shortnames  Optional: nur diese Feld-Shortnames kopieren
+     * @return void
+     */
+    private function copy_custom_coursefields(int $sourcecourseid, int $targetcourseid, array $shortnames = []): void {
+        global $DB;
+
+        // Tabellen vorhanden?
+        $mgr = $DB->get_manager();
+        foreach (['customfield_field', 'customfield_category', 'customfield_data'] as $t) {
+            if (!$mgr->table_exists($t)) {
+                return;
+            }
+        }
+
+        // Ziel-Schema ermitteln (für kompatibles Insert/Update).
+        $cols = $DB->get_columns('customfield_data');
+        $hascontextid   = isset($cols['contextid']);
+        $hasvalue       = isset($cols['value']);
+        $hasvalueformat = isset($cols['valueformat']);
+        $hasint         = isset($cols['intvalue']);
+        $hasdec         = isset($cols['decvalue']);
+        $hasshortchar   = isset($cols['shortcharvalue']);
+        $haschar        = isset($cols['charvalue']);
+        $hastext        = isset($cols['textvalue']);
+
+        // Relevante Felder der Course-Area laden.
+        $sql = "SELECT f.id, f.shortname
+                FROM {customfield_field} f
+                JOIN {customfield_category} c ON c.id = f.categoryid
+                WHERE c.component = :component AND c.area = :area";
+        $fields = $DB->get_records_sql($sql, ['component' => 'core_course', 'area' => 'course']);
+        if (empty($fields)) {
+            return;
+        }
+
+        if (!empty($shortnames)) {
+            $allow = array_flip($shortnames);
+            $fields = array_filter($fields, static fn($f) => isset($allow[$f->shortname]));
+            if (empty($fields)) {
+                return;
+            }
+        }
+
+        // Quelldaten laden.
+        $fieldids = array_map(static fn($f) => (int)$f->id, $fields);
+        [$insql, $inparams] = $DB->get_in_or_equal($fieldids, SQL_PARAMS_NAMED, 'fid');
+        $sourcedata = $DB->get_records_select(
+            'customfield_data',
+            "fieldid $insql AND instanceid = :src",
+            $inparams + ['src' => $sourcecourseid]
+        );
+        if (empty($sourcedata)) {
+            return;
+        }
+
+        $now = time();
+        $targetctxid = \context_course::instance($targetcourseid)->id;
+
+        foreach ($sourcedata as $record) {
+            // Rohwert für legacy 'value' bestimmen (Fallback-Reihenfolge).
+            $raw = '';
+            if ($hastext && $record->textvalue !== null && $record->textvalue !== '') {
+                $raw = (string)$record->textvalue;
+            } else if ($haschar && $record->charvalue !== null && $record->charvalue !== '') {
+                $raw = (string)$record->charvalue;
+            } else if ($hasshortchar && $record->shortcharvalue !== null && $record->shortcharvalue !== '') {
+                $raw = (string)$record->shortcharvalue;
+            } else if ($hasint && $record->intvalue !== null) {
+                $raw = (string)$record->intvalue;
+            } else if ($hasdec && $record->decvalue !== null) {
+                $raw = (string)$record->decvalue;
+            }
+
+            // Ziel-Datensatz vorhanden?
+            $existing = $DB->get_record('customfield_data', [
+                'fieldid'    => $record->fieldid,
+                'instanceid' => $targetcourseid,
+            ]);
+
+            // Payload dynamisch je nach existierenden Spalten aufbauen.
+            $payload = (object)[
+                'fieldid'      => (int)$record->fieldid,
+                'instanceid'   => (int)$targetcourseid,
+                'timemodified' => $now,
+            ];
+            if ($hascontextid) {
+                $payload->contextid    = $targetctxid;
+            }
+            if ($hasvalue) {
+                $payload->value        = $raw;
+            }
+            if ($hasvalueformat) {
+                $payload->valueformat  = isset($record->valueformat) ? (int)$record->valueformat : 0;
+            }
+            if ($hasint) {
+                $payload->intvalue     = $record->intvalue;
+            }
+            if ($hasdec) {
+                $payload->decvalue     = $record->decvalue;
+            }
+            if ($hasshortchar) {
+                $payload->shortcharvalue = $record->shortcharvalue ?? null;
+            }
+            if ($haschar) {
+                $payload->charvalue    = $record->charvalue ?? '';
+            }
+            if ($hastext) {
+                $payload->textvalue    = $record->textvalue ?? null;
+            }
+
+            if ($existing) {
+                $payload->id = $existing->id;
+                $DB->update_record('customfield_data', $payload);
+            } else {
+                $payload->timecreated = $now;
+                $DB->insert_record('customfield_data', $payload);
             }
         }
     }
