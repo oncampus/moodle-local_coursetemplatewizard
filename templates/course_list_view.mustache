@@ -20,7 +20,9 @@
                         <a href="{{course_url}}">{{{fullname}}}</a>
                     </td>
                     <td class="col-3 align-middle">
-                        {{{img}}}
+                        <div class="zoomable-image">
+                            {{{img}}}
+                        </div>
                     </td>
                     <td class="col-4 align-middle">{{{desc}}}</td>
                     <td class="col-2 align-middle">
@@ -33,6 +35,11 @@
             {{/courses}}
             </tbody>
         </table>
+        <!--Image Zoom Modal-->
+        <div id="imageModal" class="image-modal" aria-hidden="true" role="dialog">
+            <span class="image-modal-close">&times;</span>
+            <img class="image-modal-content" id="modalImage" alt="">
+        </div>
     </div>
 
     <br>

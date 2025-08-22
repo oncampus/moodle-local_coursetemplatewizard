@@ -115,6 +115,8 @@ $templatecontext = (object)[
     'coursesInCat'       => $boolcoursesincat,
 ];
 
+$PAGE->requires->js_call_amd('local_ocbsbcoursecreation/imagepicker', 'init');
+
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_ocbsbcoursecreation/course_list_view', $templatecontext);
 echo $OUTPUT->footer();
