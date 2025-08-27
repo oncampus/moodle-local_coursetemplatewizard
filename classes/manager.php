@@ -28,7 +28,19 @@ use moodle_url;
  */
 class manager {
     /**
-     * replace_course_with_template
+     * Replace a target course with a template while preserving the target's name/shortname.
+     *
+     * Ablauf:
+     * 1) Template sichern (Backup).
+     * 2) Neuen Kurs mit temporären, garantiert eindeutigen Namen anlegen.
+     * 3) Restore des Templates in den neuen Kurs.
+     * 4) Custom Fields und Nutzer/Rollen übernehmen.
+     * 5) Alten Zielkurs löschen (macht seinen Shortname frei).
+     * 6) Neuen Kurs final auf Fullname/Shortname des ehemaligen Zielkurses umbenennen.
+     *
+     * @param object $mdata  Erwartet mind. ->templateid, ->targetcourseid; evtl. summary_editor etc.
+     * @return int           ID des neu erstellten/ersetzten Kurses
+     * @throws \moodle_exception
      */
     public function replace_course_with_template(object $mdata): int {
         global $USER, $CFG, $PAGE, $DB;
@@ -36,20 +48,27 @@ class manager {
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
+        // Ignoriere externe Namensvorgaben: Wir wollen Name/Shortname des Zielkurses beibehalten.
+        unset($mdata->fullname, $mdata->shortname);
+
         $copyids = [];
         $mdata->startdate = time();
-        $mdata->enddate = time() + (6 * 4 * 7 * 24 * 60 * 60);
+        $mdata->enddate   = time() + (6 * 4 * 7 * 24 * 60 * 60);
         $mdata->keptroles = [];
 
-        $templateid = $mdata->templateid;
-        $targetcourseid = $mdata->targetcourseid;
-        $targetcourse = get_course($targetcourseid, false);
+        $templateid     = (int)$mdata->templateid;
+        $targetcourseid = (int)$mdata->targetcourseid;
+        $targetcourse   = get_course($targetcourseid, false);
+
+        // Endgültige (gewünschte) Namen vom ZIELkurs übernehmen.
+        $desiredfullname  = $targetcourse->fullname;
+        $desiredshortname = $targetcourse->shortname;
 
         // Admin-ID für Backup/Restore.
         $adminids = get_admins();
-        $adminid = array_pop($adminids)->id;
+        $adminid  = array_pop($adminids)->id;
 
-        // Backup des Templates.
+        // 1) Backup des Template-Kurses.
         $bc = new \backup_controller(
             \backup::TYPE_1COURSE,
             $templateid,
@@ -61,21 +80,26 @@ class manager {
         );
         $copyids['backupid'] = $bc->get_backupid();
 
-        // Restore in neuen Kurs (anstelle des Zielkurses).
-        [$fullname, $shortname] = \restore_dbops::calculate_course_names(
+        // 2) Temporäre, garantiert eindeutige Namen für den neuen Kurs berechnen.
+        // (Suffix stellt sicher, dass keine shortname-Kollision entsteht.).
+        [$tempfullname, $tempshortname] = \restore_dbops::calculate_course_names(
             0,
-            $mdata->fullname ?? get_string('copyingcourse', 'backup'),
-            $mdata->shortname ?? get_string('copyingcourseshortname', 'backup')
+            $desiredfullname . ' [pending]',
+            $desiredshortname . '-' . $targetcourseid . '-' . time()
         );
-        $categoryid = $DB->get_field('course', 'category', ['id' => $targetcourseid]);
-        $newcourseid = \restore_dbops::create_new_course($fullname, $shortname, $categoryid);
 
-        $newidnumber = !empty($targetcourse->idnumber) ? $targetcourse->idnumber : "";
+        // Kategorie vom Zielkurs übernehmen und neuen Kurs anlegen.
+        $categoryid  = (int)$DB->get_field('course', 'category', ['id' => $targetcourseid]);
+        $newcourseid = \restore_dbops::create_new_course($tempfullname, $tempshortname, $categoryid);
+
+        // Idnumber möglichst früh setzen/mitnehmen.
+        $newidnumber       = !empty($targetcourse->idnumber) ? $targetcourse->idnumber : "";
         $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
-        $mdata->idnumber = $newidnumber;
-        $mdata->visible = true;
-        $mdata->id = $newcourseid;
+        $mdata->idnumber   = $newidnumber;
+        $mdata->visible    = true;
+        $mdata->id         = $newcourseid;
 
+        // 3) Restore in den neuen Kurs.
         $rc = new \restore_controller(
             $copyids['backupid'],
             $newcourseid,
@@ -93,23 +117,23 @@ class manager {
         $bc->set_status(\backup::STATUS_AWAITING);
         $rc->save_controller();
 
-        // Fortschrittsanzeige.
-        $context = \context_course::instance($templateid);
+        // Fortschrittsanzeige rendern (optional visuelles Feedback).
+        $context   = \context_course::instance($templateid);
         $courseurl = course_get_url($templateid);
-        $restoreurl = new moodle_url('/backup/restorefile.php', ['contextid' => $newcontext->id]);
+        $restoreurl = new \moodle_url('/backup/restorefile.php', ['contextid' => $newcontext->id]);
 
         echo $PAGE->get_renderer('core', 'backup')->render_from_template('core/async_backup_status', [
-            'backupid'   => $rc->get_restoreid(),
-            'contextid'  => $context->id,
-            'courseurl'  => $courseurl->out(),
-            'restoreurl' => $restoreurl->out(),
+            'backupid'     => $rc->get_restoreid(),
+            'contextid'    => $context->id,
+            'courseurl'    => $courseurl->out(),
+            'restoreurl'   => $restoreurl->out(),
             'headingident' => 'copy',
         ]);
 
-        // Custom-Course-Fields vom alten Zielkurs in den neuen Kurs übernehmen.
+        // 4a) Custom-Course-Fields vom alten Zielkurs in den neuen Kurs übernehmen.
         $this->copy_custom_coursefields($targetcourseid, $newcourseid);
 
-        // Task synchron ausführen.
+        // 3b) Restore-Task synchron ausführen (wie im bestehenden Code).
         $asynctask = new \core\task\asynchronous_copy_task();
         $asynctask->set_blocking(false);
         $asynctask->set_custom_data($copyids);
@@ -118,30 +142,36 @@ class manager {
         $asynctask->execute();
         $bc->destroy();
 
-        // Idnumber nach Task erneut setzen.
+        // Idnumber nach Task ggf. erneut setzen (Sicherheit).
         $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
 
-        // Metadaten aus $mdata anwenden.
+        // 4b) Metadaten anwenden – KEINE Namensänderung an dieser Stelle!
         $newcourse = get_course($newcourseid, false);
-        $newcourse->fullname  = $mdata->fullname ?? $targetcourse->fullname;
-        $newcourse->shortname = $mdata->shortname ?? $targetcourse->shortname;
-        $newcourse->idnumber  = $newidnumber;
-        $newcourse->summary   = !empty($mdata->summary_editor['text']) ?
-                                $mdata->summary_editor['text'] : $targetcourse->summary;
-        update_course($newcourse);
+        $newcourse->idnumber = $newidnumber;
 
-        // Beschreibung + Bild.
+        // Summary/Editor-Inhalt anwenden (optional).
         if (!empty($mdata->summary_editor['text'])) {
+            // Editorverarbeitung mit Files.
             $editoroptions = [
                 'maxfiles' => EDITOR_UNLIMITED_FILES,
                 'maxbytes' => $CFG->maxbytes,
-                'context' => $newcontext,
+                'context'  => $newcontext,
             ];
-            $mdata = file_postupdate_standard_editor($mdata, 'summary', $editoroptions, $newcontext, 'course', 'summary', 0);
+            $mdata = file_postupdate_standard_editor(
+                $mdata,
+                'summary',
+                $editoroptions,
+                $newcontext,
+                'course',
+                'summary',
+                0
+            );
+            // Comment:$mdata enthält nun summary und summaryformat.
+            $mdata->id = $newcourseid;
             update_course($mdata);
         }
 
-        // Nutzer aus Zielkurs migrieren.
+        // 4c) Nutzer/Rollen aus Zielkurs migrieren.
         $targetcontext = \context_course::instance($targetcourseid);
         $users = get_enrolled_users($targetcontext, '', 0, 'u.id');
         foreach ($users as $user) {
@@ -151,11 +181,21 @@ class manager {
             }
         }
 
-        // Zielkurs löschen.
+        // 5) Zielkurs löschen – macht dessen Shortname frei.
         delete_course(get_course($targetcourseid), false);
+
+        // 6) Final auf die gewünschten Namen (vom ehem. Zielkurs) umbenennen.
+        $final = (object)[
+            'id'        => $newcourseid,
+            'fullname'  => $desiredfullname,
+            'shortname' => $desiredshortname,
+            'idnumber'  => $newidnumber,
+        ];
+        update_course($final);
 
         return $newcourseid;
     }
+
 
     /**
      * Kopiert Nutzer & Rollen vom alten in den neuen Kurs.

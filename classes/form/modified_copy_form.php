@@ -100,28 +100,6 @@ class modified_copy_form extends \moodleform {
             $summaryfields .= ',overviewfiles_filemanager';
         }
 
-        // Vollständiger Kursname.
-        $mform->addElement(
-            'text',
-            'fullname',
-            get_string('fullnamecourse'),
-            'maxlength="254" size="50"'
-        );
-        $mform->addHelpButton('fullname', 'fullnamecourse');
-        $mform->addRule('fullname', get_string('missingfullname'), 'required');
-        $mform->setType('fullname', PARAM_TEXT);
-
-        // Kurzer Kursname.
-        $mform->addElement(
-            'text',
-            'shortname',
-            get_string('shortnamecourse'),
-            'maxlength="100" size="20"'
-        );
-        $mform->addHelpButton('shortname', 'shortnamecourse');
-        $mform->addRule('shortname', get_string('missingshortname'), 'required');
-        $mform->setType('shortname', PARAM_TEXT);
-
         // Kursbeschreibung.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
         $mform->setExpanded('descriptionhdr');
