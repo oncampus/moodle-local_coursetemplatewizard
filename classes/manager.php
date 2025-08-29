@@ -140,8 +140,6 @@ class manager {
             'headingident' => 'copy',
         ]);
 
-        // 4a) Custom-Course-Fields vom alten Zielkurs in den neuen Kurs übernehmen.
-        $this->copy_custom_coursefields($targetcourseid, $newcourseid);
 
         // 3b) Restore-Task synchron ausführen (wie im bestehenden Code).
         $asynctask = new \core\task\asynchronous_copy_task();
@@ -154,6 +152,10 @@ class manager {
 
         // Idnumber nach Task ggf. erneut setzen (Sicherheit).
         $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
+
+        // 4b) Metadaten anwenden – KEINE Namensänderung an dieser Stelle!
+        $newcourse = get_course($newcourseid, false);
+        $newcourse->idnumber = $newidnumber;
 
         // Wenn KEIN Bild im Formular gewählt wurde, wollen wir AUCH KEINS übernehmen.
         // D. h. wir leeren die overviewfiles-Area (entfernt Template-Bild).
@@ -177,10 +179,6 @@ class manager {
             );
         }
 
-        // 4b) Metadaten anwenden – KEINE Namensänderung an dieser Stelle!
-        $newcourse = get_course($newcourseid, false);
-        $newcourse->idnumber = $newidnumber;
-
         // Summary/Editor-Inhalt anwenden (optional).
         if (!empty($mdata->summary_editor['text'])) {
             // Editorverarbeitung mit Files.
@@ -202,6 +200,8 @@ class manager {
             $mdata->id = $newcourseid;
             update_course($mdata);
         }
+
+        $this->copy_custom_coursefields($targetcourseid, $newcourseid);
 
         // 4c) Nutzer/Rollen aus Zielkurs migrieren.
         $targetcontext = \context_course::instance($targetcourseid);
