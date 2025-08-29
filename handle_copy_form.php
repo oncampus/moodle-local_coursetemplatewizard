@@ -99,6 +99,19 @@ if ($mform->is_cancelled()) {
     $targetcontext = context_course::instance($mdata->targetcourseid);
     require_capability('moodle/course:update', $targetcontext);
 
+    // Erwarteter Feldname analog zum Kursformular: overviewfiles_filemanager.
+    $mdata->hasoverview = false;
+    $mdata->overviewdraftid = 0;
+    if (!empty($mdata->overviewfiles_filemanager)) {
+        $mdata->overviewdraftid = (int)$mdata->overviewfiles_filemanager;
+        // Draft-Area prüfen, ob mind. 1 Datei hochgeladen wurde.
+        $info = file_get_draft_area_info($mdata->overviewdraftid, true);
+        if (!empty($info['filecount'])) {
+            // Es wurde aktiv ein Bild ausgewählt.
+            $mdata->hasoverview = true;
+        }
+    }
+
     // Kopiervorgang ausführen.
     $manager = new manager();
     $newcourseid = $manager->replace_course_with_template($mdata);

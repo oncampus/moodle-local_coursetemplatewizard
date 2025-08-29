@@ -52,8 +52,6 @@ class manager {
         unset($mdata->fullname, $mdata->shortname);
 
         $copyids = [];
-        $mdata->startdate = time();
-        $mdata->enddate   = time() + (6 * 4 * 7 * 24 * 60 * 60);
         $mdata->keptroles = [];
 
         $templateid     = (int)$mdata->templateid;
@@ -63,6 +61,18 @@ class manager {
         // Endgültige (gewünschte) Namen vom ZIELkurs übernehmen.
         $desiredfullname  = $targetcourse->fullname;
         $desiredshortname = $targetcourse->shortname;
+
+        // Start/Ende/Visible vom Zielkurs sichern.
+        $desiredstartdate = isset($targetcourse->startdate) ? (int)$targetcourse->startdate : 0;
+        $desiredenddate   = isset($targetcourse->enddate) ? (int)$targetcourse->enddate : 0;
+        $desiredvisible   = isset($targetcourse->visible) ? (int)$targetcourse->visible : 1;
+
+        // Startdate darf nicht 0 sein (UI/Tasks erwarten eine Epoche) – fallback: jetzt.
+        $mdata->startdate = $desiredstartdate > 0 ? $desiredstartdate : time();
+        // Enddate darf NULL nicht sein – 0 bedeutet „kein Kursende“.
+        $mdata->enddate   = $desiredenddate > 0 ? $desiredenddate : 0;
+        // Sichtbarkeit mitgeben (einige Tasks übernehmen das Feld direkt).
+        $mdata->visible   = $desiredvisible;
 
         // Admin-ID für Backup/Restore.
         $adminids = get_admins();
@@ -145,6 +155,28 @@ class manager {
         // Idnumber nach Task ggf. erneut setzen (Sicherheit).
         $DB->set_field('course', 'idnumber', $newidnumber, ['id' => $newcourseid]);
 
+        // Wenn KEIN Bild im Formular gewählt wurde, wollen wir AUCH KEINS übernehmen.
+        // D. h. wir leeren die overviewfiles-Area (entfernt Template-Bild).
+        $fs = get_file_storage();
+        if (empty($mdata->hasoverview)) {
+            $fs->delete_area_files($newcontext->id, 'course', 'overviewfiles', 0);
+        } else {
+            // Es wurde ein Bild gewählt -> Draft nach overviewfiles speichern (wie im Kursformular).
+            $fileoptions = [
+                'subdirs' => 0,
+                'maxfiles' => 1,
+                'accepted_types' => '*',
+            ];
+            file_save_draft_area_files(
+                (int)$mdata->overviewdraftid,
+                $newcontext->id,
+                'course',
+                'overviewfiles',
+                0,
+                $fileoptions
+            );
+        }
+
         // 4b) Metadaten anwenden – KEINE Namensänderung an dieser Stelle!
         $newcourse = get_course($newcourseid, false);
         $newcourse->idnumber = $newidnumber;
@@ -190,6 +222,9 @@ class manager {
             'fullname'  => $desiredfullname,
             'shortname' => $desiredshortname,
             'idnumber'  => $newidnumber,
+            'startdate'  => $desiredstartdate > 0 ? $desiredstartdate : $mdata->startdate,
+            'enddate'    => $desiredenddate > 0 ? $desiredenddate : 0,
+            'visible'    => $desiredvisible,
         ];
         update_course($final);
 
@@ -343,18 +378,14 @@ class manager {
         $targetctxid = \context_course::instance($targetcourseid)->id;
 
         foreach ($sourcedata as $record) {
-            // Rohwert für legacy 'value' bestimmen (Fallback-Reihenfolge).
+            // Rohwert für legacy 'value' IMMER aus der QUELLE ableiten – unabhängig vom Ziel-Schema.
+            // Fallback-Reihenfolge deckt beide Welten ab (typisierte Spalten und legacy 'value').
             $raw = '';
-            if ($hastext && $record->textvalue !== null && $record->textvalue !== '') {
-                $raw = (string)$record->textvalue;
-            } else if ($haschar && $record->charvalue !== null && $record->charvalue !== '') {
-                $raw = (string)$record->charvalue;
-            } else if ($hasshortchar && $record->shortcharvalue !== null && $record->shortcharvalue !== '') {
-                $raw = (string)$record->shortcharvalue;
-            } else if ($hasint && $record->intvalue !== null) {
-                $raw = (string)$record->intvalue;
-            } else if ($hasdec && $record->decvalue !== null) {
-                $raw = (string)$record->decvalue;
+            foreach (['textvalue', 'charvalue', 'shortcharvalue', 'intvalue', 'decvalue', 'value'] as $prop) {
+                if (property_exists($record, $prop) && $record->$prop !== null && $record->$prop !== '') {
+                    $raw = (string)$record->$prop;
+                    break;
+                }
             }
 
             // Ziel-Datensatz vorhanden?
@@ -370,28 +401,30 @@ class manager {
                 'timemodified' => $now,
             ];
             if ($hascontextid) {
-                $payload->contextid    = $targetctxid;
+                $payload->contextid = $targetctxid;
             }
             if ($hasvalue) {
-                $payload->value        = $raw;
+                $payload->value = $raw;
             }
             if ($hasvalueformat) {
-                $payload->valueformat  = isset($record->valueformat) ? (int)$record->valueformat : 0;
+                // Falls Quelle kein valueformat hat, Standard 0 (FORMAT_MOODLE).
+                $payload->valueformat = (int)($record->valueformat ?? 0);
             }
             if ($hasint) {
-                $payload->intvalue     = $record->intvalue;
+                $payload->intvalue = $record->intvalue ?? null;
             }
             if ($hasdec) {
-                $payload->decvalue     = $record->decvalue;
+                $payload->decvalue = $record->decvalue ?? null;
             }
             if ($hasshortchar) {
                 $payload->shortcharvalue = $record->shortcharvalue ?? null;
             }
             if ($haschar) {
-                $payload->charvalue    = $record->charvalue ?? '';
+                // Bei char-Feldern lieber leerer String statt null.
+                $payload->charvalue = $record->charvalue ?? '';
             }
             if ($hastext) {
-                $payload->textvalue    = $record->textvalue ?? null;
+                $payload->textvalue = $record->textvalue ?? null;
             }
 
             if ($existing) {
