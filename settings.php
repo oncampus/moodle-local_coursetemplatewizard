@@ -30,28 +30,23 @@ if (!$hassiteconfig) {
     return;
 }
 
-// Einstellungsseite unter "Plugins -> Lokale Plugins".
 $component = 'local_ocbsbcoursecreation';
 $settings  = new admin_settingpage($component, get_string('pluginname', $component));
 
-// Kategorie-Auswahl (für Vorlagenkategorie, falls weiterhin genutzt).
-$name = 'local_ocbsbcoursecreation/category';
-$description = get_string('template_course_desc', $component);
-
-// Kategorienamen als Auswahl (Name->Name, wie zuvor genutzt).
-$selection = [];
-$categories = core_course_category::get_all(['returnhidden' => true]);
-foreach ($categories as $cat) {
-    $selection[$cat->name] = $cat->name;
+// Kategorien-Auswahl: existierenden Kursbereich wählen (ID-basiert, voller Pfad).
+$catoptions = [];
+$catlist = core_course_category::make_categories_list();
+foreach ($catlist as $id => $path) {
+    $catoptions[$id] = $path;
 }
-$default = '';
+
 $settings->add(new admin_setting_configselect(
-    $name,
+    'local_ocbsbcoursecreation/categoryid',
     get_string('settings_choose_course', $component),
-    $description,
-    $default,
-    $selection
+    get_string('template_course_desc', $component),
+    0,
+    $catoptions
 ));
 
-// Seite in den Adminbaum einhängen (unter Plugins -> Lokale Plugins).
+// Seite einhängen.
 $ADMIN->add('localplugins', $settings);

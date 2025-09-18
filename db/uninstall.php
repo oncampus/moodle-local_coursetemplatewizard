@@ -23,15 +23,23 @@
  * @copyright   2025 Oncampus GmbH
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-global $DB, $CFG;
-$sqltype   = "DROP TABLE IF EXISTS {ocbsbcoursecreation_type}";
-$sqlvalues = "DROP TABLE IF EXISTS {ocbsbcoursecreation_value}";
 
-$transaction   = $DB->start_delegated_transaction();
-$droptype     = $DB->execute($sqltype);
-$dropvalue    = $DB->execute($sqlvalues);
-$dropsettings = $DB->delete_records('config_plugins', ['name' => 'local_ocbsbcoursecreation']);
-if ($droptype && $dropvalue && $dropsettings) {
-    $DB->commit_delegated_transaction($transaction);
+/**
+ * Uninstall hook: remove plugin settings only.
+ * Do NOT delete any course categories or courses.
+ *
+ * @return bool
+ */
+function xmldb_local_ocbsbcoursecreation_uninstall(): bool {
+    global $DB;
+
+    // Entfernt alle Einträge dieses Plugins aus config_plugins.
+    $DB->delete_records('config_plugins', ['plugin' => 'local_ocbsbcoursecreation']);
+
+    // Falls ihr eigene Tabellen habt, könnt ihr sie hier per xmldb definieren
+    // und über install.xml verwalten – dann braucht es kein manuelles DROP.
+    // Wenn es legacy-Tabellen 'ocbsbcoursecreation_type' / 'ocbsbcoursecreation_value' gab,
+    // sollten diese über XMLDB (install.xml) und upgrade/uninstall geregelt werden.
+
+    return true;
 }

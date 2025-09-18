@@ -25,38 +25,11 @@
  */
 
 /**
- * xmldb_local_ocbsbcoursecreation_install
+ * Install hook (no-op): do not create any course category.
+ *
+ * @return void
  */
 function xmldb_local_ocbsbcoursecreation_install(): void {
-    global $CFG;
-
-    require_once($CFG->dirroot . '/course/lib.php');
-
-    // If an admin already picked a category in settings, keep it.
-    $existingcatid = get_config('local_ocbsbcoursecreation', 'categoryid');
-    if (!empty($existingcatid)) {
-        return;
-    }
-
-    // Create a hidden default category (if not already present by name).
-    $defaultname = get_string('creation_page_title', 'local_ocbsbcoursecreation');
-
-    // Try to find an existing category with that name first.
-    $existing = \core_course_category::get_all(['returnhidden' => true]);
-    foreach ($existing as $cat) {
-        if ($cat->name === $defaultname) {
-            set_config('categoryid', $cat->id, 'local_ocbsbcoursecreation');
-            return;
-        }
-    }
-
-    // Create new category.
-    $data              = new stdClass();
-    $data->name        = $defaultname;
-    $data->idnumber    = '';
-    $data->description = 'Default course template category for local_ocbsbcoursecreation.';
-    $data->visible     = 0; // Hidden by default.
-
-    $created = \core_course_category::create($data);
-    set_config('categoryid', $created->id, 'local_ocbsbcoursecreation');
+    // Intentionally empty. We no longer auto-create a category.
+    // Admin chooses an existing category in the plugin settings.
 }
