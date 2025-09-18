@@ -56,6 +56,32 @@ class manager {
 
         $templateid     = (int)$mdata->templateid;
         $targetcourseid = (int)$mdata->targetcourseid;
+
+        // Vorlagen-Kategorie aus Plugin-Settings (ID bevorzugt, sonst Name) whitelisten.
+        $setcoursecategory = get_config('local_ocbsbcoursecreation', 'category');
+        $allowedcatid = null;
+        if (!empty($setcoursecategory) && ctype_digit((string)$setcoursecategory)) {
+            $allowedcatid = (int)$setcoursecategory;
+        } else {
+            $allcats = \core_course_category::get_all(['returnhidden' => true]);
+            foreach ($allcats as $c) {
+                if ($c->name === $setcoursecategory) {
+                    $allowedcatid = (int)$c->id;
+                    break;
+                }
+            }
+        }
+        $templatecourse = get_course($templateid);
+        if ($allowedcatid && (int)$templatecourse->category !== $allowedcatid) {
+            throw new moodle_exception(
+                'error',
+                'local_ocbsbcoursecreation',
+                '',
+                null,
+                'Template not in allowed category'
+            );
+        }
+
         $targetcourse   = get_course($targetcourseid, false);
 
         // Endgültige (gewünschte) Namen vom ZIELkurs übernehmen.
@@ -204,14 +230,7 @@ class manager {
         $this->copy_custom_coursefields($targetcourseid, $newcourseid);
 
         // 4c) Nutzer/Rollen aus Zielkurs migrieren.
-        $targetcontext = \context_course::instance($targetcourseid);
-        $users = get_enrolled_users($targetcontext, '', 0, 'u.id');
-        foreach ($users as $user) {
-            $roles = get_user_roles($targetcontext, $user->id);
-            foreach ($roles as $role) {
-                $this->check_enrol($newcourseid, $user->id, $role->roleid);
-            }
-        }
+        $this->migrate_enrolments_and_roles($targetcourseid, $newcourseid);
 
         // 5) Zielkurs löschen – macht dessen Shortname frei.
         delete_course(get_course($targetcourseid), false);
@@ -434,6 +453,132 @@ class manager {
                 $payload->timecreated = $now;
                 $DB->insert_record('customfield_data', $payload);
             }
+        }
+    }
+
+
+    /**
+     * Stellt sicher, dass im Zielkurs eine aktive 'manual'-Enrol-Instanz existiert und gibt sie zurück.
+     *
+     * @param int $courseid Kurs-ID
+     * @return stdClass Enrol-Instanz (manual)
+     * @throws moodle_exception Wenn das manuelle Enrol-Plugin fehlt
+     */
+    private function ensure_manual_instance($courseid) {
+        $plugin = enrol_get_plugin('manual');
+        if (!$plugin) {
+            throw new moodle_exception('Manual enrol plugin not available');
+        }
+
+        $instances = enrol_get_instances($courseid, false);
+        foreach ($instances as $instance) {
+            if ($instance->enrol === 'manual') {
+                if ((int)$instance->status !== ENROL_INSTANCE_ENABLED) {
+                    $plugin->update_status($instance, ENROL_INSTANCE_ENABLED);
+                }
+                return $instance;
+            }
+        }
+
+        // Keine Instanz vorhanden → anlegen mit Defaults des Plugins.
+        $id = $plugin->add_instance(get_course($courseid), $plugin->get_instance_defaults());
+        $instances = enrol_get_instances($courseid, false);
+        foreach ($instances as $instance) {
+            if ((int)$instance->id === (int)$id) {
+                return $instance;
+            }
+        }
+
+        throw new moodle_exception('Could not create manual enrol instance');
+    }
+
+    /**
+     * Migriert alle Einschreibungen (manual), ALLE Rollenbindungen je Nutzer (role_assign)
+     * sowie Rollen-Overrides (assign_capability) vom Quell- in den Zielkurs.
+     *
+     * Hinweis:
+     *  - Wir enroln den Nutzer genau einmal (manual). Weitere Rollenbindungen werden zusätzlich
+     *    per role_assign() gesetzt (so gehen Mehrfachrollen nicht verloren).
+     *  - Rollen-Overrides werden über assign_capability() im Zielkontext repliziert (kein direkter DB-Write).
+     *
+     * @param int $sourcecourseid Quellkurs-ID
+     * @param int $targetcourseid Zielkurs-ID
+     * @return void
+     */
+    private function migrate_enrolments_and_roles($sourcecourseid, $targetcourseid) {
+        global $DB, $USER;
+
+        $sourcectx = \context_course::instance($sourcecourseid);
+        $targetctx = \context_course::instance($targetcourseid);
+
+        // 1) Manual-Instanz im Ziel sicherstellen.
+        $manualinstance = $this->ensure_manual_instance($targetcourseid);
+        $manualplugin   = enrol_get_plugin('manual');
+
+        // 2) Alle Nutzer aus dem alten Kurs ermitteln.
+        $users = get_enrolled_users($sourcectx, '', 0, 'u.id');
+        foreach ($users as $user) {
+            $userid = (int)$user->id;
+
+            // A) Primäres Enrolment (einmal), damit der/die Nutzer*in im Zielkurs ist.
+            if (!is_enrolled($targetctx, $userid)) {
+                // Zeiten/Suspend von alter manueller Einschreibung übernehmen (falls vorhanden).
+                $timestart = 0;
+                $timeend   = 0;
+                $status    = ENROL_USER_ACTIVE;
+
+                $uesql = "SELECT ue.*
+                            FROM {user_enrolments} ue
+                            JOIN {enrol} e ON e.id = ue.enrolid
+                        WHERE e.courseid = :cid
+                            AND e.enrol = 'manual'
+                            AND ue.userid = :uid
+                        ORDER BY ue.id ASC";
+                $ue = $DB->get_records_sql($uesql, ['cid' => $sourcecourseid, 'uid' => $userid]);
+                if (!empty($ue)) {
+                    $first = reset($ue);
+                    $timestart = (int)($first->timestart ?? 0);
+                    $timeend   = (int)($first->timeend ?? 0);
+                    // In user_enrolments heißt "status" 0=active, 1=suspended.
+                    $status    = ((int)($first->status ?? 0) === 1) ? ENROL_USER_SUSPENDED : ENROL_USER_ACTIVE;
+                }
+
+                // Eine (beliebige) Rolle als Enrol-Rolle setzen; weitere Rollen folgen mit role_assign().
+                $primaryroleid = null;
+                $roles = get_user_roles($sourcectx, $userid, true);
+                if (!empty($roles)) {
+                    $firstrole = reset($roles);
+                    $primaryroleid = (int)$firstrole->roleid;
+                }
+
+                $manualplugin->enrol_user($manualinstance, $userid, $primaryroleid, $timestart, $timeend, $status);
+            }
+
+            // B) Alle Rollenbindungen aus dem alten Kurs additiv zuweisen.
+            $roles = get_user_roles($sourcectx, $userid, true);
+            foreach ($roles as $r) {
+                role_assign((int)$r->roleid, $userid, $targetctx->id);
+            }
+        }
+
+        // 3) Rollen-Overrides (capability overrides) im Kurskontext kopieren.
+        // Wir lesen role_capabilities im Quellkontext und setzen dieselben per assign_capability() im Zielkontext.
+        $overrides = $DB->get_records('role_capabilities', ['contextid' => $sourcectx->id]);
+        if (!empty($overrides)) {
+            foreach ($overrides as $ov) {
+                // Die $permission ist CAP_ALLOW / CAP_PREVENT / CAP_PROHIBIT etc.
+                assign_capability(
+                    $ov->capability,
+                    (int)$ov->permission,
+                    (int)$ov->roleid,
+                    $targetctx->id,
+                    false
+                );
+            }
+            // Caches erneuern (sicherstellen, dass neue Overrides greifen).
+            // capabilities re-evaluieren:
+            // In neueren Versionen genügt das Leeren der Zugriffscaches.
+            accesslib_clear_all_caches(false);
         }
     }
 }

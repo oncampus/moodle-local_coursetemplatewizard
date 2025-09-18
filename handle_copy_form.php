@@ -31,21 +31,44 @@ require_once($CFG->libdir . '/formslib.php');
 
 $templateid = required_param('templateid', PARAM_INT);
 
-// GET-Param getrennt ermitteln, um echte „Lock aus Navigation“-Fälle zu unterscheiden.
+// Nur Navigation-Lock unterscheiden (optional).
 $fixedtargetidfromget = isset($_GET['targetcourseid']) ? (int)$_GET['targetcourseid'] : 0;
-
-// Aktuelle Auswahl aus Request (POST oder GET) – für Defaults & URL-Persistenz.
-$currenttargetid = optional_param('targetcourseid', 0, PARAM_INT);
+$currenttargetid      = optional_param('targetcourseid', 0, PARAM_INT);
 
 require_login();
 
 $systemcontext = context_system::instance();
 
-// Kursliste der Kurse, in denen der/die Nutzer:in Trainer ist.
+// Whitelist: Vorlage MUSS aus der konfigurierten Kategorie stammen.
+$setcoursecategory = get_config('local_ocbsbcoursecreation', 'category');
+$categories        = core_course_category::get_all(['returnhidden' => true]);
+$allowedcat        = null;
+
+foreach ($categories as $item) {
+    if ($item->name === $setcoursecategory) {
+        $allowedcat = $item;
+        break;
+    }
+}
+if (!$allowedcat) {
+    throw new moodle_exception('error', 'local_ocbsbcoursecreation', '', null, 'Configured template category not found.');
+}
+
+// Gehört die Vorlage wirklich zu dieser Kategorie?
+$templatecourse = get_course($templateid);
+if ((int)$templatecourse->category !== (int)$allowedcat->id) {
+    throw new required_capability_exception(
+        context_course::instance($templateid),
+        'local/ocbsbcoursecreation:use', // Virtuelle Capability fürs Log – nicht wirklich nötig.
+        'nopermissions',
+        'Template not in allowed category'
+    );
+}
+
+// Kursliste einschränken auf Kurse, in denen der Nutzer überhaupt eingeschrieben ist (Trainer/Editingteacher o.ä.).
 $usercourses = enrol_get_users_courses($USER->id, true, 'id, fullname');
 $courselist  = [];
 
-// Falls Zielkurs aus Navigation (GET) kam und der/die Nutzer:in dort Trainer ist -> Liste einschränken.
 if ($fixedtargetidfromget && isset($usercourses[$fixedtargetidfromget])) {
     $courselist[$fixedtargetidfromget] = format_string($usercourses[$fixedtargetidfromget]->fullname);
 } else {
@@ -54,27 +77,25 @@ if ($fixedtargetidfromget && isset($usercourses[$fixedtargetidfromget])) {
     }
 }
 
-// URL nur mit GET-Preselection bauen (Navigation). Wichtig: out(false) geben wir beim Formular weiter.
 $urlparams = ['templateid' => $templateid];
 if ($fixedtargetidfromget) {
     $urlparams['targetcourseid'] = $fixedtargetidfromget;
 }
 $url = new moodle_url('/local/ocbsbcoursecreation/handle_copy_form.php', $urlparams);
 
-// Formular erstellen. Lock nur, wenn GET-Preselection existiert.
+// Formular.
 $mform = new modified_copy_form($url->out(false), [
     'courses'            => $courselist,
-    'course'             => get_course($templateid),
+    'course'             => $templatecourse,
     'fixedtargetid'      => $fixedtargetidfromget,
     'locktarget_on_load' => (bool)$fixedtargetidfromget,
 ]);
 
-// Defaults setzen: bei vorhandener Auswahl (POST/GET) den Wert vormerken (ohne Lock).
 if ($currenttargetid && isset($courselist[$currenttargetid])) {
     $mform->set_data((object)['targetcourseid' => $currenttargetid]);
 }
 
-// Seite konfigurieren.
+// Seite.
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_context($systemcontext);
@@ -86,46 +107,44 @@ echo $OUTPUT->heading(get_string('creation_page_title', 'local_ocbsbcoursecreati
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php'));
 } else if ($mdata = $mform->get_data()) {
-    // Pflichtfelder zusammenführen.
     $mdata->templateid     = $templateid;
     $mdata->targetcourseid = (int)$mdata->targetcourseid;
 
-    // Zusätzliche Sicherheit: Checkbox muss gesetzt sein.
     if (empty($mdata->confirmoverwrite)) {
         throw new moodle_exception('confirm_overwrite_required', 'local_ocbsbcoursecreation');
     }
 
-    // Sicherheit: Der/die Nutzer:in muss im Zielkurs ausreichende Rechte haben.
-    $targetcontext = context_course::instance($mdata->targetcourseid);
-    require_capability('moodle/course:update', $targetcontext);
+    // Harte Ziel-Rechte: Nutzer muss seinen Zielkurs bearbeiten dürfen.
+    $targetctx = context_course::instance($mdata->targetcourseid);
+    require_capability('moodle/course:update', $targetctx);
+    // Für Restore ins bestehende Kurskontext ist formal auch restore-Recht sinnvoll:
+    // Wenn ihr den Restore als Admin fahrt (siehe Manager unten), könnt ihr hier
+    // Code: moodle/restore:restorecourse` weglassen. Sicherheitshalber:
+    // Code: require_capability('moodle/restore:restorecourse', $targetctx);.
 
-    // Erwarteter Feldname analog zum Kursformular: overviewfiles_filemanager.
-    $mdata->hasoverview = false;
+    // Optional: Kursbild-Handling (wie gehabt).
+    $mdata->hasoverview    = false;
     $mdata->overviewdraftid = 0;
     if (!empty($mdata->overviewfiles_filemanager)) {
         $mdata->overviewdraftid = (int)$mdata->overviewfiles_filemanager;
-        // Draft-Area prüfen, ob mind. 1 Datei hochgeladen wurde.
         $info = file_get_draft_area_info($mdata->overviewdraftid, true);
         if (!empty($info['filecount'])) {
-            // Es wurde aktiv ein Bild ausgewählt.
             $mdata->hasoverview = true;
         }
     }
 
-    // Kopiervorgang ausführen.
+    // Kopiervorgang ausführen (als Admin, aber QUELLE strikt auf erlaubte Kategorie begrenzt).
     $manager = new manager();
-    $newcourseid = $manager->replace_course_with_template($mdata);
+    $newcourseid = $manager->replace_course_with_template($mdata, (int)$allowedcat->id);
 
     redirect(new moodle_url('/course/view.php', ['id' => $newcourseid]));
 } else {
-    // Bei Validationsfehlern die sichtbare Seiten-URL mit der aktuellen Auswahl updaten (Persistenz).
     if ($mform->is_submitted() && $currenttargetid) {
         $PAGE->set_url(new moodle_url(
             '/local/ocbsbcoursecreation/handle_copy_form.php',
             ['templateid' => $templateid, 'targetcourseid' => $currenttargetid]
         ));
     }
-
     $mform->display();
 }
 

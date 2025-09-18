@@ -32,30 +32,55 @@ use core_course\external\course_summary_exporter;
 
 require_login();
 
-// Check: Nur Trainer und Kursersteller dürfen zugreifen.
-$systemcontext = context_system::instance();
-if (!has_capability('moodle/course:create', $systemcontext) && !has_capability('moodle/course:update', $systemcontext)) {
-    throw new required_capability_exception($systemcontext, 'moodle/course:create', 'nopermissions', '');
-}
+// Vorlagen-Kategorie aus Plugin-Settings robust ermitteln (ID bevorzugt, sonst Name).
+$setcoursecategory = trim((string)get_config('local_ocbsbcoursecreation', 'category'));
+$category = null;
 
-// Aus Plugin-Settings: Kategorie für Vorlagen laden.
-$setcoursecategory = get_config('local_ocbsbcoursecreation', 'category');
-$categories        = core_course_category::get_all(['returnhidden' => true]);
-$category          = null;
-
-foreach ($categories as $item) {
-    if ($item->name === $setcoursecategory) {
-        $category = $item;
-        break;
+if ($setcoursecategory !== '') {
+    // Wenn die Einstellung numerisch ist, als ID interpretieren.
+    if (ctype_digit($setcoursecategory)) {
+        try {
+            $category = \core_course_category::get((int)$setcoursecategory, IGNORE_MISSING, true);
+        } catch (\Throwable $e) {
+            $category = null;
+        }
+    }
+    // Fallback: per Name suchen.
+    if ($category === null) {
+        $categories = \core_course_category::get_all(['returnhidden' => true]);
+        foreach ($categories as $item) {
+            if ($item->name === $setcoursecategory) {
+                $category = $item;
+                break;
+            }
+        }
     }
 }
 
-if (is_null($category)) {
-    redirect(new moodle_url('/admin/search.php'), 'Selected category missing.', 1);
+if ($category === null) {
+    redirect(new moodle_url('/admin/search.php'), 'Selected template category missing or misconfigured.', 1);
+}
+
+// Zugriffsprüfung: Zielkurs- oder Kategorienkontext (NICHT Systemkontext).
+$systemcontext = context_system::instance();
+
+$targetcourseid = optional_param('targetcourseid', 0, PARAM_INT);
+$targetctx = $targetcourseid ? context_course::instance($targetcourseid) : null;
+$templatecatctx = context_coursecat::instance($category->id);
+
+// Erlaubt: Nutzer darf (a) Zielkurs bearbeiten ODER (b) in der Vorlagenkategorie Kurse anlegen (falls Neuanlage genutzt wird).
+$canupdate = $targetctx ? has_capability('moodle/course:update', $targetctx) : false;
+$cancreate = has_capability('moodle/course:create', $templatecatctx);
+
+if (!$canupdate && !$cancreate) {
+    if ($targetctx) {
+        throw new required_capability_exception($targetctx, 'moodle/course:update', 'nopermissions', '');
+    } else {
+        throw new required_capability_exception($templatecatctx, 'moodle/course:create', 'nopermissions', '');
+    }
 }
 
 // Seiteneinstellungen.
-$targetcourseid = optional_param('targetcourseid', 0, PARAM_INT);
 $PAGE->set_url(new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php', [
     'targetcourseid' => $targetcourseid,
 ]));
@@ -66,23 +91,26 @@ $PAGE->set_pagelayout('standard');
 
 $manager = new manager();
 
-// Alle Vorlagenkurse in der definierten Kategorie.
-$courseids = $category->get_courses(['idonly' => true]);
+
+// Vorlagenkurse laden – auch wenn verborgen (direkt aus DB).
+global $DB;
+
+$courseids = array_keys($DB->get_records('course', ['category' => $category->id], 'sortorder', 'id'));
 $courses   = [];
 $i         = 0;
 
 foreach ($courseids as $courseid) {
-    $course = $DB->get_record('course', ['id' => $courseid]);
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
     $course->fullname = format_text($course->fullname);
 
-    // Bild.
+    // Kursbild.
     $img = html_writer::img(
         course_summary_exporter::get_course_image($course),
         "",
         ["width" => "100%", 'style' => "max-width: 350px;"]
     );
 
-    // Zusammenfassung.
+    // Zusammenfassung kürzen.
     $summary = format_text($manager->get_course_summary((int)$courseid));
     $offset  = 500;
     $end     = '</p>';
@@ -98,7 +126,7 @@ foreach ($courseids as $courseid) {
         'img'         => $img,
         'desc'        => $result,
         'course_url'  => new moodle_url('/course/view.php', ['id' => $courseid]),
-        'copy_url' => (new moodle_url(
+        'copy_url'    => (new moodle_url(
             '/local/ocbsbcoursecreation/handle_copy_form.php',
             ['templateid' => $courseid, 'targetcourseid' => $targetcourseid]
         ))->out(false),
@@ -107,7 +135,7 @@ foreach ($courseids as $courseid) {
     $i++;
 }
 
-$boolcoursesincat = $category->has_courses();
+$boolcoursesincat = !empty($courseids);
 
 $templatecontext = (object)[
     'courses'            => $courses,
