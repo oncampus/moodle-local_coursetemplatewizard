@@ -51,9 +51,6 @@ class modified_copy_form extends \moodleform {
         $fixedtargetid  = (int)($this->_customdata['fixedtargetid'] ?? 0);
         $lockonload     = !empty($this->_customdata['locktarget_on_load']);
 
-        // Optionales JS (falls später Logik nötig).
-        $PAGE->requires->js_call_amd('local_ocbsbcoursecreation/form_control_copy', 'init', []);
-
         // Zielkurs-Auswahl oder gelockte Anzeige.
         if ($lockonload && $fixedtargetid && isset($courses[$fixedtargetid])) {
             // Anzeige fixiert (aus Navigation übergeben).

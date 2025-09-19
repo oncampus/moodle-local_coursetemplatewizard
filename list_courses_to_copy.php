@@ -33,23 +33,35 @@ use core_course\external\course_summary_exporter;
 require_login();
 
 // Vorlagen-Kategorie aus Plugin-Settings robust ermitteln (ID bevorzugt, sonst Name).
-$setcoursecategory = trim((string)get_config('local_ocbsbcoursecreation', 'category'));
 $category = null;
 
+// This setting is named "categoryid" in your admin settings.
+$raw = get_config('local_ocbsbcoursecreation', 'categoryid');
+$setcoursecategory = trim((string)$raw);
+
 if ($setcoursecategory !== '') {
-    // Wenn die Einstellung numerisch ist, als ID interpretieren.
-    if (ctype_digit($setcoursecategory)) {
+    // The setting created by a category select stores a numeric category ID.
+    $id = (int)$setcoursecategory;
+    if ($id > 0) {
         try {
-            $category = \core_course_category::get((int)$setcoursecategory, IGNORE_MISSING, true);
+            $category = \core_course_category::get($id, IGNORE_MISSING, true);
         } catch (\Throwable $e) {
             $category = null;
         }
     }
-    // Fallback: per Name suchen.
+
+    // Optional fallbacks if you ever switch to storing text.
     if ($category === null) {
-        $categories = \core_course_category::get_all(['returnhidden' => true]);
-        foreach ($categories as $item) {
-            if ($item->name === $setcoursecategory) {
+        // Try by idnumber.
+        $byidnumber = \core_course_category::get_by_idnumber($setcoursecategory, IGNORE_MISSING);
+        if ($byidnumber) {
+            $category = $byidnumber;
+        }
+    }
+    if ($category === null) {
+        // Try exact name match (be mindful of duplicates/translations).
+        foreach (\core_course_category::get_all(['returnhidden' => true]) as $item) {
+            if (trim($item->name) === $setcoursecategory) {
                 $category = $item;
                 break;
             }
@@ -60,6 +72,7 @@ if ($setcoursecategory !== '') {
 if ($category === null) {
     redirect(new moodle_url('/admin/search.php'), 'Selected template category missing or misconfigured.', 1);
 }
+
 
 // Zugriffsprüfung: Zielkurs- oder Kategorienkontext (NICHT Systemkontext).
 $systemcontext = context_system::instance();

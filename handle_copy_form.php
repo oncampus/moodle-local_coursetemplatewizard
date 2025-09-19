@@ -40,18 +40,25 @@ require_login();
 $systemcontext = context_system::instance();
 
 // Whitelist: Vorlage MUSS aus der konfigurierten Kategorie stammen.
-$setcoursecategory = get_config('local_ocbsbcoursecreation', 'category');
-$categories        = core_course_category::get_all(['returnhidden' => true]);
-$allowedcat        = null;
+$setcoursecategory = get_config('local_ocbsbcoursecreation', 'categoryid');
+$allowedcat = null;
 
-foreach ($categories as $item) {
-    if ($item->name === $setcoursecategory) {
-        $allowedcat = $item;
-        break;
+if (!empty($setcoursecategory) && ctype_digit((string)$setcoursecategory)) {
+    try {
+        $allowedcat = \core_course_category::get((int)$setcoursecategory, IGNORE_MISSING, true);
+    } catch (\Throwable $e) {
+        $allowedcat = null;
     }
 }
+
 if (!$allowedcat) {
-    throw new moodle_exception('error', 'local_ocbsbcoursecreation', '', null, 'Configured template category not found.');
+    throw new \moodle_exception(
+        'error',
+        'local_ocbsbcoursecreation',
+        '',
+        null,
+        'Configured template category not found.'
+    );
 }
 
 // Gehört die Vorlage wirklich zu dieser Kategorie?
