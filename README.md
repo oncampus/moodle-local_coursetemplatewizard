@@ -1,4 +1,4 @@
-# Local Plugin ocbsbcoursecreation
+# Local Plugin ocbsbcoursecreation (Vorlagen-Assistent)
 
 **Local ocbsbcoursecreation** ist ein **lokales Plugin** für Moodle, welches die Nutzung und Verwaltung von Kursvorlagen vereinfacht. Lehrkräfte und Keyuser bei BSFB Hamburg können damit Kursvorlagen auswählen und in ihren eigenen Kursbereich kopieren, um schneller standardisierte Kurse zu erstellen.  
 Das Plugin basiert auf [local_oc_course_creation](https://gitlab.oncampus-system.de/moodle/plugins/local/local_oc_course_creation/-/tree/MOODLE_405_STABLE?ref_type=heads).
