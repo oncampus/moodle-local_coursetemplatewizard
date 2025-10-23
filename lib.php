@@ -116,20 +116,27 @@ function local_ocbsbcoursecreation_extend_navigation_course(
     );
 }
 
+/**
+ * Check if course is in school of user only by getting the Schoolnumbers in profile
+ *
+ * @param $course
+ * @return bool
+ * @throws dml_exception
+ */
 function is_course_in_school($course): bool {
     global $DB, $USER;
 
-    $sql = "SELECT cc.idnumber FROM {course_categories} cc 
-                   JOIN {course} c on c.category = cc.id
-                   WHERE c.id =:courseid";
+    $sql = "SELECT cc.idnumber FROM {course_categories} cc
+            JOIN {course} c on c.category = cc.id
+                            WHERE c.id =:courseid";
     $params = ['courseid' => $course];
 
-    $coursecategory= $DB->get_record_sql($sql, $params);
+    $coursecategory = $DB->get_record_sql($sql, $params);
     $schoolnumbers = isset($USER->profile_field_schoolno) ?: $USER->profile['schoolno'];
     $profileschools = explode(',', $schoolnumbers);
 
     foreach ($profileschools as $profileschool) {
-        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, trim($profileschool)) !== false){
+        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, trim($profileschool)) !== false) {
             return true;
         }
     }

@@ -39,7 +39,7 @@ $currenttargetid      = optional_param('targetcourseid', 0, PARAM_INT);
 
 require_login();
 
-// Check für die targetcourseid, damit Bildungspläne, Austauschforum etc. nicht zufällig benutzt werden
+// Check für die targetcourseid, damit Bildungspläne, Austauschforum etc. nicht zufällig benutzt werden!
 $redirecturl = new moodle_url('/course/view.php', ['id' => $fixedtargetidfromget]);
 if ($fixedtargetidfromget && !is_course_in_school($fixedtargetidfromget)) {
     redirect($redirecturl, get_string('errorcoursenotinschool', 'local_ocbsbcoursecreation'), null, notification::NOTIFY_ERROR);
@@ -92,7 +92,12 @@ if ($fixedtargetidfromget && isset($usercourses[$fixedtargetidfromget])) {
             $courselist[$uc->id] = s($uc->fullname);
         }
     } else {
-        redirect($redirecturl, get_string('errornotteacherincourse', 'local_ocbsbcoursecreation'), null, notification::NOTIFY_ERROR);
+        redirect(
+            $redirecturl,
+            get_string('errornotteacherincourse', 'local_ocbsbcoursecreation'),
+            null,
+            notification::NOTIFY_ERROR
+        );
     }
 }
 
@@ -118,9 +123,7 @@ $mform = new modified_copy_form($url->out(false), [
 
 if ($currenttargetid && isset($courselist[$currenttargetid])) {
     $mform->set_data((object)['targetcourseid' => $currenttargetid]);
-}
-
-;
+};
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
