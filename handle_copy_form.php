@@ -22,12 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\output\notification;
 use local_ocbsbcoursecreation\form\modified_copy_form;
 use local_ocbsbcoursecreation\manager;
 
 require('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/local/ocbsbcoursecreation/lib.php');
 
 $templateid = required_param('templateid', PARAM_INT);
 
@@ -36,6 +38,12 @@ $fixedtargetidfromget = isset($_GET['targetcourseid']) ? (int)$_GET['targetcours
 $currenttargetid      = optional_param('targetcourseid', 0, PARAM_INT);
 
 require_login();
+
+// Check für die targetcourseid, damit Bildungspläne, Austauschforum etc. nicht zufällig benutzt werden
+$redirecturl = new moodle_url('/course/view.php', ['id' => $fixedtargetidfromget]);
+if ($fixedtargetidfromget && !is_course_in_school($fixedtargetidfromget)) {
+    redirect($redirecturl, get_string('errorcoursenotinschool', 'local_ocbsbcoursecreation'), null, notification::NOTIFY_ERROR);
+}
 
 $systemcontext = context_system::instance();
 
@@ -77,10 +85,14 @@ $usercourses = enrol_get_users_courses($USER->id, true, 'id, fullname');
 $courselist  = [];
 
 if ($fixedtargetidfromget && isset($usercourses[$fixedtargetidfromget])) {
-    $courselist[$fixedtargetidfromget] = format_string($usercourses[$fixedtargetidfromget]->fullname);
+    $courselist[$fixedtargetidfromget] = s($usercourses[$fixedtargetidfromget]->fullname);
 } else {
-    foreach ($usercourses as $uc) {
-        $courselist[$uc->id] = format_string($uc->fullname);
+    if (has_capability('local/ocbsbcoursecreation:handle_presets', $systemcontext)) {
+        foreach ($usercourses as $uc) {
+            $courselist[$uc->id] = s($uc->fullname);
+        }
+    } else {
+        redirect($redirecturl, get_string('errornotteacherincourse', 'local_ocbsbcoursecreation'), null, notification::NOTIFY_ERROR);
     }
 }
 
@@ -89,6 +101,12 @@ if ($fixedtargetidfromget) {
     $urlparams['targetcourseid'] = $fixedtargetidfromget;
 }
 $url = new moodle_url('/local/ocbsbcoursecreation/handle_copy_form.php', $urlparams);
+
+// Seite.
+$PAGE->set_url($url);
+$PAGE->set_pagelayout('standard');
+$PAGE->set_context($systemcontext);
+$PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
 
 // Formular.
 $mform = new modified_copy_form($url->out(false), [
@@ -102,11 +120,7 @@ if ($currenttargetid && isset($courselist[$currenttargetid])) {
     $mform->set_data((object)['targetcourseid' => $currenttargetid]);
 }
 
-// Seite.
-$PAGE->set_url($url);
-$PAGE->set_pagelayout('standard');
-$PAGE->set_context($systemcontext);
-$PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
+;
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
