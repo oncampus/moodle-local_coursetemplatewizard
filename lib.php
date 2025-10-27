@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 /**
  * Extend the settings navigation (course administration) with a link to the template list.
  *
@@ -113,4 +114,32 @@ function local_ocbsbcoursecreation_extend_navigation_course(
         'local_ocbsbcoursecreation',
         new pix_icon('i/backup', $label)
     );
+}
+
+/**
+ * Check if course is in school of user only by getting the Schoolnumbers in profile
+ *
+ * @param $course
+ * @return bool
+ * @throws dml_exception
+ */
+function is_course_in_school($course): bool {
+    global $DB, $USER;
+
+    $sql = "SELECT cc.idnumber FROM {course_categories} cc
+            JOIN {course} c on c.category = cc.id
+                            WHERE c.id =:courseid";
+    $params = ['courseid' => $course];
+
+    $coursecategory = $DB->get_record_sql($sql, $params);
+    $schoolnumbers = isset($USER->profile_field_schoolno) ?: $USER->profile['schoolno'];
+    $profileschools = explode(',', $schoolnumbers);
+
+    foreach ($profileschools as $profileschool) {
+        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, trim($profileschool)) !== false) {
+            return true;
+        }
+    }
+
+    return false;
 }
