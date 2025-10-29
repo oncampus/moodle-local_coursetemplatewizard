@@ -41,7 +41,7 @@ require_login();
 
 // Check für die targetcourseid, damit Bildungspläne, Austauschforum etc. nicht zufällig benutzt werden!
 $redirecturl = new moodle_url('/course/view.php', ['id' => $fixedtargetidfromget]);
-if ($fixedtargetidfromget && !is_course_in_school($fixedtargetidfromget)) {
+if ($fixedtargetidfromget && !local_ocbsbcoursecreation_is_course_in_school($fixedtargetidfromget)) {
     redirect($redirecturl, get_string('errorcoursenotinschool', 'local_ocbsbcoursecreation'), null, notification::NOTIFY_ERROR);
 }
 
