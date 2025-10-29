@@ -124,7 +124,7 @@ function local_ocbsbcoursecreation_extend_navigation_course(
  * @throws dml_exception
  */
 function local_ocbsbcoursecreation_is_course_in_school($courseid): bool {
-    global $USER,
+    global $USER;
 
     $coursecategory = local_ocbsbcoursecreation_return_categoryitems($courseid);
 
