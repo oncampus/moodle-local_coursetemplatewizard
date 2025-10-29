@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 /**
  * Extend the settings navigation (course administration) with a link to the template list.
  *
@@ -113,4 +114,65 @@ function local_ocbsbcoursecreation_extend_navigation_course(
         'local_ocbsbcoursecreation',
         new pix_icon('i/backup', $label)
     );
+}
+
+/**
+ * Check if course is in school of user only by getting the Schoolnumbers in profile
+ *
+ * @param $course
+ * @return bool
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_is_course_in_school($courseid): bool {
+    global $USER;
+
+    $coursecategory = local_ocbsbcoursecreation_return_categoryitems($courseid);
+
+    while (!empty($coursecategory->parent) && $coursecategory->parent !== 0) {
+        $coursecategory = local_ocbsbcoursecreation_return_categoryitems_from_parent($coursecategory->parent);
+    }
+
+    $schoolnumbers = $USER->profile_field_schoolno ?? ($USER->profile['schoolno'] ?? '');
+
+    $profileschools = array_map('trim', explode(',', $schoolnumbers));
+
+    foreach ($profileschools as $profileschool) {
+        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, $profileschool) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Return Category items
+ *
+ * @param $courseid
+ * @return false|mixed
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_return_categoryitems($courseid): mixed {
+    global $DB;
+
+    $sql = "SELECT cc.idnumber, cc.parent
+              FROM {course_categories} cc
+              JOIN {course} c ON c.category = cc.id
+             WHERE c.id = :courseid";
+    $params = ['courseid' => $courseid];
+
+    return $DB->get_record_sql($sql, $params);
+}
+
+/**
+ * Return category items from parent category
+ *
+ * @param $categoryid
+ * @return false|mixed|stdClass
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_return_categoryitems_from_parent($categoryid): mixed {
+    global $DB;
+
+    return $DB->get_record("course_categories", ['id' => $categoryid]);
 }
