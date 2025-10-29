@@ -123,23 +123,56 @@ function local_ocbsbcoursecreation_extend_navigation_course(
  * @return bool
  * @throws dml_exception
  */
-function is_course_in_school($course): bool {
-    global $DB, $USER;
+function local_ocbsbcoursecreation_is_course_in_school($courseid): bool {
+    global $USER,
 
-    $sql = "SELECT cc.idnumber FROM {course_categories} cc
-            JOIN {course} c on c.category = cc.id
-                            WHERE c.id =:courseid";
-    $params = ['courseid' => $course];
+    $coursecategory = local_ocbsbcoursecreation_return_categoryitems($courseid);
 
-    $coursecategory = $DB->get_record_sql($sql, $params);
-    $schoolnumbers = isset($USER->profile_field_schoolno) ?: $USER->profile['schoolno'];
-    $profileschools = explode(',', $schoolnumbers);
+    while (!empty($coursecategory->parent) && $coursecategory->parent !== 0) {
+        $coursecategory = local_ocbsbcoursecreation_return_categoryitems_from_parent($coursecategory->parent);
+    }
+
+    $schoolnumbers = $USER->profile_field_schoolno ?? ($USER->profile['schoolno'] ?? '');
+
+    $profileschools = array_map('trim', explode(',', $schoolnumbers));
 
     foreach ($profileschools as $profileschool) {
-        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, trim($profileschool)) !== false) {
+        if (!empty($coursecategory->idnumber) && strpos($coursecategory->idnumber, $profileschool) !== false) {
             return true;
         }
     }
 
     return false;
+}
+
+/**
+ * Return Category items
+ *
+ * @param $courseid
+ * @return false|mixed
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_return_categoryitems($courseid): mixed {
+    global $DB;
+
+    $sql = "SELECT cc.idnumber, cc.parent
+              FROM {course_categories} cc
+              JOIN {course} c ON c.category = cc.id
+             WHERE c.id = :courseid";
+    $params = ['courseid' => $courseid];
+
+    return $DB->get_record_sql($sql, $params);
+}
+
+/**
+ * Return category items from parent category
+ *
+ * @param $categoryid
+ * @return false|mixed|stdClass
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_return_categoryitems_from_parent($categoryid): mixed {
+    global $DB;
+
+    return $DB->get_record("course_categories", ['id' => $categoryid]);
 }
