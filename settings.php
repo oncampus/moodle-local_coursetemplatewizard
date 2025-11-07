@@ -48,5 +48,13 @@ $settings->add(new admin_setting_configselect(
     $catoptions
 ));
 
+$settings->add(new admin_setting_configtext(
+    'local_ocbsbcoursecreation/serviceuserid',
+    get_string('settings_serviceuserid', $component),
+    get_string('settings_serviceuserid_desc', $component),
+    0,
+    PARAM_INT
+));
+
 // Seite einhängen.
 $ADMIN->add('localplugins', $settings);

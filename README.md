@@ -38,6 +38,7 @@ Wichtige Einstellungen:
 - **Vorlagen-Kategorie**: Standard-Kategorie für Kursvorlagen.
 - **Namenskonvention**: Verwendung von Prefix, Separator und Textfeldern.
 - **Voreinstellungen**: `use_default_course_naming`, `course_name_readonly`, `course_shortname_readonly`.
+- **Service-Nutzer**: Optionaler Nutzer (per ID), unter dessen Kontext die Backup/Restore-Prozesse laufen – ideal für ein eigenes „Systemkonto“, das keine Benachrichtigungen zustellt.
 - **Asynchroner Modus**: Optionale Aktivierung der Kurskopie über Cronjobs.
 - **Preset-Verwaltung**: Hinzufügen, Bearbeiten oder Löschen von Preset-Werten.
 

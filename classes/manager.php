@@ -100,9 +100,27 @@ class manager {
         // Sichtbarkeit mitgeben (einige Tasks übernehmen das Feld direkt).
         $mdata->visible   = $desiredvisible;
 
-        // Admin-ID für Backup/Restore.
-        $adminids = get_admins();
-        $adminid  = array_pop($adminids)->id;
+        // Service-Nutzer bestimmt, unter wessen ID Backup/Restore laufen (steuert auch Benachrichtigungen).
+        $serviceuserid = (int)get_config('local_ocbsbcoursecreation', 'serviceuserid');
+        $serviceuserrecord = null;
+        if ($serviceuserid > 0) {
+            $serviceuserrecord = $DB->get_record('user', ['id' => $serviceuserid, 'deleted' => 0], 'id', IGNORE_MISSING);
+        }
+        if ($serviceuserrecord) {
+            $copyuserid = (int)$serviceuserrecord->id;
+        } else {
+            $adminids = get_admins();
+            if (empty($adminids)) {
+                throw new moodle_exception(
+                    'error',
+                    'local_ocbsbcoursecreation',
+                    '',
+                    null,
+                    'No site admin available for backup execution'
+                );
+            }
+            $copyuserid = (int)reset($adminids)->id;
+        }
 
         // 1) Backup des Template-Kurses.
         $bc = new \backup_controller(
@@ -111,7 +129,7 @@ class manager {
             \backup::FORMAT_MOODLE,
             \backup::INTERACTIVE_NO,
             \backup::MODE_COPY,
-            $adminid,
+            $copyuserid,
             \backup::RELEASESESSION_YES
         );
         $copyids['backupid'] = $bc->get_backupid();
@@ -141,7 +159,7 @@ class manager {
             $newcourseid,
             \backup::INTERACTIVE_NO,
             \backup::MODE_COPY,
-            $adminid,
+            $copyuserid,
             \backup::TARGET_NEW_COURSE,
             null,
             \backup::RELEASESESSION_NO,
