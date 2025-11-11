@@ -159,8 +159,9 @@ if ($mform->is_cancelled()) {
 
     // Kopiervorgang ausführen (als Admin, aber QUELLE strikt auf erlaubte Kategorie begrenzt).
     $manager = new manager();
-    $newcourseid = $manager->replace_course_with_template($mdata, (int)$allowedcat->id);
-
+    $newcourseid = $manager->replace_course_with_template($mdata);
+    // Update courseid if Schuldock/IAM Kurs.
+    local_ocbsbcoursecreation_update_iamschool($mdata->targetcourseid, $newcourseid);
     redirect(new moodle_url('/course/view.php', ['id' => $newcourseid]));
 } else {
     if ($mform->is_submitted() && $currenttargetid) {

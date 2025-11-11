@@ -176,3 +176,21 @@ function local_ocbsbcoursecreation_return_categoryitems_from_parent($categoryid)
 
     return $DB->get_record("course_categories", ['id' => $categoryid]);
 }
+
+/**
+ * Update Record in iamexp table if record exists there
+ *
+ * @param $targetcourseid
+ * @param $newcourseid
+ * @return void
+ * @throws dml_exception
+ */
+function local_ocbsbcoursecreation_update_iamschool($targetcourseid, $newcourseid): void {
+    global $DB;
+
+    if ($DB->record_exists('local_oc_iamexp', ['type' => "COURSE", "lms_id" => $targetcourseid])) {
+        $record = $DB->get_record("local_oc_iamexp", ['type' => "COURSE", "lms_id" => $targetcourseid]);
+        $record->lms_id = $newcourseid;
+        $DB->update_record('local_oc_iamexp', $record);
+    }
+}
