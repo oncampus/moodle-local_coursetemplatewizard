@@ -156,12 +156,16 @@ if ($mform->is_cancelled()) {
             $mdata->hasoverview = true;
         }
     }
+    // IAM Infos holen.
+    $iamschool = local_ocbsbcoursecreation_get_iamschool($mdata->targetcourseid);
 
     // Kopiervorgang ausführen (als Admin, aber QUELLE strikt auf erlaubte Kategorie begrenzt).
     $manager = new manager();
     $newcourseid = $manager->replace_course_with_template($mdata);
+
     // Update courseid if Schuldock/IAM Kurs.
-    local_ocbsbcoursecreation_update_iamschool($mdata->targetcourseid, $newcourseid);
+    local_ocbsbcoursecreation_update_iamschool($iamschool, $newcourseid);
+
     redirect(new moodle_url('/course/view.php', ['id' => $newcourseid]));
 } else {
     if ($mform->is_submitted() && $currenttargetid) {
