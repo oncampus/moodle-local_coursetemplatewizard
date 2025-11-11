@@ -206,6 +206,6 @@ function local_ocbsbcoursecreation_update_iamschool($iamschool, $newcourseid): v
 
     if ($iamschool) {
         $iamschool->lms_id = $newcourseid;
-        $DB->update_record('local_oc_iamexp', $iamschool);
+        $DB->insert_record('local_oc_iamexp', $iamschool);
     }
 }
