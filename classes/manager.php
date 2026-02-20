@@ -184,7 +184,6 @@ class manager {
             'headingident' => 'copy',
         ]);
 
-
         // 3b) Restore-Task synchron ausführen (wie im bestehenden Code).
         $asynctask = new \core\task\asynchronous_copy_task();
         $asynctask->set_blocking(false);
