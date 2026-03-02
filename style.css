@@ -1,32 +1,32 @@
-html[lang="en"] .path-local-ocbsbcoursecreation *[lang] {
+html[lang="en"] .path-local-coursetemplatewizard *[lang] {
     display: none;
 }
 
-html[lang="en"] .path-local-ocbsbcoursecreation *[lang="en"] {
+html[lang="en"] .path-local-coursetemplatewizard *[lang="en"] {
     display: block;
 }
 
-html[lang="de"] .path-local-ocbsbcoursecreation *[lang] {
+html[lang="de"] .path-local-coursetemplatewizard *[lang] {
     display: none;
 }
 
-html[lang="de"] .path-local-ocbsbcoursecreation *[lang="de"] {
+html[lang="de"] .path-local-coursetemplatewizard *[lang="de"] {
     display: block;
 }
 
-html[lang="fr"] .path-local-ocbsbcoursecreation *[lang] {
+html[lang="fr"] .path-local-coursetemplatewizard *[lang] {
     display: none;
 }
 
-html[lang="fr"] .path-local-ocbsbcoursecreation *[lang="fr"] {
+html[lang="fr"] .path-local-coursetemplatewizard *[lang="fr"] {
     display: block;
 }
 
-html[lang="us"] .path-local-ocbsbcoursecreation *[lang] {
+html[lang="us"] .path-local-coursetemplatewizard *[lang] {
     display: none;
 }
 
-html[lang="us"] .path-local-ocbsbcoursecreation *[lang="us"] {
+html[lang="us"] .path-local-coursetemplatewizard *[lang="us"] {
     display: block;
 }
 

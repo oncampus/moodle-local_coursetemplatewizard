@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * List courses to copy (Kursvorlagenübersicht)
+ * List courses to copy (course template overview)
  *
- * @package     local_ocbsbcoursecreation
+ * @package     local_coursetemplatewizard
  * @copyright   2025 Oncampus GmbH
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
@@ -27,137 +27,109 @@
 require('../../config.php');
 require_once($CFG->dirroot . '/course/classes/category.php');
 
-use local_ocbsbcoursecreation\manager;
+use local_coursetemplatewizard\template_utilization_manager;
 use core_course\external\course_summary_exporter;
 
 require_login();
 
-// Vorlagen-Kategorie aus Plugin-Settings robust ermitteln (ID bevorzugt, sonst Name).
+// Determining the template category by id.
 $category = null;
-
-// This setting is named "categoryid" in your admin settings.
-$raw = get_config('local_ocbsbcoursecreation', 'categoryid');
+$raw = get_config('local_coursetemplatewizard', 'templatecoursecategoryid');
 $setcoursecategory = trim((string)$raw);
-
 if ($setcoursecategory !== '') {
     // The setting created by a category select stores a numeric category ID.
     $id = (int)$setcoursecategory;
     if ($id > 0) {
-        try {
-            $category = \core_course_category::get($id, IGNORE_MISSING, true);
-        } catch (\Throwable $e) {
-            $category = null;
-        }
-    }
-
-    // Optional fallbacks if you ever switch to storing text.
-    if ($category === null) {
-        // Try by idnumber.
-        $byidnumber = \core_course_category::get_by_idnumber($setcoursecategory, IGNORE_MISSING);
-        if ($byidnumber) {
-            $category = $byidnumber;
-        }
-    }
-    if ($category === null) {
-        // Try exact name match (be mindful of duplicates/translations).
-        foreach (\core_course_category::get_all(['returnhidden' => true]) as $item) {
-            if (trim($item->name) === $setcoursecategory) {
-                $category = $item;
-                break;
-            }
-        }
+        $category = \core_course_category::get($id, IGNORE_MISSING, true);
     }
 }
-
+$targetcourseid = required_param('targetcourseid', PARAM_INT);
 if ($category === null) {
-    redirect(new moodle_url('/admin/search.php'), 'Selected template category missing or misconfigured.', 1);
+    $redirecturl = new moodle_url('/course/view.php', ['id' => $targetcourseid]);
+    redirect($redirecturl, 'Selected template category missing or misconfigured.', 1);
 }
 
+$templatetargetcourseexceptionsconfig = get_config('local_coursetemplatewizard', 'templatetargetcourseexceptions');
+$templatetargetcourseexceptions = explode(',', $templatetargetcourseexceptionsconfig);
+if (in_array($targetcourseid, $templatetargetcourseexceptions, true)) {
+    return;
+}
 
-// Zugriffsprüfung: Zielkurs- oder Kategorienkontext (NICHT Systemkontext).
+// Access check: target course or category.
 $systemcontext = context_system::instance();
-
-$targetcourseid = optional_param('targetcourseid', 0, PARAM_INT);
 $targetctx = $targetcourseid ? context_course::instance($targetcourseid) : null;
 $templatecatctx = context_coursecat::instance($category->id);
 
-// Erlaubt: Nutzer darf (a) Zielkurs bearbeiten ODER (b) in der Vorlagenkategorie Kurse anlegen (falls Neuanlage genutzt wird).
+// The page is shown, if the user is able to
+// edit the target course
+// and has the capability to use templates to overwrite existing courses.
 $canupdate = $targetctx ? has_capability('moodle/course:update', $targetctx) : false;
-$cancreate = has_capability('moodle/course:create', $templatecatctx);
-
-if (!$canupdate && !$cancreate) {
-    if ($targetctx) {
-        throw new required_capability_exception($targetctx, 'moodle/course:update', 'nopermissions', '');
-    } else {
-        throw new required_capability_exception($templatecatctx, 'moodle/course:create', 'nopermissions', '');
-    }
+if (!$canupdate) {
+    throw new required_capability_exception($targetctx, 'moodle/course:update', 'nopermissions', '');
+}
+if (!has_capability('local/coursetemplatewizard:use', $targetctx)) {
+    throw new required_capability_exception(
+        $targetctx,
+        'local/coursetemplatewizard:use',
+        'nopermissions',
+        ''
+    );
 }
 
-// Seiteneinstellungen.
-$PAGE->set_url(new moodle_url('/local/ocbsbcoursecreation/list_courses_to_copy.php', [
+// Site configuration.
+$PAGE->set_url(new moodle_url('/local/coursetemplatewizard/list_courses_to_copy.php', [
     'targetcourseid' => $targetcourseid,
 ]));
 $PAGE->set_context($systemcontext);
-$PAGE->set_title(get_string('creation_page_title', 'local_ocbsbcoursecreation'));
+$PAGE->set_title(get_string('creation_page_title', 'local_coursetemplatewizard'));
 $PAGE->set_heading(get_site()->fullname);
 $PAGE->set_pagelayout('standard');
 
-$manager = new manager();
-
-
-// Vorlagenkurse laden – auch wenn verborgen (direkt aus DB).
+// Reading course templates – hidden templates included.
 global $DB;
-
-$courseids = array_keys($DB->get_records('course', ['category' => $category->id], 'sortorder', 'id'));
+$coursetemplates = $DB->get_records('course', ['category' => $category->id], 'sortorder');
 $courses   = [];
-$i         = 0;
-
-foreach ($courseids as $courseid) {
-    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+foreach ($coursetemplates as $course) {
     $course->fullname = format_text($course->fullname);
 
-    // Kursbild.
-    $img = html_writer::img(
+    $courseimage = html_writer::img(
         course_summary_exporter::get_course_image($course),
         "",
         ["width" => "100%", 'style' => "max-width: 350px;"]
     );
-
-    // Zusammenfassung kürzen.
-    $summary = format_text($manager->get_course_summary((int)$courseid));
+    // Trimming summary for course description.
+    $manager = new template_utilization_manager();
+    $summary = format_text($manager->get_course_summary((int)$course->id));
     $offset  = 500;
     $end     = '</p>';
     if (strlen($summary) > $offset && strpos($summary, $end, $offset)) {
-        $result = substr($summary, 0, strlen($end) + (strpos($summary, $end, $offset)));
+        $coursedescription = substr($summary, 0, strlen($end) + (strpos($summary, $end, $offset)));
     } else {
-        $result = $summary;
+        $coursedescription = $summary;
     }
 
-    $courses[$i] = (object)[
-        'id'          => $courseid,
+    $courses[] = (object)[
+        'id'          => $course->id,
         'fullname'    => $course->fullname,
-        'img'         => $img,
-        'desc'        => $result,
-        'course_url'  => new moodle_url('/course/view.php', ['id' => $courseid]),
+        'img'         => $courseimage,
+        'desc'        => $coursedescription,
+        'course_url'  => new moodle_url('/course/view.php', ['id' => $course->id]),
         'copy_url'    => (new moodle_url(
-            '/local/ocbsbcoursecreation/handle_copy_form.php',
-            ['templateid' => $courseid, 'targetcourseid' => $targetcourseid]
+            '/local/coursetemplatewizard/handle_copy_form.php',
+            ['templateid' => $course->id, 'targetcourseid' => $targetcourseid]
         ))->out(false),
     ];
-
-    $i++;
 }
 
-$boolcoursesincat = !empty($courseids);
-
+$boolcoursesincat = !empty($coursetemplates);
 $templatecontext = (object)[
     'courses'            => $courses,
     'courseCategoryName' => $category->name,
     'coursesInCat'       => $boolcoursesincat,
 ];
 
-$PAGE->requires->js_call_amd('local_ocbsbcoursecreation/imagepicker', 'init');
+$PAGE->requires->js_call_amd('local_coursetemplatewizard/imagepicker', 'init');
 
 echo $OUTPUT->header();
-echo $OUTPUT->render_from_template('local_ocbsbcoursecreation/course_list_view', $templatecontext);
+echo $OUTPUT->render_from_template('local_coursetemplatewizard/course_list_view', $templatecontext);
 echo $OUTPUT->footer();

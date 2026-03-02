@@ -17,7 +17,7 @@
 /**
  * creates special access for users
  *
- * @package    local_ocbsbcoursecreation
+ * @package    local_coursetemplatewizard
  * @copyright   2025 Oncampus GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,28 +25,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-        'local/ocbsbcoursecreation:handle_presets'                       => [
+        'local/coursetemplatewizard:use' => [
                 'captype'      => 'write',
-                'contextlevel' => CONTEXT_SYSTEM,
+                'contextlevel' => CONTEXT_COURSE,
+                'riskbitmask'  => RISK_DATALOSS,
                 'archetypes'   => [
-                        'manager'       => CAP_ALLOW,
-                        'coursecreator' => CAP_PREVENT,
-                ],
-        ],
-        'local/ocbsbcoursecreation:course_cat_copy_cap'                  => [
-                'captype'      => 'write',
-                'contextlevel' => CONTEXT_COURSECAT,
-                'archetypes'   => [
-                        'manager'       => CAP_ALLOW,
-                        'coursecreator' => CAP_ALLOW,
-                ],
-        ],
-        'local/ocbsbcoursecreation:ocbsbcoursecreation_access_capability' => [
-                'captype'      => 'write',
-                'contextlevel' => CONTEXT_SYSTEM,
-                'archetypes'   => [
-                        'manager'       => CAP_ALLOW,
-                        'coursecreator' => CAP_ALLOW,
+                    'manager'       => CAP_ALLOW,
+                    'editingteacher' => CAP_ALLOW,
                 ],
         ],
 ];

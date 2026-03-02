@@ -17,15 +17,15 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     local_ocbsbcoursecreation
+ * @package     local_coursetemplatewizard
  * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ocbsbcoursecreation';
-$plugin->release   = '1.2.0';
-$plugin->version   = 2025091800;
+$plugin->component = 'local_coursetemplatewizard';
+$plugin->release   = '1.3.0';
+$plugin->version   = 2026012000;
 $plugin->requires  = 2020061511;
 $plugin->maturity  = MATURITY_STABLE;

@@ -1,4 +1,4 @@
-// local/ocbsbcoursecreation/amd/src/imagepicker.js
+// local/coursetemplatewizard/amd/src/imagepicker.js
 
 /**
  * Image zoom/picker modal for course list.
@@ -6,7 +6,7 @@
  * Initialisiert Klick-Handler auf Bildern und öffnet ein Modal
  * zum Vergrößern bzw. (später) Auswählen.
  *
- * @module     local_ocbsbcoursecreation/imagepicker
+ * @module     local_coursetemplatewizard/imagepicker
  * @copyright  2025 oncampus
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

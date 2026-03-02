@@ -17,12 +17,12 @@
 /**
  * copy form
  *
- * @package    local_ocbsbcoursecreation
+ * @package    local_coursetemplatewizard
  * @copyright   2025 Oncampus GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_ocbsbcoursecreation\form;
+namespace local_coursetemplatewizard\form;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,66 +30,57 @@ require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
-use local_ocbsbcoursecreation\manager;
+use moodle_exception;
 
 /**
  * modified_copy_form
  */
-class modified_copy_form extends \moodleform {
+class template_utilization_form extends \moodleform {
     /**
      * definition
      */
     public function definition() {
-        global $PAGE;
-
-        $manager        = new manager();
-        $mform          = $this->_form;
-        // Kurse, in denen der/die Nutzer:in Trainer ist.
-        $courses        = $this->_customdata['courses'];
-        // Für Overviewfiles-Optionen.
-        $course         = $this->_customdata['course'] ?? null;
-        $fixedtargetid  = (int)($this->_customdata['fixedtargetid'] ?? 0);
-        $lockonload     = !empty($this->_customdata['locktarget_on_load']);
-
-        // Zielkurs-Auswahl oder gelockte Anzeige.
-        if ($lockonload && $fixedtargetid && isset($courses[$fixedtargetid])) {
-            // Anzeige fixiert (aus Navigation übergeben).
-            $mform->addElement(
-                'static',
-                'targetcourseid_label',
-                get_string('select_target_course', 'local_ocbsbcoursecreation'),
-                format_string($courses[$fixedtargetid])
+        $mform = $this->_form;
+        $templatecourse = $this->_customdata['templatecourse'];
+        $targetcourse = $this->_customdata['targetcourse'];
+        if (!$templatecourse) {
+            throw new moodle_exception(
+                'error',
+                'local_coursetemplatewizard',
+                '',
+                null,
+                'Target course not found.'
             );
-            $mform->addElement('hidden', 'targetcourseid', $fixedtargetid);
-            $mform->setType('targetcourseid', PARAM_INT);
-        } else {
-            // Normale Auswahl (auch bei POST-Resubmits nach Validation-Fehlern).
-            $mform->addElement(
-                'select',
-                'targetcourseid',
-                get_string('select_target_course', 'local_ocbsbcoursecreation'),
-                $courses
-            );
-            $mform->addRule('targetcourseid', get_string('required'), 'required');
-            $mform->setType('targetcourseid', PARAM_INT);
-
-            // Falls aus GET ein Vorschlag kam, als Default setzen (nicht locken).
-            if ($fixedtargetid && isset($courses[$fixedtargetid])) {
-                $mform->setDefault('targetcourseid', $fixedtargetid);
-            }
         }
+        if (!$targetcourse) {
+            throw new moodle_exception(
+                'error',
+                'local_coursetemplatewizard',
+                '',
+                null,
+                'Target course not found.'
+            );
+        }
+        $mform->addElement(
+            'static',
+            'targetcourseid_label',
+            get_string('select_target_course', 'local_coursetemplatewizard'),
+            format_string($targetcourse->fullname)
+        );
+        $mform->addElement('hidden', 'targetcourseid', $targetcourse->id);
+        $mform->setType('targetcourseid', PARAM_INT);
 
         // Kursbild.
         $summaryfields = 'summary_editor';
-        if ($overviewfilesoptions = course_overviewfiles_options($course)) {
+        if ($overviewfilesoptions = course_overviewfiles_options($templatecourse)) {
             $mform->addElement(
                 'html',
-                '<h3 class="qheader">' . get_string('form_copy_header', 'local_ocbsbcoursecreation') . '</h3>'
+                '<h3 class="qheader">' . get_string('form_copy_header', 'local_coursetemplatewizard') . '</h3>'
             );
             $mform->addElement(
                 'filemanager',
                 'overviewfiles_filemanager',
-                get_string('form_copy_image_desc', 'local_ocbsbcoursecreation'),
+                get_string('form_copy_image_desc', 'local_coursetemplatewizard'),
                 null,
                 $overviewfilesoptions
             );
@@ -108,7 +99,7 @@ class modified_copy_form extends \moodleform {
         $mform->addElement(
             'html',
             '<div class="alert alert-danger" role="alert" style="margin-top:12px;">' .
-                get_string('confirm_overwrite_note', 'local_ocbsbcoursecreation') .
+                get_string('confirm_overwrite_note', 'local_coursetemplatewizard') .
             '</div>'
         );
 
@@ -117,7 +108,7 @@ class modified_copy_form extends \moodleform {
             'advcheckbox',
             'confirmoverwrite',
             '',
-            get_string('confirm_overwrite_checkbox', 'local_ocbsbcoursecreation'),
+            get_string('confirm_overwrite_checkbox', 'local_coursetemplatewizard'),
             ['group' => 1],
             [0, 1]
         );
@@ -125,7 +116,7 @@ class modified_copy_form extends \moodleform {
         // Hinweis: addRule('required') ist bei Checkboxen unzuverlässig -> serverseitige validation().
 
         // Buttons.
-        $this->add_action_buttons(true, get_string('apply_template', 'local_ocbsbcoursecreation'));
+        $this->add_action_buttons(true, get_string('apply_template', 'local_coursetemplatewizard'));
     }
 
     /**
@@ -138,7 +129,7 @@ class modified_copy_form extends \moodleform {
             $errors['targetcourseid'] = get_string('required');
         }
         if (empty($data['confirmoverwrite'])) {
-            $errors['confirmoverwrite'] = get_string('confirm_overwrite_required', 'local_ocbsbcoursecreation');
+            $errors['confirmoverwrite'] = get_string('confirm_overwrite_required', 'local_coursetemplatewizard');
         }
 
         return $errors;
