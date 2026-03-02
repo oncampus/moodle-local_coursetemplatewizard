@@ -17,7 +17,7 @@
 /**
  * Plugin administration settings.
  *
- * @package    local_ocbsbcoursecreation
+ * @package    local_coursetemplatewizard
  * @copyright   2025 Oncampus GmbH
  * @category   admin
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,7 +30,7 @@ if (!$hassiteconfig) {
     return;
 }
 
-$component = 'local_ocbsbcoursecreation';
+$component = 'local_coursetemplatewizard';
 $settings  = new admin_settingpage($component, get_string('pluginname', $component));
 
 // Kategorien-Auswahl: existierenden Kursbereich wählen (ID-basiert, voller Pfad).
@@ -41,7 +41,7 @@ foreach ($catlist as $id => $path) {
 }
 
 $settings->add(new admin_setting_configselect(
-    'local_ocbsbcoursecreation/categoryid',
+    'local_coursetemplatewizard/templatecoursecategoryid',
     get_string('settings_choose_course', $component),
     get_string('template_course_desc', $component),
     0,
@@ -49,11 +49,19 @@ $settings->add(new admin_setting_configselect(
 ));
 
 $settings->add(new admin_setting_configtext(
-    'local_ocbsbcoursecreation/serviceuserid',
+    'local_coursetemplatewizard/serviceuserid',
     get_string('settings_serviceuserid', $component),
     get_string('settings_serviceuserid_desc', $component),
     0,
     PARAM_INT
+));
+
+$settings->add(new admin_setting_configtext(
+    'local_coursetemplatewizard/templatetargetcourseexceptions',
+    get_string('settings:templatetargetcourseexceptions', 'local_coursetemplatewizard'),
+    get_string('settings:templatetargetcourseexceptions_desc', 'local_coursetemplatewizard'),
+    '',
+    PARAM_SEQUENCE
 ));
 
 // Seite einhängen.

@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     local_ocbsbcoursecreation
+ * @package     local_coursetemplatewizard
  * @copyright   2025 Oncampus GmbH
  * @category    string
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -35,12 +35,17 @@ $string['confirm_overwrite_title'] = 'Kurs überschreiben';
 $string['confirm_overwrite_yes'] = 'Ja, überschreiben';
 $string['course_format'] = 'Kursbereich';
 $string['coursesummary'] = 'Kursbeschreibung';
+$string['coursetemplateserviceuser_firstname'] = 'Vorlagenkurse';
+$string['coursetemplateserviceuser_lastname'] = 'Service user';
+$string['coursetemplateserviceuserrole_desc'] = 'Ein Service User für Vorlagenkurse ist ein interner User, der den Backup- und Restore-Prozess durchführt und auf den Zielkurs anwendet.';
+$string['coursetemplateserviceuserrole_name'] = 'Vorlagenkurse Service User';
+$string['coursetemplatewizard:use'] = 'Zugriff auf Kursvorlagen und Überschreiben von Kursen';
 $string['creation_page_title'] = 'Vorlagen-Assistent';
-$string['errorcoursenotinschool'] = 'Dieser Kurs kann nicht als Zielkurs für den Vorlagen-Assistent ausgewählt werden. Wählen Sie bitte einen Kurs aus ihrem Schulbereich.';
+$string['errornocourseoverwriterights'] = 'Sie haben nicht die Berechtigung, diesen Kurs mit einer Kursvorlage zu überschreiben.';
 $string['errornotteacherincourse'] = 'Sie sind nicht in diesem Kurs eingeschrieben, deswegen können Sie den Vorlagen-Assistent nicht für diesen Kurs nutzen.';
 $string['form_copy_course_name_header'] = 'Kursdaten';
 $string['form_copy_description'] = 'Wählen Sie den Zielkurs, der mit der Vorlage überschrieben wird.';
-$string['form_copy_header'] = 'Kursbild und Kursnamen auswählen';
+$string['form_copy_header'] = 'Kursbild auswählen';
 $string['form_copy_image_desc'] = 'Wählen Sie ein Kursbild aus oder laden Sie ein eigenes Bild für den Zielkurs hoch.';
 $string['form_copy_select_default'] = 'Zielkurs auswählen';
 $string['fullnamecourse'] = 'Vollständiger Kursname';
@@ -48,9 +53,10 @@ $string['headline_table_view'] = 'Vorlagen-Assistent';
 $string['info_no_courses'] = 'Es wurde kein Kurs in der ausgewählten Kursvorlagen-Kategorie gefunden.';
 $string['missingfullname'] = 'Bitte geben Sie einen vollständigen Kursnamen ein.';
 $string['missingshortname'] = 'Bitte geben Sie einen kurzen Kursnamen ein.';
-$string['ocbsbcoursecreation:ocbsbcoursecreation_access_capability'] = 'Zugriff auf Kursvorlagen und Kopierfunktion';
-$string['pluginname'] = 'Vorlagen-Assistent';
+$string['pluginname'] = 'Vorlagenkurs-Assistent';
 $string['select_target_course'] = 'Zielkurs';
+$string['settings:templatetargetcourseexceptions'] = 'Vorlagenziel-Ausnahmen';
+$string['settings:templatetargetcourseexceptions_desc'] = 'Kommagetrennte Id\'s von Kursen, die nicht durch eine Kursvorlage überschrieben werden können.';
 $string['settings_choose_course'] = 'Vorlagen-Kursbereich auswählen';
 $string['settings_create_course'] = 'Kurs aus Vorlage erstellen';
 $string['settings_serviceuserid'] = 'Service-Nutzer-ID';
@@ -62,3 +68,5 @@ $string['table_head_coursetext'] = 'Beschreibung';
 $string['table_head_edit'] = 'Diese Vorlage verwenden';
 $string['template_applied'] = 'Die Vorlage wurde erfolgreich auf den Zielkurs angewendet.';
 $string['template_course_desc'] = 'Wählen Sie den Kursbereich, in dem sich die Kursvorlagen befinden.';
+$string['template_restore_page_no_data'] = 'Die Daten für den Überschreibungsvorgang konnten nicht gefunden werden. Dies kann passieren, wenn Sie eine Seite neu laden. Bitte senden Sie diese Daten erneut.';
+$string['template_restore_page_title'] = 'Überschreibe Kurs mit Kursvorlage.';

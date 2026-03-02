@@ -14,27 +14,44 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Deinstall the plugin and the plugin settings
- * Won't deinstall course category to ensure course templates are sustained
+ * Uninstall the plugin and the plugin settings
+ * Won't remove course category to ensure course templates are sustained
  *
- * @package     local_ocbsbcoursecreation
+ * @package     local_coursetemplatewizard
  * @category    admin
  * @copyright   2025 Oncampus GmbH
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once($CFG->dirroot . '/user/lib.php');
+
 /**
- * Uninstall hook: remove plugin settings only.
+ * Uninstall hook: remove plugin settings and dedicated service user (including role) only.
  * Do NOT delete any course categories or courses.
  *
  * @return bool
+ * @throws coding_exception
+ * @throws dml_exception
+ * @package local_coursetemplatewizard
  */
-function xmldb_local_ocbsbcoursecreation_uninstall(): bool {
+function xmldb_local_coursetemplatewizard_uninstall(): bool {
     global $DB;
 
-    // Entfernt alle Einträge dieses Plugins aus config_plugins.
-    $DB->delete_records('config_plugins', ['plugin' => 'local_ocbsbcoursecreation']);
+    // Deletes all configurations of this plugin from config_plugins.
+    $DB->delete_records('config_plugins', ['plugin' => 'local_coursetemplatewizard']);
+
+    // Deletes the dedicated service user and the service user role for this plugin.
+    $templatewizardserviceuser = $DB->get_record('user', ['username' => 'coursetemplateserviceuser']);
+    if ($templatewizardserviceuser) {
+        delete_user($templatewizardserviceuser);
+    }
+    $templatewizardserviceuserrole = $DB->get_record('role', ['shortname' => 'coursetemplateserviceuser']);
+    if ($templatewizardserviceuserrole) {
+        delete_role($templatewizardserviceuserrole->id);
+    }
 
     // Falls ihr eigene Tabellen habt, könnt ihr sie hier per xmldb definieren
     // und über install.xml verwalten – dann braucht es kein manuelles DROP.

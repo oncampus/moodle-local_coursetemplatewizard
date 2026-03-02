@@ -14,22 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Install script: creates (if needed) a default hidden course category
- * and stores its ID in plugin config.
- *
- * @package    local_ocbsbcoursecreation
- * @category   admin
- * @copyright   2025 Oncampus GmbH
- * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+use local_coursetemplatewizard\service_user_creation_handler;
 
 /**
- * Install hook (no-op): do not create any course category.
+ * Install hook: creates a dedicated service user and role for handling backup and restore functionality.
  *
  * @return void
+ * @throws dml_exception
+ * @throws moodle_exception
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_coursetemplatewizard
+ * @category   admin
+ * @copyright   2025 Oncampus GmbH
  */
-function xmldb_local_ocbsbcoursecreation_install(): void {
-    // Intentionally empty. We no longer auto-create a category.
-    // Admin chooses an existing category in the plugin settings.
+function xmldb_local_coursetemplatewizard_install(): void {
+    $serviceusercreationhandler = new service_user_creation_handler();
+    $serviceusercreationhandler->create_service_user_with_role_and_capabilities();
 }
