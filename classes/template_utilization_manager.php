@@ -29,7 +29,6 @@ use restore_controller;
 use restore_controller_exception;
 use restore_dbops;
 use stdClass;
-use stored_file;
 
 /**
  * Manager class for handling course template copy logic.
@@ -192,6 +191,13 @@ class template_utilization_manager {
         $rc->save_controller();
 
         $this->render_overwrite_process($templateid, $targetcoursecontext, $copyids['restoreid']);
+
+        // Keep the target course format identical to the selected template (e.g. tiles, not topics).
+        $templateformat = course_get_format($templateid)->get_format();
+        $coursedata = new stdClass();
+        $coursedata->id = $targetcourseid;
+        $coursedata->format = $templateformat;
+        update_course($coursedata);
 
         // 2a) Executing Restore-Task.
         $asynctask = new asynchronous_copy_task();
