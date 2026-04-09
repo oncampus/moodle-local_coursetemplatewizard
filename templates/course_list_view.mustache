@@ -1,8 +1,49 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_coursetemplatwizard/course_list_view
+
+    Template to display the list of usable course templates from the dedicated course template category.
+
+    Context variables required for this template:
+    * courses - The course templates to display
+    * courseCategoryName - The name of the course category for template courses
+    * coursesInCat - A bool, identifying the list of course templates as empty
+
+    Example context (json):
+    {
+        'courses' : [
+            {
+                    "id" : 1234,
+                    "fullname" : "Course template",
+                    "img" : "<img src="https://example.com/pluginfile.php/12345/course/overviewfiles/example.png">",
+                    "desc" : "Course template description",
+                    "course_url" : "https://example.com/course/view.php?id=123456",
+                    "copy_url" : "https://example.com/local/coursetemplatewizard/handle_copy_form.php?templateid=123456&targetcourseid=123",
+            }
+        ],
+        'courseCategoryName' : 'Course templates',
+        'coursesInCat' : true,
+    }
+}}
 <div class="container-fluid">
     <div>
+        <h2>{{#str}} headline_table_view, local_coursetemplatewizard {{/str}}</h2>
         <table class="table table-striped" id="course-table">
-
-            <h2>{{#str}} headline_table_view, local_coursetemplatewizard {{/str}}</h2>
             <thead class="table-head-courslist">
             <tr>
                 <th class="th-sm col-2">{{#str}} table_head_coursename, local_coursetemplatewizard {{/str}}</th>
