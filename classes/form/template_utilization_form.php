@@ -30,6 +30,7 @@ require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
+use coding_exception;
 use moodle_exception;
 
 /**
@@ -103,7 +104,7 @@ class template_utilization_form extends \moodleform {
             '</div>'
         );
 
-        // Pflicht-Checkbox.
+        // Confirmation checkbox
         $mform->addElement(
             'advcheckbox',
             'confirmoverwrite',
@@ -113,7 +114,6 @@ class template_utilization_form extends \moodleform {
             [0, 1]
         );
         $mform->setType('confirmoverwrite', PARAM_BOOL);
-        // Hinweis: addRule('required') ist bei Checkboxen unzuverlässig -> serverseitige validation().
 
         // Buttons.
         $this->add_action_buttons(true, get_string('apply_template', 'local_coursetemplatewizard'));
@@ -121,8 +121,13 @@ class template_utilization_form extends \moodleform {
 
     /**
      * validation
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
      */
-    public function validation($data, $files) {
+    public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
 
         if (empty($data['targetcourseid'])) {
