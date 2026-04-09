@@ -104,7 +104,7 @@ class template_utilization_form extends \moodleform {
             '</div>'
         );
 
-        // Confirmation checkbox
+        // Confirmation checkbox.
         $mform->addElement(
             'advcheckbox',
             'confirmoverwrite',
