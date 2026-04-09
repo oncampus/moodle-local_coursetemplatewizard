@@ -1,10 +1,7 @@
-// local/coursetemplatewizard/amd/src/imagepicker.js
-
 /**
  * Image zoom/picker modal for course list.
  *
- * Initialisiert Klick-Handler auf Bildern und öffnet ein Modal
- * zum Vergrößern bzw. (später) Auswählen.
+ * Initialisiert Klick-Handler auf Bildern und öffnet ein Modal zum Vergrößern bzw. (später) Auswählen.
  *
  * @module     local_coursetemplatewizard/imagepicker
  * @copyright  2025 oncampus
@@ -71,9 +68,9 @@ define([], function() {
 
     /**
      * Initialisiert das Modul:
-     * - setzt Cursor auf zoomable Images
-     * - öffnet Modal bei Klick
-     * - registriert Close-Handler (Button, Overlay)
+     * - Setzt Cursor auf zoomable Images
+     * - Öffnet Modal bei Klick
+     * - Registriert Close-Handler (Button, Overlay)
      *
      * @returns {void}
      */
