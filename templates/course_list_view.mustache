@@ -30,14 +30,15 @@
         {
           "id" : 1234,
           "fullname" : "Course template",
-          "img" : "<img src='https://example.com/pluginfile.php/12345/course/overviewfiles/example.png'>",
+          "img" : "<img src='https://example.com/pluginfile.php/12345/course/overviewfiles/example.png' alt=''>",
           "desc" : "Course template description",
           "course_url" : "https://example.com/course/view.php?id=123456",
           "copy_url" : "https://example.com/local/coursetemplatewizard/handle_copy_form.php?templateid=123456&targetcourseid=123"
         }
       ],
       "courseCategoryName" : "Course templates",
-      "coursesInCat" : true
+      "coursesInCat" : true,
+      "modalimage" : "https://example.com/pluginfile.php/12345/course/overviewfiles/example.png"
     }
 }}
 <div class="container-fluid">
@@ -79,7 +80,7 @@
         <!--Image Zoom Modal-->
         <div id="imageModal" class="image-modal" aria-hidden="true" role="dialog">
             <span class="image-modal-close">&times;</span>
-            <img class="image-modal-content" id="modalImage" alt="">
+            <img class="image-modal-content" id="modalImage" src="{{modalimage}}" alt="">
         </div>
     </div>
 
