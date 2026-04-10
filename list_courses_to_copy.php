@@ -126,6 +126,7 @@ $templatecontext = (object)[
     'courses'            => $courses,
     'courseCategoryName' => $category->name,
     'coursesInCat'       => $boolcoursesincat,
+    'modalimage'         => $OUTPUT->image_url('tiny', 'local_coursetemplatewizard')->out(),
 ];
 
 $PAGE->requires->js_call_amd('local_coursetemplatewizard/imagepicker', 'init');
