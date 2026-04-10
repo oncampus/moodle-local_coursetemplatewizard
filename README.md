@@ -1,58 +1,59 @@
-# Local Plugin coursetemplatewizard (Vorlagenkurs-Assistent)
+# Course Template Wizard
 
-**Local coursetemplatewizard** ist ein **lokales Plugin** für Moodle, welches die Nutzung und Verwaltung von Kursvorlagen vereinfacht. 
-Kursersteller*innen und Lehrkräfte können damit Kursvorlagen auswählen und in ihren eigenen Kursbereich kopieren, um schneller standardisierte Kurse zu erstellen.
+**Course Template Wizard** is a local plugin for Moodle that simplifies the use and management of course templates.
+Course creators and teachers can use it to select course templates and copy them into their own course category,
+allowing them to create standardized courses more quickly.
 
 ## Features
 
-- **Kursvorlagenverwaltung**: Verwalten von Vorlagenkursen in einem konfigurierten Kursbereich.
-- **Kursüberschreibung**: Überschreiben von Kursen durch Kursvorlagen in beliebigen Kategorien.
-- **Rollen- und Zugriffssteuerung**: Berechtigungen für Manager und Kursersteller*in.
+- **Course template management**: Managing of course templates in a configured course category
+- **Apply course templates**: Using course templates to overwrite courses in any course category
 
 ## Installation
 
-1. Kopiere das Plugin in das Verzeichnis:  
-   ```bash
-   /local/coursetemplatewizard
-   ```
+1. Copy the contents of this directory to `{your/moodle/dirroot}/local/coursetemplatewizard`.
+2. Go to **Site Administration → Notifications** to initiate or execute the installation via `php admin/cli/upgrade.php`.
 
-2. Starte die Installation über:  
-   **Website-Administration → Mitteilungen**  
-   oder führe den CLI-Upgrade aus:  
-   ```bash
-   php admin/cli/upgrade.php
-   ```
+### Requirements
+- Moodle version: `2024100700` or higher.
 
-### Voraussetzungen
-- Moodle-Version: `2020061511` oder höher.
+## Configuration
 
-## Konfiguration
+Once installed, the plugin can be configured via the following page:  
+**Site Administration → Plugins → Local plugins → Course Template Wizard**
 
-Nach der Installation ist das Plugin über folgende Seite konfigurierbar:  
-**Website-Administration → Plugins → Lokale Plugins → Vorlagenkurs-Assistent**
+Before using the plugin, the following settings must be set:
+- **Template course category**: The course category containing all course templates.
+- **Template target exceptions**: Courses (Specified by comma-separated IDs) that can't be overwritten by course templates.
 
-Wichtige Einstellungen:
-- **Vorlagen-Kategorie**: Standard-Kategorie für Kursvorlagen.
-- **Service-Nutzer**: Nutzer (per ID), unter dessen Kontext die Backup/Restore-Prozesse laufen. Bei Installation des Plugins wird ein solcher Service-Nutzer bereits angelegt und hier hinterlegt.
-- **Vorlagenziel-Ausnahmen**: Kurse (Angabe per kommagetrennter IDs), die nicht von den Vorlagenkursen überschrieben werden dürfen.
+## Usage
 
-## Nutzung
+- Navigate to a course, you want to apply a course template on
+- Open the "Template Wizard overview" via the secondary menu
+- Select a course template you want to use
+- (Optional) Add a course image and a description to the target course
+- Apply the template
 
-- Lehrkräfte und Kursersteller*innen sehen verfügbare Vorlagenkurse und können diese mit wenigen Klicks zum Überschreiben von bestehenden Kursen nutzen.
+## Rights
 
-## Rechte
+This plugin defines the following right:
 
-Dieses Plugin definiert folgende Rechte:
+| Name                             | Description                                                             | Default role                   |
+|----------------------------------|-------------------------------------------------------------------------|--------------------------------|
+| `local/coursetemplatewizard:use` | Allows the user to use course templates to overwrite existing courses   | Course creator, editingteacher |
 
-| Name des Rechts                                                | Beschreibung                                                                | Standardrolle             |
-|----------------------------------------------------------------|-----------------------------------------------------------------------------|---------------------------|
-| `local/coursetemplatewizard:use`                                | Recht zum Nutzen der Vorlagenkurse zum Überschreiben von bestehenden Kursen | Manager, Kursersteller*in |
+## License
 
-## Lizenz
+2026 oncampus GmbH support@oncampus.de
 
-Dieses Plugin ist lizensiert unter [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-## Credits
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-Autor: Jordan Krause ([jordan.krause@oncampus.de](mailto:jordan.krause@oncampus.de))
-Inspired by / thanks to: oncampus GmbH, Laurenz Schindler
+You should have received a copy of the GNU General Public License along with
+this program. If not, see https://www.gnu.org/licenses/.
