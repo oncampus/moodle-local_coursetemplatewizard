@@ -38,9 +38,9 @@ Before using the plugin, the following settings must be set:
 
 This plugin defines the following right:
 
-| Name                             | Description                                                             | Default role                   |
-|----------------------------------|-------------------------------------------------------------------------|--------------------------------|
-| `local/coursetemplatewizard:use` | Allows the user to use course templates to overwrite existing courses   | Course creator, editingteacher |
+| Name                             | Description                                                             | Default role            |
+|----------------------------------|-------------------------------------------------------------------------|-------------------------|
+| `local/coursetemplatewizard:use` | Allows the user to use course templates to overwrite existing courses   | Course creator, Teacher |
 
 ## License
 
