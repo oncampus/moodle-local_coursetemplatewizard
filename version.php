@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_coursetemplatewizard';
-$plugin->release   = '1.3.0';
-$plugin->version   = 2026012000;
-$plugin->requires  = 2024100700;
+$plugin->release   = '5.2.0';
+$plugin->version   = 2026042000;
+$plugin->requires  = 2026042000;
 $plugin->maturity  = MATURITY_STABLE;
