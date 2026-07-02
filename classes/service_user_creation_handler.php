@@ -104,6 +104,11 @@ class service_user_creation_handler {
      */
     private function create_service_user_role_capabilities(int $roleid, int $systemcontextid): void {
         assign_capability('moodle/backup:backupcourse', CAP_ALLOW, $roleid, $systemcontextid);
+        assign_capability('moodle/backup:backupsection', CAP_ALLOW, $roleid, $systemcontextid);
+        assign_capability('moodle/backup:backuptargetimport', CAP_ALLOW, $roleid, $systemcontextid);
+        assign_capability('moodle/backup:configure', CAP_ALLOW, $roleid, $systemcontextid);
         assign_capability('moodle/restore:restorecourse', CAP_ALLOW, $roleid, $systemcontextid);
+        assign_capability('moodle/question:add', CAP_ALLOW, $roleid, $systemcontextid);
+        assign_capability('moodle/question:managecategory', CAP_ALLOW, $roleid, $systemcontextid);
     }
 }
