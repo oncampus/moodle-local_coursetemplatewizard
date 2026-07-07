@@ -207,6 +207,13 @@ class template_utilization_manager {
         $asynctask->execute();
         $bc->destroy();
 
+        // Remove the service user enrolment that the restore added to the target course.
+        foreach (enrol_get_instances($targetcourseid, false) as $instance) {
+            if ($instance->enrol === 'manual') {
+                enrol_get_plugin('manual')->unenrol_user($instance, $serviceuserid);
+            }
+        }
+
         // 3) Restore custom field data for the target course.
         if (!empty($coursecustomfielddata)) {
             $this->copy_course_customfield_data_into_course($targetcourseid, $coursecustomfielddata);
