@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package     local_coursetemplatewizard
  * @category    admin
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -53,10 +53,10 @@ function xmldb_local_coursetemplatewizard_uninstall(): bool {
         delete_role($templatewizardserviceuserrole->id);
     }
 
-    // Falls ihr eigene Tabellen habt, könnt ihr sie hier per xmldb definieren
-    // und über install.xml verwalten – dann braucht es kein manuelles DROP.
-    // Wenn es legacy-Tabellen 'ocbsbcoursecreation_type' / 'ocbsbcoursecreation_value' gab,
-    // sollten diese über XMLDB (install.xml) und upgrade/uninstall geregelt werden.
+    // If you have your own tables, you can define them here via xmldb.
+    // and manage them via install.xml - then no manual DROP is needed.
+    // If legacy tables 'ocbsbcoursecreation_type' / 'ocbsbcoursecreation_value' exist,
+    // they should be managed via XMLDB (install.xml) and upgrade/uninstall.
 
     return true;
 }

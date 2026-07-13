@@ -14,18 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace local_coursetemplatewizard\privacy;
+
+use core_privacy\local\metadata\null_provider;
+
 /**
- * Plugin version and other meta-data are defined here.
- *
+ * Privacy metadata provider.
  * @package     local_coursetemplatewizard
- * @copyright   2021 Laurenz Schindler <Laurenz.Schindler@oncampus.de>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2026 oncampus GmbH <support@oncampus.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'local_coursetemplatewizard';
-$plugin->release   = '5.2.0';
-$plugin->version   = 2026042001;
-$plugin->requires  = 2026042000;
-$plugin->maturity  = MATURITY_STABLE;
+class provider implements null_provider {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}

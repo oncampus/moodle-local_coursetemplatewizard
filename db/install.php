@@ -19,13 +19,13 @@ use local_coursetemplatewizard\service_user_creation_handler;
 /**
  * Install hook: creates a dedicated service user and role for handling backup and restore functionality.
  *
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @category    admin
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @return void
  * @throws dml_exception
  * @throws moodle_exception
- * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package    local_coursetemplatewizard
- * @category   admin
- * @copyright   2025 Oncampus GmbH
  */
 function xmldb_local_coursetemplatewizard_install(): void {
     $serviceusercreationhandler = new service_user_creation_handler();

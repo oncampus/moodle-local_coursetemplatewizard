@@ -17,9 +17,9 @@
 /**
  * Handle copy form: pick target course and apply template.
  *
- * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use core\output\notification;
@@ -63,7 +63,7 @@ if (!empty($templatecoursecategoryid) && ctype_digit((string)$templatecoursecate
     }
 }
 if (!$allowedcat) {
-    throw new \moodle_exception(
+    throw new moodle_exception(
         'error',
         'local_coursetemplatewizard',
         '',
@@ -78,7 +78,7 @@ $urlparams = [
 ];
 $url = new moodle_url('/local/coursetemplatewizard/handle_copy_form.php', $urlparams);
 
-// Seite.
+// Page.
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_context($systemcontext);
@@ -129,7 +129,8 @@ if ($mdata = $mform->get_data()) {
         }
     }
 
-    $SESSION->coursetemplatewizardformdata = $mdata;
+    $cache = cache::make('local_coursetemplatewizard', 'formdata');
+    $cache->set('formdata', $mdata);
 
     redirect(
         new moodle_url(

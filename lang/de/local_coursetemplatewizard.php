@@ -18,7 +18,7 @@
  * Plugin strings are defined here.
  *
  * @package     local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @category    string
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -54,6 +54,7 @@ $string['info_no_courses'] = 'Es wurde kein Kurs in der ausgewählten Kursvorlag
 $string['missingfullname'] = 'Bitte geben Sie einen vollständigen Kursnamen ein.';
 $string['missingshortname'] = 'Bitte geben Sie einen kurzen Kursnamen ein.';
 $string['pluginname'] = 'Vorlagenkurs-Assistent';
+$string['privacy:metadata'] = 'Der Vorlagenkurs-Assistent ermöglicht lediglich einen einfachen Weg standartisierte Kurse zu erstellen und speichert keine personenbezogen Daten für diesen Prozess.';
 $string['select_target_course'] = 'Zielkurs';
 $string['settings:templatetargetcourseexceptions'] = 'Vorlagenziel-Ausnahmen';
 $string['settings:templatetargetcourseexceptions_desc'] = 'Kommagetrennte Id\'s von Kursen, die nicht durch eine Kursvorlage überschrieben werden können.';

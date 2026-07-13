@@ -17,10 +17,10 @@
 /**
  * Local plugin library callbacks.
  *
- * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
- * @category   navigation
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
+ * @category    navigation
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**

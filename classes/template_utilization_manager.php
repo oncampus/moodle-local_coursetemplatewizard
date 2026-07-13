@@ -25,6 +25,7 @@ use core\task\asynchronous_copy_task;
 use ddl_exception;
 use dml_exception;
 use moodle_exception;
+use moodle_url;
 use restore_controller;
 use restore_controller_exception;
 use restore_dbops;
@@ -34,7 +35,7 @@ use stdClass;
  * Manager class for handling course template copy logic.
  *
  * @package     local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class template_utilization_manager {
@@ -62,7 +63,7 @@ class template_utilization_manager {
     public function transfer_summary_from_form_to_course(object $formdata, int $courseid, bool|course $targetcoursecontext): void {
         global $CFG;
         if (!empty($formdata->summary_editor['text'])) {
-            // Editorverarbeitung mit Files.
+            // Editor processing with files.
             $editoroptions = [
                     'maxfiles' => EDITOR_UNLIMITED_FILES,
                     'maxbytes' => $CFG->maxbytes,
@@ -96,7 +97,7 @@ class template_utilization_manager {
         if (empty($formdata->hasoverview)) {
             $fs->delete_area_files($targetcoursecontext->id, 'course', 'overviewfiles', 0);
         } else {
-            // Es wurde ein Bild gewählt -> Draft nach overviewfiles speichern (wie im Kursformular).
+            // An image was selected -> Save draft to overviewfiles (as shown in the course form).
             $fileoptions = [
                     'subdirs' => 0,
                     'maxfiles' => 1,
@@ -298,7 +299,7 @@ class template_utilization_manager {
         global $DB;
         $now = time();
         $targetctxid = context_course::instance($targetcourseid)->id;
-        // Ziel-Schema ermitteln (für kompatibles Insert/Update).
+        // Determine the target schema (for compatible INSERT/UPDATE).
         $cols = $DB->get_columns('customfield_data');
         $hascontextid = isset($cols['contextid']);
         $hasvalue = isset($cols['value']);
@@ -309,8 +310,8 @@ class template_utilization_manager {
         $haschar = isset($cols['charvalue']);
         $hastext = isset($cols['textvalue']);
         foreach ($coursecustomfielddata as $record) {
-            // Rohwert für legacy 'value' IMMER aus der QUELLE ableiten – unabhängig vom Ziel-Schema.
-            // Fallback-Reihenfolge deckt beide Welten ab (typisierte Spalten und legacy 'value').
+            // ALWAYS derive the raw value for legacy ‘value’ from the SOURCE—regardless of the target schema.
+            // The fallback order covers both scenarios (typed columns and legacy ‘value’).
             $raw = '';
             foreach (['textvalue', 'charvalue', 'shortcharvalue', 'intvalue', 'decvalue', 'value'] as $prop) {
                 if (property_exists($record, $prop) && $record->$prop !== null && $record->$prop !== '') {
@@ -319,13 +320,13 @@ class template_utilization_manager {
                 }
             }
 
-            // Ziel-Datensatz vorhanden?
+            // Is the target dataset available?
             $existing = $DB->get_record('customfield_data', [
                     'fieldid' => $record->fieldid,
                     'instanceid' => $targetcourseid,
             ]);
 
-            // Payload dynamisch je nach existierenden Spalten aufbauen.
+            // Build the payload dynamically based on the existing columns.
             $payload = (object) [
                     'fieldid' => (int) $record->fieldid,
                     'instanceid' => (int) $targetcourseid,
@@ -338,7 +339,7 @@ class template_utilization_manager {
                 $payload->value = $raw;
             }
             if ($hasvalueformat) {
-                // Falls Quelle kein valueformat hat, Standard 0 (FORMAT_MOODLE).
+                // If the source does not have a valueformat, the default is 0 (FORMAT_MOODLE).
                 $payload->valueformat = (int) ($record->valueformat ?? 0);
             }
             if ($hasint) {
@@ -351,7 +352,7 @@ class template_utilization_manager {
                 $payload->shortcharvalue = $record->shortcharvalue ?? null;
             }
             if ($haschar) {
-                // Bei char-Feldern lieber leerer String statt null.
+                // For char-fields, use an empty string instead of null.
                 $payload->charvalue = $record->charvalue ?? '';
             }
             if ($hastext) {
@@ -416,7 +417,7 @@ class template_utilization_manager {
      */
     private function get_course_customfields_data(int $courseid): ?array {
         global $DB;
-        // Tabellen vorhanden?
+        // Are there any tables?
         $mgr = $DB->get_manager();
         foreach (['customfield_field', 'customfield_category', 'customfield_data'] as $t) {
             if (!$mgr->table_exists($t)) {
@@ -424,13 +425,13 @@ class template_utilization_manager {
             }
         }
 
-        // Relevante Felder der Course-Area laden.
+        // Load relevant fields from the course area.
         $fields = $this->get_course_area_customfields();
         if (empty($fields)) {
             return null;
         }
 
-        // Quelldaten laden.
+        // Load source data.
         $coursecustomfielddata = $this->get_customfield_data_from($fields, $courseid);
         if (empty($coursecustomfielddata)) {
             return null;
@@ -448,12 +449,12 @@ class template_utilization_manager {
         $coursecopydata = new stdClass();
         $coursecopydata->keptroles = [];
         $coursecopydata->userdata = false;
-        // Startdate darf nicht 0 sein (UI/Tasks erwarten eine Epoche) – fallback: jetzt.
+        // The start date cannot be 0 (UI/Tasks expect an epoch) – fallback: now.
         $coursecopydata->startdate =
                 isset($targetcourse->startdate) && $targetcourse->startdate > 0 ? $targetcourse->startdate : time();
-        // Enddate darf NULL nicht sein – 0 bedeutet „kein Kursende“.
+        // The end date cannot be NULL – 0 means “no end date”.
         $coursecopydata->enddate = !empty($targetcourse->enddate) ? (int) $targetcourse->enddate : 0;
-        // Sichtbarkeit mitgeben (einige Tasks übernehmen das Feld direkt).
+        // Set visibility (some tasks populate this field automatically).
         $coursecopydata->id = $targetcourse->id;
         $coursecopydata->fullname = $targetcourse->fullname;
         $coursecopydata->shortname = $targetcourse->shortname;
@@ -475,7 +476,7 @@ class template_utilization_manager {
         global $PAGE;
         $context = context_course::instance($templateid);
         $courseurl = course_get_url($templateid);
-        $restoreurl = new \moodle_url('/backup/restorefile.php', ['contextid' => $targetcoursecontext->id]);
+        $restoreurl = new moodle_url('/backup/restorefile.php', ['contextid' => $targetcoursecontext->id]);
         echo $PAGE->get_renderer('core', 'backup')->render_from_template('core/async_backup_status', [
                 'backupid' => $restoreid,
                 'contextid' => $context->id,

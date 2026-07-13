@@ -17,9 +17,9 @@
 /**
  * creates special access for users
  *
- * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

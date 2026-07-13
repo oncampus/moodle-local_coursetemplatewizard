@@ -18,7 +18,7 @@
  * Plugin strings are defined here.
  *
  * @package     local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @category    string
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -54,6 +54,7 @@ $string['info_no_courses'] = 'No course found in the selected templates category
 $string['missingfullname'] = 'Please enter a full course name.';
 $string['missingshortname'] = 'Please enter a short course name.';
 $string['pluginname'] = 'Course Template Wizard';
+$string['privacy:metadata'] = 'The Course Template Wizard only provides a simplified way to create standardized courses and does not store any personal data in the process.';
 $string['select_target_course'] = 'Target course';
 $string['settings:templatetargetcourseexceptions'] = 'Template target course exceptions';
 $string['settings:templatetargetcourseexceptions_desc'] = 'Comma-separated id\'s from courses, which can\'t be overwritten by a course template.';

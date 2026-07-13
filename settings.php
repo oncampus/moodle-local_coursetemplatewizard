@@ -17,15 +17,15 @@
 /**
  * Plugin administration settings.
  *
- * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
- * @category   admin
- * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
+ * @category    admin
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Nur Haupt-Admin darf Settings sehen.
+// Only admin is allowed to view the settings.
 if (!$hassiteconfig) {
     return;
 }
@@ -33,7 +33,7 @@ if (!$hassiteconfig) {
 $component = 'local_coursetemplatewizard';
 $settings  = new admin_settingpage($component, get_string('pluginname', $component));
 
-// Kategorien-Auswahl: existierenden Kursbereich wählen (ID-basiert, voller Pfad).
+// Category-selection: choose existing course-category (ID-based, complete path).
 $catoptions = [];
 $catlist = core_course_category::make_categories_list();
 foreach ($catlist as $id => $path) {
@@ -64,5 +64,5 @@ $settings->add(new admin_setting_configtext(
     PARAM_SEQUENCE
 ));
 
-// Seite einhängen.
+// Add settings-page.
 $ADMIN->add('localplugins', $settings);

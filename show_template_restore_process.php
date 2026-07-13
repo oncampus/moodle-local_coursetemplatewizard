@@ -17,9 +17,9 @@
 /**
  * Handle copy form: pick target course and apply template.
  *
- * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_coursetemplatewizard
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use core\output\notification;
@@ -47,7 +47,9 @@ if (!has_capability('local/coursetemplatewizard:use', $targetcoursecontext)) {
 }
 
 // Redirecting to originating form page, if no form data has been stored.
-if (empty($SESSION->coursetemplatewizardformdata)) {
+$cache = cache::make('local_coursetemplatewizard', 'formdata');
+$mdata = $cache->get('formdata');
+if (empty($mdata)) {
     redirect(
         new moodle_url('/local/coursetemplatewizard/handle_copy_form.php', [
             'templateid' => $templateid,
@@ -56,9 +58,7 @@ if (empty($SESSION->coursetemplatewizardformdata)) {
         get_string('template_restore_page_no_data', 'local_coursetemplatewizard')
     );
 }
-
-$mdata = $SESSION->coursetemplatewizardformdata;
-unset($SESSION->coursetemplatewizardformdata);
+$cache->delete('formdata');
 
 $urlparams = [
         'templateid' => $templateid,
@@ -78,7 +78,7 @@ $PAGE->set_title(get_string('template_restore_page_title', 'local_coursetemplate
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('template_restore_page_title', 'local_coursetemplatewizard'));
 
-// Kopiervorgang ausführen (als Admin, aber QUELLE strikt auf erlaubte Kategorie begrenzt).
+// Perform the copy operation (as an administrator, but strictly limit the SOURCE to the permitted category).
 $templateutilizationmanager = new template_utilization_manager();
 $templateutilizationmanager->replace_course_with_template_and_render_progress($targetcoursecontext, $targetcourseid, $templateid);
 $templateutilizationmanager->transfer_picture_from_form_to_course($mdata, $targetcoursecontext);

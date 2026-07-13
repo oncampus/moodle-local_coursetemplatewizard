@@ -18,7 +18,7 @@
  * copy form
  *
  * @package    local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -71,7 +71,7 @@ class template_utilization_form extends \moodleform {
         $mform->addElement('hidden', 'targetcourseid', $targetcourse->id);
         $mform->setType('targetcourseid', PARAM_INT);
 
-        // Kursbild.
+        // Course picture.
         $summaryfields = 'summary_editor';
         if ($overviewfilesoptions = course_overviewfiles_options($templatecourse)) {
             $mform->addElement(
@@ -89,14 +89,14 @@ class template_utilization_form extends \moodleform {
             $summaryfields .= ',overviewfiles_filemanager';
         }
 
-        // Kursbeschreibung.
+        // Course description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
         $mform->setExpanded('descriptionhdr');
         $mform->addElement('editor', 'summary_editor', get_string('coursesummary'), null);
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
 
-        // Warnhinweis (rot hervorgehoben).
+        // Warning (highlighted in red).
         $mform->addElement(
             'html',
             '<div class="alert alert-danger" role="alert" style="margin-top:12px;">' .

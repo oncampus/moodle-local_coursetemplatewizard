@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/user/lib.php');
  * Class for handling the creation of a service user and their required role and capabilities.
  *
  * @package     local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class service_user_creation_handler {

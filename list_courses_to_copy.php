@@ -18,7 +18,7 @@
  * List courses to copy (course template overview)
  *
  * @package     local_coursetemplatewizard
- * @copyright   2025 Oncampus GmbH
+ * @copyright   2025 oncampus GmbH <support@oncampus.de>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @var $PAGE
  * @var $OUTPUT
