@@ -50,8 +50,7 @@
                 <th class="th-sm col-2">{{#str}} table_head_coursename, local_coursetemplatewizard {{/str}}</th>
                 <th class="th-sm col-3">{{#str}} table_head_courseimg, local_coursetemplatewizard {{/str}}</th>
                 <th class="th-sm col-4">{{#str}} table_head_coursetext, local_coursetemplatewizard {{/str}}</th>
-                <th class="th-sm col-2">
-                </th>
+                <th class="th-sm col-2">{{#str}} table_head_courseselection, local_coursetemplatewizard {{/str}}</th>
             </tr>
             </thead>
             <tbody>
@@ -59,7 +58,7 @@
                 {{{out}}}
                 <tr class="table-body-courlist">
                     <td class="col-2 align-middle">
-                        <a href="{{course_url}}" target="_blank" rel="noopener noreferrer">{{{fullname}}}</a>
+                        <a class="d-block" href="{{course_url}}" target="_blank" rel="noopener noreferrer" tabindex="0">{{{fullname}}}</a>
                     </td>
                     <td class="col-3 align-middle">
                         <div class="zoomable-image">

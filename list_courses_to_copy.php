@@ -94,7 +94,7 @@ foreach ($coursetemplates as $course) {
 
     $courseimage = html_writer::img(
         course_summary_exporter::get_course_image($course),
-        "",
+        get_string('previewimage', 'local_coursetemplatewizard') . ': ' . strip_tags(format_string($course->fullname)),
         ["width" => "100%", 'style' => "max-width: 350px;"]
     );
     // Trimming summary for course description.
